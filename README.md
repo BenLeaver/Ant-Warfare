@@ -1,4 +1,4 @@
-# Ant Warfare
+# 🐜 Ant Warfare 
 
 *A real-time strategy game where players control ant colonies and compete for survival.*
 
@@ -65,4 +65,4 @@ Assets/
 ```
 
 ## How to Play
-(Instructions on how to play will be added here).
+Download and open the [Windows Build](https://github.com/BenLeaver/Ant-Warfare/tree/main/Windows%20Builds/0.10.3) folder, and run the file Ant Warfare.exe
