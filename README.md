@@ -8,7 +8,12 @@
 - Features both **singleplayer** and **multiplayer** modes.
 
 ## Screenshots / GIFs
-(Screenshots will be added here).
+
+<p align="center">
+  <img src="Media/Gameplay%20GIF.gif" alt="Gameplay GIF" width="1000"/>
+    <img src="Media/AW%20Screenshot%201.png" alt="Markers Screenshot" width="500"/>
+  <img src="Media/AW%20Screenshot%202.png" alt="Upgrades Screenshot" width="500"/>
+</p>
 
 ## Features
 
