@@ -1,0 +1,95 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &838271910960409950
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 838271910960409948}
+  - component: {fileID: 838271910960409951}
+  - component: {fileID: 1534956279189112771}
+  m_Layer: 0
+  m_Name: SGameManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &838271910960409948
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 838271910960409950}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &838271910960409951
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 838271910960409950}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 755ac5cf8462c32499d8b287defd46cc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  blackAntQueenPrefab: {fileID: 8564992431610467721, guid: 591fcb9c99c5d024bbc49b28b86ef7aa, type: 3}
+  fireAntQueenPrefab: {fileID: 8564992431610467721, guid: 6b39f2524db20cc4a9743745a2259e5a, type: 3}
+  enemy1: 0
+  enemy2: 0
+  enemy3: 0
+  numberTeams: 0
+  enemy1Dropdown: {fileID: 0}
+  enemy2Dropdown: {fileID: 0}
+  enemy3Dropdown: {fileID: 0}
+  dropdownSpecies:
+  - Black
+  - Fire
+  gameScene: Simple Arena
+  playerTeams: 00000000000000000000000000000000
+  playerSpecies:
+  - Black
+  - Black
+  - Black
+  - Fire
+  player: {fileID: 0}
+  playerBlackPrefab: {fileID: 8888923500336714826, guid: fee6559b720e1914d98318b25dc08b1c, type: 3}
+  playerFirePrefab: {fileID: 8888923500336714826, guid: ba0ed64185fc1ed4180929a76c3b2901, type: 3}
+  nestSpawns:
+  - {x: 0, y: 50, z: 0}
+  - {x: 50, y: 0, z: 0}
+  - {x: 0, y: -50, z: 0}
+  - {x: -50, y: 0, z: 0}
+  queenSpawns:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  BlackUI: {fileID: 5366978905723964851, guid: 51c8ca6992725f641bdb379fc9bc45b4, type: 3}
+  FireUI: {fileID: 5366978905723964851, guid: d3a0f35d103b3f6418d77d5f673eaf3f, type: 3}
+  tutorialPart: 0
+  tutorialEnemyPrefab: {fileID: 8200308034547834947, guid: 5f4edf750a8bc1a43bcfb888f26126e4, type: 3}
+--- !u!114 &1534956279189112771
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 838271910960409950}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 623ca98477f39bd479adab41e925c170, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

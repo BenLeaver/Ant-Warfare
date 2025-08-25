@@ -1,0 +1,69 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!78 &1
+TagManager:
+  serializedVersion: 2
+  tags:
+  - Ant
+  - Food
+  - Environment
+  - Marker
+  - Bug
+  layers:
+  - Default
+  - TransparentFX
+  - Ignore Raycast
+  - 
+  - Water
+  - UI
+  - Ground
+  - PostProcessing
+  - Player
+  - DefaultAnts
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  m_SortingLayers:
+  - name: Ground
+    uniqueID: 2892785645
+    locked: 0
+  - name: Water
+    uniqueID: 3509943789
+    locked: 0
+  - name: ParticleEffects
+    uniqueID: 3760401365
+    locked: 0
+  - name: LowEnvironment
+    uniqueID: 3959352217
+    locked: 0
+  - name: Food
+    uniqueID: 728960389
+    locked: 0
+  - name: Markers
+    uniqueID: 2017438043
+    locked: 0
+  - name: Default
+    uniqueID: 0
+    locked: 0
+  - name: Obstacle
+    uniqueID: 623957139
+    locked: 0
