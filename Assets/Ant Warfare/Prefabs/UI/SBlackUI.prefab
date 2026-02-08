@@ -7793,6 +7793,7 @@ MonoBehaviour:
   colonySizeText: {fileID: 3557961957243839906}
   helpUI: {fileID: 3188426764051449182}
   upgradeUI: {fileID: 5656935408752724670}
+  mainCanvas: {fileID: 3000619346157902711}
   upgradeTier: 0
   upgrades:
   - {fileID: 5760737209976659166}
@@ -7805,7 +7806,7 @@ MonoBehaviour:
   - {fileID: 1736111522466611578}
   - {fileID: 4599113651826551404}
   - {fileID: 6615233841164179237}
-  lastLifePostProcessing: {fileID: 0}
+  lastLifeVolume: {fileID: 0}
   inTutorial: 0
   markerAmountTexts:
   - {fileID: 5744104541369037279}

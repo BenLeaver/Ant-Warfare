@@ -10,7 +10,6 @@ using Unity.Netcode;
 public class MUpgradeManager : MonoBehaviour
 {
     public GameObject multiplayerUI;
-    private GameObject[] Ants;
     private int thisTeam;
 
     /// <summary>
@@ -19,7 +18,6 @@ public class MUpgradeManager : MonoBehaviour
     /// <param name="name">The name of the upgrade to apply.</param>
     public void ApplyUpgrade(string name)
     {
-        Ants = GameObject.FindGameObjectsWithTag("Ant");
         thisTeam = multiplayerUI.GetComponent<Multiplayer_UI>().playerTeam;
         
         if (GameObject.Find("ProjectSceneManager"))

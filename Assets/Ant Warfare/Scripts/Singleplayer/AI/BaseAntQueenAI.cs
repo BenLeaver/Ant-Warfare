@@ -52,6 +52,22 @@ public class BaseAntQueenAI : MonoBehaviour
     public bool aphidFarming = false;
     public bool lastStand = false;
 
+    private void OnEnable()
+    {
+        if (UnitManager.Instance != null)
+        {
+            UnitManager.Instance.RegisterUnit(gameObject);
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (UnitManager.Instance != null)
+        {
+            UnitManager.Instance.UnregisterUnit(gameObject);
+        }
+    }
+
     /// <summary>
     /// Adds an upgrade to a list of selected upgrades, used to ensure the upgrades apply to 
     /// newly spawned ants.
@@ -74,7 +90,6 @@ public class BaseAntQueenAI : MonoBehaviour
 
         if (!playerOnTeam)
         {
-            Ants = GameObject.FindGameObjectsWithTag("Ant");
             Brain();
         }
         else
@@ -396,7 +411,7 @@ public class BaseAntQueenAI : MonoBehaviour
         command = "attack";
         queenToAttack = null;
         List<GameObject> enemyQueens = new List<GameObject>();
-        foreach (GameObject a in Ants)
+        foreach (GameObject a in UnitManager.Instance.Ants)
         {
             if (a.GetComponent<BaseAntQueenAI>() && a != this.gameObject)
             {
@@ -487,7 +502,7 @@ public class BaseAntQueenAI : MonoBehaviour
 
     private bool CheckEnemiesInNest()
     {
-        foreach (GameObject a in Ants)
+        foreach (GameObject a in UnitManager.Instance.AllUnits)
         {
             if (a.GetComponent<SHealth>().team != healthScript.team)
             {

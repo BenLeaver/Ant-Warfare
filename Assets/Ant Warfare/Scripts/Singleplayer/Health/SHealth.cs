@@ -25,22 +25,27 @@ public class SHealth : MonoBehaviour
         if(team == 1)
         {
             // Red
-            fill.color = new Color32(209, 55, 44, 255);
+            fill.color = new Color32(209, 55, 44, 155);
         }
-        if (team == 2)
+        else if (team == 2)
         {
             // Green
-            fill.color = new Color32(59, 219, 60, 255);
+            fill.color = new Color32(59, 219, 60, 155);
         }
-        if (team == 3)
+        else if (team == 3)
         {
             // Blue
-            fill.color = new Color32(59, 144, 219, 255);
+            fill.color = new Color32(59, 144, 219, 155);
         }
-        if (team == 4)
+        else if (team == 4)
         {
             // Purple
-            fill.color = new Color32(143, 59, 219, 255);
+            fill.color = new Color32(143, 59, 219, 155);
+        }
+        else if (team == 5)
+        {
+            // Grey
+            fill.color = new Color32(128, 128, 128, 155);
         }
     }
 
@@ -60,6 +65,10 @@ public class SHealth : MonoBehaviour
         if (damage > 0)
         {
             gameObject.GetComponent<ObjectAudioManager>().Play("Attack");
+            if (GetComponent<BeetleStateManager>())
+            {
+                gameObject.GetComponent<BeetleStateManager>().DamageTaken();
+            }
         }
         
         if (health <= 0)
@@ -77,6 +86,10 @@ public class SHealth : MonoBehaviour
             else if (GetComponent<BaseAntQueenAI>())
             {
                 gameObject.GetComponent<BaseAntQueenAI>().Death();
+            }
+            else if (GetComponent<BugStateManager>())
+            {
+                gameObject.GetComponent<BugStateManager>().Death();
             }
             else if (GetComponent<AntTutorialAI>())
             {

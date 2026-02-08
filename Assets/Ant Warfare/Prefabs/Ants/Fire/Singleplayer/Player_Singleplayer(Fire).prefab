@@ -240,7 +240,7 @@ Canvas:
   m_VertexColorAlwaysGammaSpace: 0
   m_AdditionalShaderChannelsFlag: 0
   m_UpdateRectTransformForStandalone: 0
-  m_SortingLayerID: 0
+  m_SortingLayerID: -333774381
   m_SortingOrder: 0
   m_TargetDisplay: 0
 --- !u!114 &2771245328336901863
@@ -465,7 +465,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 195fc782e3c5ea24c95f5dc841a5957f, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -572,10 +572,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   species: Fire
+  inTutorial: 0
   moveSpeed: 5
   clockwise: 200
   healthScript: {fileID: 5168169206562734574}
   nestSpawn: {x: 0, y: 0, z: 0}
+  anim: {fileID: 1480485923741818967}
   playerCameraPrefab: {fileID: 8272454099664095240, guid: 298df97444122094a9c08b25a8f06370, type: 3}
   cam: {fileID: 0}
   mouth: {fileID: 4030995992750618952}
@@ -588,8 +590,6 @@ MonoBehaviour:
   foodCarried: {fileID: 0}
   queenRange: 5
   foodMult: 1
-  anim: {fileID: 1480485923741818967}
-  inTutorial: 0
 --- !u!95 &1480485923741818967
 Animator:
   serializedVersion: 5

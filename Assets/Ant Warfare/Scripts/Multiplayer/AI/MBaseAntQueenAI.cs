@@ -36,7 +36,6 @@ public class MBaseAntQueenAI : NetworkBehaviour
     public int totalWorkers = 0;
     public int colonySize = 0;
     public int maxColonySize = 50;
-    public GameObject[] Ants;
     private int strengthRanking = 1;
     public Vector3 attackLocation;
 
@@ -52,6 +51,22 @@ public class MBaseAntQueenAI : NetworkBehaviour
     public float lastHealTime = 0f;
     public bool aphidFarming = false;
     public bool lastStand = false;
+
+    private void OnEnable()
+    {
+        if (UnitManager.Instance != null)
+        {
+            UnitManager.Instance.RegisterUnit(gameObject);
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (UnitManager.Instance != null)
+        {
+            UnitManager.Instance.UnregisterUnit(gameObject);
+        }
+    }
 
     /// <summary>
     /// Adds an upgrade to a list of selected upgrades, used to ensure the upgrades apply to 
@@ -77,7 +92,6 @@ public class MBaseAntQueenAI : NetworkBehaviour
 
         if (!playerOnTeam)
         {
-            Ants = GameObject.FindGameObjectsWithTag("Ant");
             Brain();
         }
         else
@@ -346,7 +360,7 @@ public class MBaseAntQueenAI : NetworkBehaviour
                 //Will store the ranking of the colony relative to enemy colonies
                 // - so better judgement can be made about whether to attack
                 strengthRanking = 1; 
-                foreach (GameObject a in Ants)
+                foreach (GameObject a in UnitManager.Instance.Ants)
                 {
                     if (a.GetComponent<MBaseAntQueenAI>())
                     {
@@ -371,7 +385,6 @@ public class MBaseAntQueenAI : NetworkBehaviour
                 {
                     command = "attack";
                 }
-
             }
             if (species != "Fire")
             {
@@ -390,7 +403,7 @@ public class MBaseAntQueenAI : NetworkBehaviour
                 int strongestEnemySoldiers = 0;
                 //int attackChance = 0; //will be used to determine if an attack should be carried out - will only happen when this colony is one of the stronger ones
                 strengthRanking = 1; //Will store the ranking of the colony relative to enemy colonies - so better judgement can be made about whether to attack
-                foreach (GameObject a in Ants)
+                foreach (GameObject a in UnitManager.Instance.Ants)
                 {
                     if (a.GetComponent<MBaseAntQueenAI>())
                     {
@@ -433,7 +446,7 @@ public class MBaseAntQueenAI : NetworkBehaviour
                 int strongestEnemySoldiers = 0;
                 //int attackChance = 0; //will be used to determine if an attack should be carried out - will only happen when this colony is one of the stronger ones
                 strengthRanking = 1; //Will store the ranking of the colony relative to enemy colonies - so better judgement can be made about whether to attack
-                foreach (GameObject a in Ants)
+                foreach (GameObject a in UnitManager.Instance.Ants)
                 {
                     if (a.GetComponent<MBaseAntQueenAI>())
                     {
@@ -483,7 +496,7 @@ public class MBaseAntQueenAI : NetworkBehaviour
 
     private bool CheckEnemiesInNest()
     {
-        foreach (GameObject a in Ants)
+        foreach (GameObject a in UnitManager.Instance.AllUnits)
         {
             if (a.GetComponent<MHealth>().team != healthScript.team)
             {

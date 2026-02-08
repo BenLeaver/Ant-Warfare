@@ -75,16 +75,25 @@ public class AntBaseAI : MonoBehaviour
         agent.updateUpAxis = false;
     }
 
-    // Start is called before the first frame update
-    void Start()
+    private void OnEnable()
     {
-        Ants = GameObject.FindGameObjectsWithTag("Ant");
+        if (UnitManager.Instance != null)
+        {
+            UnitManager.Instance.RegisterUnit(gameObject);
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (UnitManager.Instance != null)
+        {
+            UnitManager.Instance.UnregisterUnit(gameObject);
+        }
     }
 
     // Update is called once per frame
     void Update()
     {
-        transform.position = new Vector3(transform.position.x, transform.position.y, 0);
         
         //Queen might be dead, so need to check if it exists
         if (GameObject.Find(species + "AntQueen" + gameObject.GetComponent<SHealth>().team.ToString())) 
@@ -100,7 +109,6 @@ public class AntBaseAI : MonoBehaviour
                 friendlyPlayer = queenScript.player;
             }
 
-            Ants = GameObject.FindGameObjectsWithTag("Ant");
             attackTimer += Time.deltaTime;
 
             if (firstAid)
@@ -448,7 +456,8 @@ public class AntBaseAI : MonoBehaviour
     {
         float closestDistance = -1f;
         closestEnemy = null;
-        foreach (GameObject a in Ants)
+
+        foreach (GameObject a in UnitManager.Instance.AllUnits)
         {
             if (a.GetComponent<SHealth>().team != healthScript.team)
             {

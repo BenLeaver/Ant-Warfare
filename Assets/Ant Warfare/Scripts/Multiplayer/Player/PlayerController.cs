@@ -28,7 +28,6 @@ public class PlayerController : NetworkBehaviour
     public NetworkVariable<FixedString32Bytes> username = new NetworkVariable<FixedString32Bytes>
         (default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
     private GameObject projectSceneManager;
-    private GameObject[] Ants;
     private bool inGame = false;
     private bool spectating = false;
 
@@ -91,6 +90,22 @@ public class PlayerController : NetworkBehaviour
 
     }
 
+    private void OnEnable()
+    {
+        if (UnitManager.Instance != null)
+        {
+            UnitManager.Instance.RegisterUnit(gameObject);
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (UnitManager.Instance != null)
+        {
+            UnitManager.Instance.UnregisterUnit(gameObject);
+        }
+    }
+
     // Update is called once per frame
     void Update()
     {
@@ -103,7 +118,6 @@ public class PlayerController : NetworkBehaviour
             WriteUsername();
             if (inGame)
             {
-                Ants = GameObject.FindGameObjectsWithTag("Ant");
                 attackTimer += Time.deltaTime;
                 CheckEnemies();
 
@@ -309,7 +323,7 @@ public class PlayerController : NetworkBehaviour
     private void CheckEnemies()
     {
         float closestDistance = 0f;
-        foreach (GameObject a in Ants)
+        foreach (GameObject a in UnitManager.Instance.AllUnits)
         {
             if (a.GetComponent<MHealth>().team != playerTeam)
             {
@@ -613,8 +627,7 @@ public class PlayerController : NetworkBehaviour
         {
             return;
         }
-        Ants = GameObject.FindGameObjectsWithTag("Ant");
-        foreach (GameObject a in Ants)
+        foreach (GameObject a in UnitManager.Instance.Ants)
         {
             if(a.GetComponent<MHealth>().team == team)
             {

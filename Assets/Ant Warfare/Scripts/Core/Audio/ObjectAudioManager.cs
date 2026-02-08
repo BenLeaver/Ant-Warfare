@@ -5,7 +5,7 @@ using System;
 /// <summary>
 /// Manages audio playback for a specific GameObject.
 /// Unlike the global AudioManager, this component attaches 3D AudioSources
-/// so that sounds originate from the GameObject’s position in the scene.
+/// so that sounds originate from the GameObject's position in the scene.
 /// <summary>
 public class ObjectAudioManager : MonoBehaviour
 {

@@ -37,7 +37,6 @@ public class AntTutorialAI : MonoBehaviour
 
     [Header("Other")]
     public Transform mouth;
-    private GameObject[] Ants;
 
 
     void Awake()
@@ -47,17 +46,26 @@ public class AntTutorialAI : MonoBehaviour
         agent.updateUpAxis = false;
     }
 
-    // Start is called before the first frame update
-    void Start()
+    private void OnEnable()
     {
-        Ants = GameObject.FindGameObjectsWithTag("Ant");
+        if (UnitManager.Instance != null)
+        {
+            UnitManager.Instance.RegisterUnit(gameObject);
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (UnitManager.Instance != null)
+        {
+            UnitManager.Instance.UnregisterUnit(gameObject);
+        }
     }
 
     // Update is called once per frame
     void Update()
     {
         transform.position = new Vector3(transform.position.x, transform.position.y, 0);
-        Ants = GameObject.FindGameObjectsWithTag("Ant");
         attackTimer += Time.deltaTime;
         FindClosestEnemy();
         MovementDecision();
@@ -85,7 +93,7 @@ public class AntTutorialAI : MonoBehaviour
     {
         float closestDistance = -1f;
         closestEnemy = null;
-        foreach (GameObject a in Ants)
+        foreach (GameObject a in UnitManager.Instance.Ants)
         {
             if (a.GetComponent<SHealth>().team != healthScript.team)
             {

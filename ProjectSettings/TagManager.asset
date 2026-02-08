@@ -9,6 +9,7 @@ TagManager:
   - Environment
   - Marker
   - Bug
+  - PlayerCamera
   layers:
   - Default
   - TransparentFX
@@ -63,6 +64,9 @@ TagManager:
     locked: 0
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: HealthBars
+    uniqueID: 3961192915
     locked: 0
   - name: Obstacle
     uniqueID: 623957139

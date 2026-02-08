@@ -57,7 +57,6 @@ public class MAntBaseAI : NetworkBehaviour
 
     [Header("Other")]
     public Transform mouth;
-    private GameObject[] Ants;
     private GameObject queen;
     private MBaseAntQueenAI queenScript;
 
@@ -73,15 +72,25 @@ public class MAntBaseAI : NetworkBehaviour
         agent.updateUpAxis = false;
     }
 
-    void Start()
+    private void OnEnable()
     {
-        Ants = GameObject.FindGameObjectsWithTag("Ant");
+        if (UnitManager.Instance != null)
+        {
+            UnitManager.Instance.RegisterUnit(gameObject);
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (UnitManager.Instance != null)
+        {
+            UnitManager.Instance.UnregisterUnit(gameObject);
+        }
     }
 
     // Update is called once per frame
     void Update()
     {
-        transform.position = new Vector3(transform.position.x, transform.position.y, 0);
 
         //Queen might be dead, so need to check if it exists
         if (GameObject.Find("M" + species + "AntQueen" + gameObject.GetComponent<MHealth>().team.ToString())) 
@@ -93,7 +102,6 @@ public class MAntBaseAI : NetworkBehaviour
                 UpdateFortressBuff();
             }
         }
-        Ants = GameObject.FindGameObjectsWithTag("Ant");
         attackTimer += Time.deltaTime;
         if (IsServer)
         {
@@ -452,7 +460,7 @@ public class MAntBaseAI : NetworkBehaviour
     {
         float closestDistance = -1f;
         closestEnemy = null;
-        foreach (GameObject a in Ants)
+        foreach (GameObject a in UnitManager.Instance.AllUnits)
         {
             if (a.GetComponent<MHealth>().team != healthScript.team)
             {

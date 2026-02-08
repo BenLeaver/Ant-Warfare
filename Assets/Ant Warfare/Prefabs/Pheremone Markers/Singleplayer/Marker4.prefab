@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 408897715111941945}
   - component: {fileID: 1211429405928064744}
   - component: {fileID: 3593696170873468381}
+  - component: {fileID: 4849184180957822303}
   m_Layer: 0
   m_Name: Marker4
   m_TagString: Marker
@@ -76,7 +77,7 @@ SpriteRenderer:
   m_SortingLayerID: 2017438043
   m_SortingLayer: -1
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 720ae53e858e8e143acee6c2e5867f96, type: 3}
+  m_Sprite: {fileID: -1146463848, guid: 875cb98b9c539b14089df23fdbb4ae60, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -105,6 +106,28 @@ MonoBehaviour:
   affectSoldiers: 1
   affectFoodCarriers: 0
   isPathMarker: 0
+  team: 0
+--- !u!95 &4849184180957822303
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1614144195752745818}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: eeef004def4b3224fa4ed81f2e533159, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 1
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &3643676246448433097
 GameObject:
   m_ObjectHideFlags: 0
@@ -392,6 +415,54 @@ PrefabInstance:
     - target: {fileID: 5201313894881137831, guid: b78d9bf51f630a9439f1235b8c56c467, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6512048236302645849, guid: b78d9bf51f630a9439f1235b8c56c467, type: 3}
+      propertyPath: ShapeModule.radius.value
+      value: 0.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 6512048236302645849, guid: b78d9bf51f630a9439f1235b8c56c467, type: 3}
+      propertyPath: ShapeModule.radiusThickness
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6512048236302645849, guid: b78d9bf51f630a9439f1235b8c56c467, type: 3}
+      propertyPath: InitialModule.startSize.scalar
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6512048236302645849, guid: b78d9bf51f630a9439f1235b8c56c467, type: 3}
+      propertyPath: InitialModule.startSize.minScalar
+      value: 0.01
+      objectReference: {fileID: 0}
+    - target: {fileID: 6512048236302645849, guid: b78d9bf51f630a9439f1235b8c56c467, type: 3}
+      propertyPath: InitialModule.startColor.maxColor.b
+      value: 0.4117647
+      objectReference: {fileID: 0}
+    - target: {fileID: 6512048236302645849, guid: b78d9bf51f630a9439f1235b8c56c467, type: 3}
+      propertyPath: InitialModule.startColor.maxColor.g
+      value: 0.85882354
+      objectReference: {fileID: 0}
+    - target: {fileID: 6512048236302645849, guid: b78d9bf51f630a9439f1235b8c56c467, type: 3}
+      propertyPath: InitialModule.startColor.maxColor.r
+      value: 0.5686275
+      objectReference: {fileID: 0}
+    - target: {fileID: 6512048236302645849, guid: b78d9bf51f630a9439f1235b8c56c467, type: 3}
+      propertyPath: InitialModule.startColor.minColor.b
+      value: 0.3882353
+      objectReference: {fileID: 0}
+    - target: {fileID: 6512048236302645849, guid: b78d9bf51f630a9439f1235b8c56c467, type: 3}
+      propertyPath: InitialModule.startColor.minColor.g
+      value: 0.5647059
+      objectReference: {fileID: 0}
+    - target: {fileID: 6512048236302645849, guid: b78d9bf51f630a9439f1235b8c56c467, type: 3}
+      propertyPath: InitialModule.startColor.minColor.r
+      value: 0.13725491
+      objectReference: {fileID: 0}
+    - target: {fileID: 6512048236302645849, guid: b78d9bf51f630a9439f1235b8c56c467, type: 3}
+      propertyPath: EmissionModule.m_Bursts.Array.data[0].repeatInterval
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6512048236302645849, guid: b78d9bf51f630a9439f1235b8c56c467, type: 3}
+      propertyPath: EmissionModule.m_Bursts.Array.data[0].countCurve.scalar
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

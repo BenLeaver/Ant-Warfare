@@ -9,7 +9,6 @@ using UnityEngine.AI;
 /// </summary>
 public class Upgrader : NetworkBehaviour
 {
-    private GameObject[] Ants;
     private int thisTeam;
 
     /// <summary>
@@ -21,7 +20,6 @@ public class Upgrader : NetworkBehaviour
     public void SyncUpgradeRpc(int team, string name)
     {
         Debug.Log($"Sync Upgrade {team} {name}");
-        Ants = GameObject.FindGameObjectsWithTag("Ant");
         thisTeam = team;
 
         // Black Upgrades
@@ -76,7 +74,7 @@ public class Upgrader : NetworkBehaviour
 
     void MovementSpeed(float speedMult)
     {
-        foreach (GameObject a in Ants)
+        foreach (GameObject a in UnitManager.Instance.Ants)
         {
             if (a.GetComponent<MHealth>().team == thisTeam)
             {
@@ -95,7 +93,7 @@ public class Upgrader : NetworkBehaviour
     void StrongerSoldiers(float damageMult)
     {
 
-        foreach (GameObject a in Ants)
+        foreach (GameObject a in UnitManager.Instance.Ants)
         {
             if (a.GetComponent<MHealth>().team == thisTeam)
             {
@@ -113,7 +111,7 @@ public class Upgrader : NetworkBehaviour
 
     void LessFoodWaste(float foodMult)
     {
-        foreach (GameObject a in Ants)
+        foreach (GameObject a in UnitManager.Instance.Ants)
         {
             if (a.GetComponent<MHealth>().team == thisTeam)
             {
@@ -131,7 +129,7 @@ public class Upgrader : NetworkBehaviour
 
     void ColonyCapacity(int capacityIncrease)
     {
-        foreach (GameObject a in Ants)
+        foreach (GameObject a in UnitManager.Instance.Ants)
         {
             if (a.GetComponent<MBaseAntQueenAI>() && a.GetComponent<MHealth>().team == thisTeam)
             {
@@ -142,7 +140,7 @@ public class Upgrader : NetworkBehaviour
 
     void Fortress()
     {
-        foreach (GameObject a in Ants)
+        foreach (GameObject a in UnitManager.Instance.Ants)
         {
             if (a.GetComponent<MBaseAntQueenAI>() && a.GetComponent<MHealth>().team == thisTeam)
             {
@@ -153,7 +151,7 @@ public class Upgrader : NetworkBehaviour
 
     void FirstAid()
     {
-        foreach (GameObject a in Ants)
+        foreach (GameObject a in UnitManager.Instance.Ants)
         {
             if (a.GetComponent<MHealth>().team == thisTeam)
             {
@@ -170,7 +168,7 @@ public class Upgrader : NetworkBehaviour
 
     void LongStingers(float damageMult)
     {
-        foreach (GameObject a in Ants)
+        foreach (GameObject a in UnitManager.Instance.Ants)
         {
             if (a.GetComponent<MHealth>().team == thisTeam)
             {
@@ -190,7 +188,7 @@ public class Upgrader : NetworkBehaviour
 
     void AphidFarming()
     {
-        foreach (GameObject a in Ants)
+        foreach (GameObject a in UnitManager.Instance.Ants)
         {
             if (a.GetComponent<MBaseAntQueenAI>() && a.GetComponent<MHealth>().team == thisTeam)
             {
@@ -201,7 +199,7 @@ public class Upgrader : NetworkBehaviour
 
     void AggressiveWorkers(float speedMult, float damageMult)
     {
-        foreach (GameObject a in Ants)
+        foreach (GameObject a in UnitManager.Instance.Ants)
         {
             if (a.GetComponent<MHealth>().team == thisTeam)
             {
@@ -223,7 +221,7 @@ public class Upgrader : NetworkBehaviour
 
     void LastStand()
     {
-        foreach (GameObject a in Ants)
+        foreach (GameObject a in UnitManager.Instance.Ants)
         {
             if (a.GetComponent<MBaseAntQueenAI>() && a.GetComponent<MHealth>().team == thisTeam)
             {

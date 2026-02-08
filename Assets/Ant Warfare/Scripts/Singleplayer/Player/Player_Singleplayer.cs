@@ -25,7 +25,6 @@ public class Player_Singleplayer : MonoBehaviour
     public Camera cam;
 
     [Header("Attack")]
-    GameObject[] Ants;
     private GameObject closestEnemy;
     public Transform mouth;
     public float attackRange = 1f;
@@ -48,8 +47,23 @@ public class Player_Singleplayer : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        Ants = GameObject.FindGameObjectsWithTag("Ant");
         InitialiseCamera();
+    }
+
+    private void OnEnable()
+    {
+        if (UnitManager.Instance != null)
+        {
+            UnitManager.Instance.RegisterUnit(gameObject);
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (UnitManager.Instance != null)
+        {
+            UnitManager.Instance.UnregisterUnit(gameObject);
+        }
     }
 
     void InitialiseCamera()
@@ -62,7 +76,6 @@ public class Player_Singleplayer : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Ants = GameObject.FindGameObjectsWithTag("Ant");
         
         attackTimer += Time.deltaTime;
         CheckInput();
@@ -145,11 +158,11 @@ public class Player_Singleplayer : MonoBehaviour
                 FoodDrop();
             }
         }
-        if (Input.mouseScrollDelta.y == 1 && cam.orthographicSize > 10)
+        if (Input.mouseScrollDelta.y == 1 && cam.orthographicSize > 5)
         {
             cam.orthographicSize -= 1;
         }
-        else if (Input.mouseScrollDelta.y == -1 && cam.orthographicSize < 50)
+        else if (Input.mouseScrollDelta.y == -1 && cam.orthographicSize < 100)
         {
             cam.orthographicSize += 1;
         }
@@ -158,7 +171,7 @@ public class Player_Singleplayer : MonoBehaviour
     void CheckEnemies()
     {
         float closestDistance = 0f;
-        foreach (GameObject a in Ants)
+        foreach (GameObject a in UnitManager.Instance.AllUnits)
         {
             if (a.GetComponent<SHealth>().team != healthScript.team)
             {

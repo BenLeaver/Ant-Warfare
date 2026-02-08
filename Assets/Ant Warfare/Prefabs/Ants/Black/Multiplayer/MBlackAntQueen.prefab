@@ -298,7 +298,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 195fc782e3c5ea24c95f5dc841a5957f, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -415,7 +415,6 @@ MonoBehaviour:
   totalWorkers: 0
   colonySize: 0
   maxColonySize: 50
-  Ants: []
   attackLocation: {x: 0, y: 0, z: 0}
   healthScript: {fileID: 5408195117577038278}
   fortress: 0
@@ -541,7 +540,7 @@ Canvas:
   m_VertexColorAlwaysGammaSpace: 0
   m_AdditionalShaderChannelsFlag: 0
   m_UpdateRectTransformForStandalone: 0
-  m_SortingLayerID: 0
+  m_SortingLayerID: -333774381
   m_SortingOrder: 0
   m_TargetDisplay: 0
 --- !u!114 &8564992432049666967

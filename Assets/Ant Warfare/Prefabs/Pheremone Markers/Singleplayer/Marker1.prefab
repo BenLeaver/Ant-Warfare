@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 408897715111941945}
   - component: {fileID: 1211429405928064744}
   - component: {fileID: 3593696170873468381}
+  - component: {fileID: -8515235672393773440}
   m_Layer: 0
   m_Name: Marker1
   m_TagString: Marker
@@ -76,7 +77,7 @@ SpriteRenderer:
   m_SortingLayerID: 2017438043
   m_SortingLayer: -1
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 0e221f2fa8db1dd4c87a5dddfaafc467, type: 3}
+  m_Sprite: {fileID: -1216902995, guid: 27ae74d16869aa74985ff3b0243298a4, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -105,6 +106,28 @@ MonoBehaviour:
   affectSoldiers: 1
   affectFoodCarriers: 0
   isPathMarker: 0
+  team: 0
+--- !u!95 &-8515235672393773440
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1614144195752745818}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 6f37564500edfb5468843351ab2e06f0, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 1
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &3643676246448433097
 GameObject:
   m_ObjectHideFlags: 0
@@ -392,6 +415,50 @@ PrefabInstance:
     - target: {fileID: 5201313894881137831, guid: 3e7d393c1cd288d46b4e60d157d428dd, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6512048236302645849, guid: 3e7d393c1cd288d46b4e60d157d428dd, type: 3}
+      propertyPath: ShapeModule.radius.value
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6512048236302645849, guid: 3e7d393c1cd288d46b4e60d157d428dd, type: 3}
+      propertyPath: ShapeModule.radiusThickness
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6512048236302645849, guid: 3e7d393c1cd288d46b4e60d157d428dd, type: 3}
+      propertyPath: InitialModule.startSize.scalar
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6512048236302645849, guid: 3e7d393c1cd288d46b4e60d157d428dd, type: 3}
+      propertyPath: InitialModule.startSize.minScalar
+      value: 0.01
+      objectReference: {fileID: 0}
+    - target: {fileID: 6512048236302645849, guid: 3e7d393c1cd288d46b4e60d157d428dd, type: 3}
+      propertyPath: InitialModule.startColor.maxColor.b
+      value: 0.32941177
+      objectReference: {fileID: 0}
+    - target: {fileID: 6512048236302645849, guid: 3e7d393c1cd288d46b4e60d157d428dd, type: 3}
+      propertyPath: InitialModule.startColor.maxColor.g
+      value: 0.14117648
+      objectReference: {fileID: 0}
+    - target: {fileID: 6512048236302645849, guid: 3e7d393c1cd288d46b4e60d157d428dd, type: 3}
+      propertyPath: InitialModule.startColor.maxColor.r
+      value: 0.7647059
+      objectReference: {fileID: 0}
+    - target: {fileID: 6512048236302645849, guid: 3e7d393c1cd288d46b4e60d157d428dd, type: 3}
+      propertyPath: InitialModule.startColor.minColor.b
+      value: 0.47058824
+      objectReference: {fileID: 0}
+    - target: {fileID: 6512048236302645849, guid: 3e7d393c1cd288d46b4e60d157d428dd, type: 3}
+      propertyPath: InitialModule.startColor.minColor.g
+      value: 0.30980393
+      objectReference: {fileID: 0}
+    - target: {fileID: 6512048236302645849, guid: 3e7d393c1cd288d46b4e60d157d428dd, type: 3}
+      propertyPath: InitialModule.startColor.minColor.r
+      value: 0.9411765
+      objectReference: {fileID: 0}
+    - target: {fileID: 6512048236302645849, guid: 3e7d393c1cd288d46b4e60d157d428dd, type: 3}
+      propertyPath: EmissionModule.m_Bursts.Array.data[0].countCurve.scalar
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

@@ -1,4 +1,6 @@
 using UnityEngine.Rendering.PostProcessing;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -25,7 +27,7 @@ public class Multiplayer_UI : MonoBehaviour
 
     public int playerTeam;
     private string playerSpecies;
-    public GameObject lastLifePostProcessing;
+    public GameObject lastLifeVolume;
 
     [Header("Commands")]
     private GameObject player;
@@ -41,13 +43,13 @@ public class Multiplayer_UI : MonoBehaviour
         {
             buySuperSoldier.onClick.AddListener(BuySuperSoldier);
         }
-        if (GameObject.Find("LastLifePostProcessing"))
+        if (GameObject.Find("LastLifeVolume"))
         {
-            lastLifePostProcessing = GameObject.Find("LastLifePostProcessing");
+            lastLifeVolume = GameObject.Find("LastLifeVolume");
         }
         else
         {
-            Debug.LogWarning("LastLifePostProcessing could not be found.");
+            Debug.LogWarning("LastLifeVolume could not be found.");
         }
     }
 
@@ -66,12 +68,12 @@ public class Multiplayer_UI : MonoBehaviour
             if (food < 0)
             {
                 foodText.color = new Color(0.566f, 0.0275f, 0.0275f, 1f);
-                lastLifePostProcessing.GetComponent<PostProcessVolume>().enabled = true;
+                lastLifeVolume.GetComponent<Volume>().enabled = true;
             }
             else
             {
                 foodText.color = new Color(0.0275f, 0.0275f, 0.0275f, 1f);
-                lastLifePostProcessing.GetComponent<PostProcessVolume>().enabled = false;
+                lastLifeVolume.GetComponent<Volume>().enabled = false;
             }
             foodText.text = food.ToString();
             colonySizeText.text = playerQueen.GetComponent<MBaseAntQueenAI>().colonySize.ToString() + "/" 

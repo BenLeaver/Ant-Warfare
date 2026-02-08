@@ -4,6 +4,9 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.Rendering.PostProcessing;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
+
 
 /// <summary>
 /// Handles the singleplayer UI, including buying ants, upgrades, placing marker commands,
@@ -23,10 +26,11 @@ public class Singleplayer_UI : MonoBehaviour
     public TMP_Text colonySizeText;
     public GameObject helpUI;
     public GameObject upgradeUI;
+    public Canvas mainCanvas;
     public int upgradeTier = 0;
     public GameObject[] upgrades;
     public GameObject[] tiers;
-    public GameObject lastLifePostProcessing;
+    public GameObject lastLifeVolume;
 
     public bool inTutorial = false;
 
@@ -41,13 +45,13 @@ public class Singleplayer_UI : MonoBehaviour
         {
             buySuperSoldier.onClick.AddListener(BuySuperSoldier);
         }
-        if (GameObject.Find("LastLifePostProcessing"))
+        if (GameObject.Find("LastLifeVolume"))
         {
-            lastLifePostProcessing = GameObject.Find("LastLifePostProcessing");
+            lastLifeVolume = GameObject.Find("LastLifeVolume");
         }
         else
         {
-            Debug.LogError("LastLifePostProcessing could not be found.");
+            Debug.LogError("LastLifeVolume could not be found.");
         }
         StartCoroutine(UpdatePlayerMarkerTexts());
 
@@ -83,12 +87,12 @@ public class Singleplayer_UI : MonoBehaviour
             if (food < 0)
             {
                 foodText.color = new Color(0.566f, 0.0275f, 0.0275f, 1f);
-                lastLifePostProcessing.GetComponent<PostProcessVolume>().enabled = true;
+                lastLifeVolume.GetComponent<Volume>().enabled = true;
             }
             else
             {
                 foodText.color = new Color(0.0275f, 0.0275f, 0.0275f, 1f);
-                lastLifePostProcessing.GetComponent<PostProcessVolume>().enabled = false;
+                lastLifeVolume.GetComponent<Volume>().enabled = false;
             }
             foodText.text = food.ToString();
             colonySizeText.text = playerQueen.GetComponent<BaseAntQueenAI>().colonySize.ToString() 
@@ -104,6 +108,10 @@ public class Singleplayer_UI : MonoBehaviour
         if(Input.GetKeyDown(KeyCode.U))
         {
             ToggleUpgradeUI();
+        }
+        if (Input.GetKeyDown(KeyCode.J))
+        {
+            ToggleMainUI();
         }
     }
 
@@ -122,6 +130,12 @@ public class Singleplayer_UI : MonoBehaviour
     public bool isUpgradeUIActive()
     {
         return upgradeUI.activeSelf;
+    }
+
+    public void ToggleMainUI()
+    {
+        bool isEnabled = mainCanvas.enabled;
+        mainCanvas.enabled = !isEnabled;
     }
 
     public void PlacePheremone(int index)

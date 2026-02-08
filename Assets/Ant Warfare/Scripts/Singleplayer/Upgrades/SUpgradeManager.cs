@@ -10,7 +10,6 @@ using TMPro;
 public class SUpgradeManager : MonoBehaviour
 {
     public GameObject singleplayerUI;
-    private GameObject[] Ants;
     private int thisTeam;
 
     /// <summary>
@@ -19,7 +18,6 @@ public class SUpgradeManager : MonoBehaviour
     /// <param name="name">The name of the upgrade to apply.</param>
     public void ApplyUpgrade(string name)
     {
-        Ants = GameObject.FindGameObjectsWithTag("Ant");
         thisTeam = singleplayerUI.GetComponent<Singleplayer_UI>().playerTeam;
         // Black Upgrades
         if (name == "Movement Speed")
@@ -76,7 +74,7 @@ public class SUpgradeManager : MonoBehaviour
 
     void MovementSpeed(float speedMult)
     {
-        foreach (GameObject a in Ants)
+        foreach (GameObject a in UnitManager.Instance.Ants)
         {
             if (a.GetComponent<SHealth>().team == thisTeam)
             {
@@ -95,7 +93,7 @@ public class SUpgradeManager : MonoBehaviour
     void StrongerSoldiers(float damageMult)
     {
 
-        foreach (GameObject a in Ants)
+        foreach (GameObject a in UnitManager.Instance.Ants)
         {
             if (a.GetComponent<SHealth>().team == thisTeam)
             {
@@ -113,7 +111,7 @@ public class SUpgradeManager : MonoBehaviour
 
     void LessFoodWaste(float foodMult)
     {
-        foreach (GameObject a in Ants)
+        foreach (GameObject a in UnitManager.Instance.Ants)
         {
             if (a.GetComponent<SHealth>().team == thisTeam)
             {
@@ -149,7 +147,7 @@ public class SUpgradeManager : MonoBehaviour
 
     void FirstAid()
     {
-        foreach (GameObject a in Ants)
+        foreach (GameObject a in UnitManager.Instance.Ants)
         {
             if (a.GetComponent<SHealth>().team == thisTeam)
             {
@@ -166,7 +164,7 @@ public class SUpgradeManager : MonoBehaviour
 
     void LongStingers(float damageMult)
     {
-        foreach (GameObject a in Ants)
+        foreach (GameObject a in UnitManager.Instance.Ants)
         {
             if (a.GetComponent<SHealth>().team == thisTeam)
             {
@@ -195,7 +193,7 @@ public class SUpgradeManager : MonoBehaviour
 
     void AggressiveWorkers(float speedMult, float damageMult)
     {
-        foreach (GameObject a in Ants)
+        foreach (GameObject a in UnitManager.Instance.Ants)
         {
             if (a.GetComponent<SHealth>().team == thisTeam)
             {
