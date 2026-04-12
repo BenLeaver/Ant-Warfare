@@ -314,7 +314,7 @@ public class AntBaseAI : MonoBehaviour
     /// <returns>The command/pheremone type index.</returns>
     public int GetCommandIndex()
     {
-        List<GameObject> markers = friendlyPlayer.GetComponent<PheremoneMarkerManager>().markers;
+        List<GameObject> markers = queen.GetComponent<ColonyPheromonesManager>().markers;
         closestMarker = null;
         float closestDistance = 9999f;
         foreach (GameObject m in markers)

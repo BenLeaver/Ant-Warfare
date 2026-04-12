@@ -75,9 +75,9 @@ public class SHealth : MonoBehaviour
         {
             Instantiate(deathObject, gameObject.transform.position, gameObject.transform.rotation);
             
-            if (GetComponent<AntBaseAI>())
+            if (GetComponent<IAntWorld>() != null)
             {
-                gameObject.GetComponent<AntBaseAI>().Death();
+                gameObject.GetComponent<IAntWorld>().Death();
             }
             else if (GetComponent<Player_Singleplayer>())
             {

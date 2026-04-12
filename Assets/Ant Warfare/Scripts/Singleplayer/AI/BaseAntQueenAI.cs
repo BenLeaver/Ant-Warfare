@@ -158,9 +158,8 @@ public class BaseAntQueenAI : MonoBehaviour
     {
         for (int i = 0; i < 10; i++)
         {
-            int team = gameObject.GetComponent<SHealth>().team;
-            GameObject soldier = Instantiate(soldierPrefab, spawnPos, Quaternion.identity);
-            soldier.GetComponent<SHealth>().UpdateTeam(team);
+            
+            GameObject soldier = InstantiateAnt(soldierPrefab);
             totalSoldiers += 1;
             colonySize = totalSoldiers + totalWorkers;
             if (playerOnTeam)
@@ -176,9 +175,8 @@ public class BaseAntQueenAI : MonoBehaviour
         if (food >= soldierCost && colonySize < maxColonySize)
         {
             //Will instantiate soldier and set the correct team
-            int team = gameObject.GetComponent<SHealth>().team;
             GameObject soldier = InstantiateAnt(soldierPrefab);
-            soldier.GetComponent<SHealth>().UpdateTeam(team);
+            
             food -= soldierCost;
             totalSoldiers += 1;
             colonySize = totalSoldiers + totalWorkers;
@@ -228,9 +226,7 @@ public class BaseAntQueenAI : MonoBehaviour
         if (food >= workerCost && colonySize < maxColonySize)
         {
             //Will instantiate worker and set the correct team
-            int team = gameObject.GetComponent<SHealth>().team;
             GameObject worker = InstantiateAnt(workerPrefab);
-            worker.GetComponent<SHealth>().UpdateTeam(team);
             food -= workerCost;
             totalWorkers += 1;
             colonySize = totalSoldiers + totalWorkers;
@@ -276,9 +272,7 @@ public class BaseAntQueenAI : MonoBehaviour
     {
         if (food >= superSoldierCost && colonySize < maxColonySize)
         {
-            int team = gameObject.GetComponent<SHealth>().team;
             GameObject soldier = InstantiateAnt(superSoldierPrefab);
-            soldier.GetComponent<SHealth>().UpdateTeam(team);
             food -= superSoldierCost;
             totalSoldiers += 1;
             colonySize = totalSoldiers + totalWorkers;
@@ -315,10 +309,20 @@ public class BaseAntQueenAI : MonoBehaviour
     /// <returns>The Instantiated Ant GameObject.</returns>
     public GameObject InstantiateAnt(GameObject antPrefab)
     {
+        // Spawn near spawn position.
         float rX = Random.Range(-2f, 2f);
         float rY = Random.Range(-2f, 2f);
         Vector3 position = new Vector3(spawnPos.x + rX, spawnPos.y + rY, 0);
-        return Instantiate(antPrefab, position, Quaternion.identity);
+        var ant = Instantiate(antPrefab, position, Quaternion.identity);
+
+        // Set the ant's team.
+        int team = gameObject.GetComponent<SHealth>().team;
+        ant.GetComponent<SHealth>().UpdateTeam(team);
+
+        // Initialise the ant with a reference to the queen.
+        ant.GetComponent<SingleplayerAntWorld>().InitializeAntFromQueen(this.gameObject);
+
+        return ant;
     }
 
     public void SpawnDecision()

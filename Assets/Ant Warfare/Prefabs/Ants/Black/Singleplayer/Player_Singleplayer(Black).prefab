@@ -673,16 +673,42 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 42e63d50dc332bf44adcc002113b5b48, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  markerPrefabs:
-  - {fileID: 1614144195752745818, guid: f90b123b78f52c1418fb3238373136f4, type: 3}
-  - {fileID: 1614144195752745818, guid: d0954c9e677b88d4bb20c480d9c7ddea, type: 3}
-  - {fileID: 1614144195752745818, guid: fe09436e3e8194042893e8158f7922ef, type: 3}
-  - {fileID: 1614144195752745818, guid: b56422483a2ddd245b25e4136970d95c, type: 3}
-  - {fileID: 1614144195752745818, guid: 9f91c50649e6a784a9cffa3720af7ec3, type: 3}
-  - {fileID: 1614144195752745818, guid: 4a0f1229e0038284e812fa25fe065fd7, type: 3}
-  - {fileID: 1614144195752745818, guid: 3e488846bbb36524fabc7c2084e8a785, type: 3}
-  - {fileID: 1614144195752745818, guid: 855f428d66b05cb4cb6bea95bdb90cc4, type: 3}
-  - {fileID: 1614144195752745818, guid: d4d26eb177565f9419ad46ecd6a0ee99, type: 3}
+  pheromoneInfos:
+  - subtype: 0
+    prefab: {fileID: 1614144195752745818, guid: a20ead28be04d2e40978a6ace7843858, type: 3}
+    total: 0
+    remaining: 50
+    amountText: {fileID: 0}
+  - subtype: 1
+    prefab: {fileID: 1614144195752745818, guid: f79e0f4fbbc23a745ba385ac38d0ede9, type: 3}
+    total: 0
+    remaining: 50
+    amountText: {fileID: 0}
+  - subtype: 2
+    prefab: {fileID: 1614144195752745818, guid: 4e8b2c56fdac41046b39321c1ca85ded, type: 3}
+    total: 0
+    remaining: 50
+    amountText: {fileID: 0}
+  - subtype: 3
+    prefab: {fileID: 1614144195752745818, guid: 91576eab972bff640893951fd2942ad7, type: 3}
+    total: 0
+    remaining: 50
+    amountText: {fileID: 0}
+  - subtype: 4
+    prefab: {fileID: 1614144195752745818, guid: 53579970a188ae4478718665d7d2d337, type: 3}
+    total: 0
+    remaining: 50
+    amountText: {fileID: 0}
+  - subtype: 5
+    prefab: {fileID: 1614144195752745818, guid: 9776bb89f255fd0489bdf7908110469a, type: 3}
+    total: 0
+    remaining: 100
+    amountText: {fileID: 0}
+  - subtype: 6
+    prefab: {fileID: 1614144195752745818, guid: 69a6c7ddaa69d0f47ad463a93471cb28, type: 3}
+    total: 0
+    remaining: 100
+    amountText: {fileID: 0}
   markers: []
   placementTransform: {fileID: 3057034877805859683}
   markerAmountTexts: []

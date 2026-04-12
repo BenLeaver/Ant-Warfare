@@ -42,7 +42,7 @@ public class Player_Singleplayer : MonoBehaviour
     public GameObject foodCarried;
     public float queenRange = 5f;
     public float foodMult = 1f;
-    private GameObject queen;
+    public GameObject queen;
 
     // Start is called before the first frame update
     void Start()

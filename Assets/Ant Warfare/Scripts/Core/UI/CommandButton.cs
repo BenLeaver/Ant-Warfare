@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
 
 /// <summary>
 /// Handles showing or hiding the description of a command when UI command 
@@ -10,6 +12,11 @@ using UnityEngine;
 public class CommandButton : MonoBehaviour
 {
     public GameObject commandDescription;
+    public TMP_Text amountText;
+    public Singleplayer_UI uiScript;
+    public PheromoneSubtype subtype;
+
+    public bool isRemoveButton = false;
 
     public void DisplayDescription()
     {
@@ -19,5 +26,14 @@ public class CommandButton : MonoBehaviour
     public void HideDescription()
     {
         commandDescription.SetActive(false);
+    }
+
+    void Start()
+    {
+        if (!isRemoveButton)
+        {
+            var queen = uiScript.playerQueen;
+            queen.GetComponent<ColonyPheromonesManager>().InitializePlayerAmountText(subtype, amountText);
+        }
     }
 }

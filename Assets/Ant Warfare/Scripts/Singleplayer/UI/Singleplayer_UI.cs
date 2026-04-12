@@ -53,19 +53,7 @@ public class Singleplayer_UI : MonoBehaviour
         {
             Debug.LogError("LastLifeVolume could not be found.");
         }
-        StartCoroutine(UpdatePlayerMarkerTexts());
 
-    }
-
-    /// <summary>
-    /// Waits 1 frame to make sure player has been instantiated before updating the 
-    /// markerAmountTexts, so that the player has a reference to the marker amount UI texts.
-    /// </summary>
-    IEnumerator UpdatePlayerMarkerTexts()
-    {
-        yield return null;
-        player = GameObject.Find("SGameManager").GetComponent<SGameManager>().player;
-        player.GetComponent<PheremoneMarkerManager>().markerAmountTexts = markerAmountTexts;
     }
 
     // Update is called once per frame
@@ -138,14 +126,39 @@ public class Singleplayer_UI : MonoBehaviour
         mainCanvas.enabled = !isEnabled;
     }
 
-    public void PlacePheremone(int index)
+    public void PlacePheremone(PheromoneSubtype subtype)
     {
-        player.GetComponent<PheremoneMarkerManager>().PlaceMarker(index);
+        player.GetComponent<PheromoneMarkerManager>().PlaceMarker(subtype);
+    }
+
+    public void Place_FoodReturnPath()
+    {
+        PlacePheremone(PheromoneSubtype.FoodReturnPath);
+    }
+
+    public void Place_UnifiedFollowPath()
+    {
+        PlacePheremone(PheromoneSubtype.UnifiedFollowPath);
+    }
+
+    public void Place_SoldierAttackPath()
+    {
+        PlacePheremone(PheromoneSubtype.SoldierAttackPath);
+    }
+
+    public void Place_WorkerGatheringPath()
+    {
+        PlacePheremone(PheromoneSubtype.WorkerGatheringPath);
+    }
+
+    public void Place_GuardPoint()
+    {
+        PlacePheremone(PheromoneSubtype.GuardPoint);
     }
 
     public void RemovePheremone()
     {
-        player.GetComponent<PheremoneMarkerManager>().RemoveMarker();
+        player.GetComponent<PheromoneMarkerManager>().RemoveMarker();
     }
 
     /// <summary>

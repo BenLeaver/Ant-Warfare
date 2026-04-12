@@ -211,6 +211,7 @@ GameObject:
   - component: {fileID: 8456778941846023881}
   - component: {fileID: 4117572639574396759}
   - component: {fileID: -5059071483451960181}
+  - component: {fileID: 4179109791574043190}
   m_Layer: 9
   m_Name: Worker(Black)
   m_TagString: Ant
@@ -348,7 +349,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8200308034547834947}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 23c1e767a709492409f1c47c5abca673, type: 3}
   m_Name: 
@@ -442,6 +443,32 @@ MonoBehaviour:
     pitch: 1
     loop: 0
     source: {fileID: 0}
+--- !u!114 &4179109791574043190
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8200308034547834947}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5e4fa0e069290434491657ede20a1049, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  healthScript: {fileID: 8200308034547834944}
+  mouth: {fileID: 8480871882801946560}
+  queen: {fileID: 0}
+  foodCarried: {fileID: 0}
+  queenRange: 5
+  Type: 0
+  species: Black
+  attackDamage: 10
+  sightRange: 20
+  attackRange: 2.5
+  attackDelay: 1
+  pickupRange: 2
+  firstAid: 0
+  foodMult: 1
 --- !u!1 &8253315209348739095
 GameObject:
   m_ObjectHideFlags: 0

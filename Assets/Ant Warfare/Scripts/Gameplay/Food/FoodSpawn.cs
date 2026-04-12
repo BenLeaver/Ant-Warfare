@@ -29,8 +29,10 @@ public class FoodSpawn : MonoBehaviour
         {
             for (int i = 0; i < batchSize; i++)
             {
-                float rX = Random.Range(-10f, 10f) + transform.position.x;
-                float rY = Random.Range(-10f, 10f) + transform.position.y;
+                Vector2 offset2D = Random.insideUnitCircle * 10f;
+                float rX = offset2D.x + transform.position.x;
+                float rY = offset2D.y + transform.position.y;
+
                 if (!multiplayer)
                 {
                     Instantiate(foodPrefabs[foodTypeIndex], new Vector3(rX, rY, 0), Quaternion.identity);

@@ -100,6 +100,7 @@ public class SGameManager : MonoBehaviour
         if (gameStart == true)
         {
             SpawnTeams();
+            CreateUI();
             gameStart = false;
             reset = false; //Ready for next time game is reset
         }
@@ -290,7 +291,7 @@ public class SGameManager : MonoBehaviour
 
         GenerateTeams();
 
-        CreateUI();
+        
 
         gameStart = true;
     }
@@ -375,6 +376,8 @@ public class SGameManager : MonoBehaviour
                     queen.GetComponent<BaseAntQueenAI>().player = player;
                     queen.GetComponent<SHealth>().UpdateTeam(team);
                     queen.GetComponent<BaseAntQueenAI>().spawnPos = nestSpawns[team - 1];
+
+                    player.GetComponent<Player_Singleplayer>().queen = queen; // Ensure player has a reference to it's queen.
                 }
                 else if(team == playerTeams[1])
                 {
@@ -469,14 +472,18 @@ public class SGameManager : MonoBehaviour
 
     public void CreateUI()
     {
+        GameObject ui = null;
+
         if(playerSpecies[0] == "Black")
         {
-            Instantiate(BlackUI);
+            ui = Instantiate(BlackUI);
         }
         else if (playerSpecies[0] == "Fire")
         {
-            Instantiate(FireUI);
+            ui = Instantiate(FireUI);
         }
+        ui.GetComponent<Singleplayer_UI>().player = player;
+        ui.GetComponent<Singleplayer_UI>().playerQueen = player.GetComponent<Player_Singleplayer>().queen;
     }
 
     IEnumerator TutorialStart()
