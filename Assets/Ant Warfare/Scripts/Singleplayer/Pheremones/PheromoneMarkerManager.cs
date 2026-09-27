@@ -33,8 +33,6 @@ public class PheromoneMarkerManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.T)) RemoveAllMarkers();
 
         // Note: SearchPath and FoodPath are AI-only -> not bound to keys
-
-        Debug.Log($"Player follow ants: {playerFollowAnts.Count}");
     }
 
     public void PlaceMarker(PheromoneSubtype subtype)

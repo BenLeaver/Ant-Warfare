@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 838271910960409948}
   - component: {fileID: 838271910960409951}
   - component: {fileID: 1534956279189112771}
-  - component: {fileID: 105237230377089062}
   m_Layer: 0
   m_Name: SGameManager
   m_TagString: Untagged
@@ -96,15 +95,3 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cellSize: 20
---- !u!114 &105237230377089062
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 838271910960409950}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 700d4e32abfdcfc4b922246abb4cb510, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
