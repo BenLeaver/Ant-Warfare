@@ -254,6 +254,7 @@ GameObject:
   - component: {fileID: 8564992431610467717}
   - component: {fileID: 6090065536386963422}
   - component: {fileID: -6177511116294685959}
+  - component: {fileID: 6560387485567277399}
   m_Layer: 9
   m_Name: FireAntQueen
   m_TagString: Ant
@@ -460,6 +461,26 @@ MonoBehaviour:
     pitch: 0.7
     loop: 0
     source: {fileID: 0}
+--- !u!114 &6560387485567277399
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8564992431610467721}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84eedbc81abe20b4e85bc2445136b613, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  unifiedFollowPrefab: {fileID: 1614144195752745818, guid: a20ead28be04d2e40978a6ace7843858, type: 3}
+  soldierAttackPrefab: {fileID: 1614144195752745818, guid: f79e0f4fbbc23a745ba385ac38d0ede9, type: 3}
+  workerGatheringPrefab: {fileID: 1614144195752745818, guid: 4e8b2c56fdac41046b39321c1ca85ded, type: 3}
+  foodReturnPrefab: {fileID: 1614144195752745818, guid: 91576eab972bff640893951fd2942ad7, type: 3}
+  guardPrefab: {fileID: 1614144195752745818, guid: 53579970a188ae4478718665d7d2d337, type: 3}
+  searchPrefab: {fileID: 1614144195752745818, guid: 9776bb89f255fd0489bdf7908110469a, type: 3}
+  foodPrefab: {fileID: 1614144195752745818, guid: 69a6c7ddaa69d0f47ad463a93471cb28, type: 3}
+  markers: []
 --- !u!1 &8564992432049666970
 GameObject:
   m_ObjectHideFlags: 0

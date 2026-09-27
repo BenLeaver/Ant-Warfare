@@ -1,8 +1,16 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Ant.AI;
 
+/// <summary>
+/// Interrupt state triggered when an ant detects an enemy.
+/// 
+/// Overview:
+/// -   Locks onto the closest enemy and continuously updates the target.
+/// -   Moves toward the enemy until within attack range.
+/// -   Attacks when close enough, respecting the ant's attack cooldown.
+/// -   Exits the interrupt if the enemy is lost or leaves sight range.
+/// </summary>
 public class AntEnemyIRState : BaseAntState
 {
     private float enemyUpdateTimer = 0f;
@@ -29,14 +37,16 @@ public class AntEnemyIRState : BaseAntState
         enemyUpdateTimer += deltaTime;
 
         // Update the enemy target about two times a second - or sooner if the previous target no longer exists.
-        if (enemyUpdateTimer > 0.5f || context.CurrentEnemyTarget == null)
+        // When an enemy is killed the gameobject is marked as null
+        // But the cached enemy UnitInfo in this script is not necessarily marked as null
+        if (enemyUpdateTimer > 0.5f || context.CurrentEnemyTarget == null || context.CurrentEnemyTarget.go == null)
         {
             enemyUpdateTimer = 0f;
             if (!UpdateEnemyTarget()) return;   
         }
-
+        
         context.LocalTarget = context.CurrentEnemyTarget.transform.position;
-        float enemyDist = Vector3.Distance(context.World.Position, context.LocalTarget);
+        float enemyDist = Vector3.Distance(context.World.MouthPosition, context.LocalTarget);
         if (enemyDist > context.SightRange)
         {
             // Enemy is outside of sight range -> stop interrupt.

@@ -1,10 +1,17 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// Stores data for a pheromone marker.
-/// Markers are used to direct ant behavior for each team and can have different effects.
+/// Stores all data associated with a single pheromone marker in the world.
+/// 
+/// Behaviour overview:
+/// -   Each marker has a type, subtype, strength, and a target direction.
+/// -   Some markers are placed by the player (persistent), others by ants (decay over time).
+/// -   Strength decays only for non?player?placed markers, and the marker is removed when strength reaches zero.
+/// -   Subtype determines initial strength and whether the marker is considered player?placed.
+/// 
+/// This component is attached to each pheromone marker prefab and is managed
+/// by the ColonyPheromonesManager.
 /// </summary>
 public class MarkerData : MonoBehaviour
 {
@@ -28,7 +35,6 @@ public class MarkerData : MonoBehaviour
 
     void Start()
     {
-
         strength = 10f;
         playerPlaced = true;
         if (subtype == PheromoneSubtype.SearchPath)

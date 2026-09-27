@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.AI;
+using System.Collections.Generic;
 
 /// <summary>
 /// Component which can be added to an ant to handle throwing it.
@@ -11,13 +12,13 @@ public class ThrownAnt : MonoBehaviour
     private float duration;
     private float elapsed;
 
-    private SHealth health;
     private NavMeshAgent agent;
     private Collider col;
-    private AntBaseAI ai;
 
     private float damage;
     private bool finished;
+
+    private UnitInfo myInfo;
 
     private GameObject impactParticleEffect;
 
@@ -27,9 +28,11 @@ public class ThrownAnt : MonoBehaviour
     /// <param name="targetPos">The target where the ant will be thrown to.</param>
     /// <param name="flightTime">The time the ant will spend in flight.</param>
     /// <param name="impactDamage">The damage the ant will deal to itself and others on impact.</param>
-    public void Initialise(Vector3 targetPos, float flightTime, float impactDamage, GameObject impactParticleEffect)
+    public void Initialise(Vector3 targetPos, float flightTime, float impactDamage, GameObject impactParticleEffect, UnitInfo selfInfo)
     {
-        start = transform.position;
+        myInfo = selfInfo;
+
+        start = myInfo.transform.position;
         target = targetPos;
         duration = flightTime;
         damage = impactDamage;
@@ -37,14 +40,14 @@ public class ThrownAnt : MonoBehaviour
         elapsed = 0f;
         finished = false;
 
-        health = GetComponent<SHealth>();
+        
+
         agent = GetComponent<NavMeshAgent>();
         col = GetComponent<Collider>();
-        ai = GetComponent<AntBaseAI>();
 
+        if (myInfo.antWorld != null) myInfo.antWorld.Disable();
         if (agent) agent.enabled = false;
         if (col) col.enabled = false;
-        if (ai) ai.enabled = false;
 
         this.impactParticleEffect = impactParticleEffect;
     }
@@ -78,7 +81,7 @@ public class ThrownAnt : MonoBehaviour
     private void Land()
     {
         finished = true;
-        Instantiate(impactParticleEffect, transform.position, Quaternion.identity);
+        Instantiate(impactParticleEffect, myInfo.transform.position, Quaternion.identity);
 
         if (agent)
         {
@@ -87,9 +90,9 @@ public class ThrownAnt : MonoBehaviour
         }
 
         if (col) col.enabled = true;
-        if (ai) ai.enabled = true;
+        if (myInfo.antWorld != null) myInfo.antWorld.Enable();
 
-        health?.UpdateHealth(damage);
+        myInfo.health.UpdateHealth(damage);
         DamageAntsInRange(2f);
 
         GameObject camera = GameObject.FindWithTag("PlayerCamera");
@@ -104,14 +107,16 @@ public class ThrownAnt : MonoBehaviour
 
     private void DamageAntsInRange(float damageRange)
     {
-        foreach (GameObject a in UnitManager.Instance.AllUnits)
+        List<UnitInfo> nearbyUnits = UnitManager.Instance.GetNearbyUnits(myInfo.transform.position);
+
+        foreach (UnitInfo u in nearbyUnits)
         {
-            float dist = Vector3.Distance(transform.position, a.transform.position);
+            float dist = Vector3.Distance(myInfo.transform.position, u.transform.position);
             if (dist <= damageRange)
             {
-                if (a != this.gameObject && a.GetComponent<SHealth>())
+                if (u.go != this.gameObject)
                 {
-                    a.GetComponent<SHealth>().UpdateHealth(damage / 2);
+                    u.health.UpdateHealth(damage / 2);
                 }
             }
         }

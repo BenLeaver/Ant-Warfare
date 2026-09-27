@@ -1,18 +1,34 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Ant.AI;
 
+/// <summary>
+/// Core abstract controller for an individual ant's AI state machine.
+/// 
+/// This class owns:
+/// -   All state instances (Search, Guard, FollowPath, etc.)
+/// -   The active state
+/// -   An interrupt stack allowing temporary state overrides for food, enemy and player follow interrupts.
+/// -   Pheromone evaluation logic that decides which state the ant should enter next based 
+///     on the weight and mean targets of the nearby pheromone types.
+/// 
+/// 
+/// The manager (and its states) use the IAntWorld (sometimes via the AntContext) for perception 
+/// and performing actions.
+/// 
+/// Each state can have multiple subtypes, further customising behaviour. 
+/// For example, in the FollowPath state the subtype determines which interrupts are enabled.
+/// </summary>
 public class AntStateManager
 {
     private AntContext context;
 
     public AntSearchState searchState;
-    public AntGuardState guardState; // DONE
-    public AntFollowPathState followPathState; // DONE
-    public AntConfusedState confusedState; // TODO
-    public AntFoodIRState foodIRState; // TODO
-    public AntEnemyIRState enemyIRState; // DONE
+    public AntGuardState guardState; 
+    public AntFollowPathState followPathState; 
+    public AntConfusedState confusedState; 
+    public AntFoodIRState foodIRState; 
+    public AntEnemyIRState enemyIRState; 
     public AntCarryFoodIRState carryFoodIRState; 
     public AntFollowPlayerIRState followPlayerIRState;
 
@@ -23,6 +39,11 @@ public class AntStateManager
 
     Dictionary<PheromoneType, Dictionary<float, (PheromoneSubtype subtype, Vector3)>> pheromones;
     [SerializeField] private float pheromoneMajorityThreshold = 3f;
+
+    // Anti-infinite-loop guard
+    private int lastStateChangeFrame = -1;
+    private int stateChangesThisFrame = 0;
+    private const int MaxStateChangesPerFrame = 5;
 
     public AntStateManager(AntContext context)
     {
@@ -38,24 +59,60 @@ public class AntStateManager
         followPlayerIRState = new AntFollowPlayerIRState(this, context, AntStateType.FollowPlayerIR);
     }
 
+    /// <summary>
+    /// Called to immediately decide the first state.
+    /// </summary>
     public void Initialize()
     {
         DecideNextState();
     }
 
+    /// <summary>
+    /// Called every frame on Update from the AntWorld and updates the active state.
+    /// </summary>
     public void Tick(float deltaTime)
     {
         context.AttackTimer += deltaTime;
         currentState?.UpdateState(deltaTime);
     }
 
+    /// <summary>
+    /// Switches to a new state.
+    /// </summary>
     public void ChangeState(BaseAntState newState, Vector3 target = default, int subtype = 0)
     {
+        // Infinite loop guard
+        if (Time.frameCount == lastStateChangeFrame)
+        {
+            stateChangesThisFrame++;
+
+            if (stateChangesThisFrame > MaxStateChangesPerFrame)
+            {
+                Debug.LogError(
+                    $"[AntStateManager] Ant changed state " +
+                    $"{stateChangesThisFrame} times in one frame. " +
+                    $"Forcing confused state to prevent infinite loop."
+                );
+
+                newState = confusedState;
+            }
+        }
+        else
+        {
+            lastStateChangeFrame = Time.frameCount;
+            stateChangesThisFrame = 1;
+        }
+
+        // State Change logic
         context.World.StopMovement();
         currentState = newState;
         currentState.EnterState(target, subtype);
+        CurrentStateType = newState.StateType;
     }
 
+    /// <summary>
+    /// Temporarily interrupts the current state and pushes the current state data onto the stack.
+    /// </summary>
     public void PushInterrupt(BaseAntState interruptState, Vector3 target = default, int subtype=0)
     {
         if (currentState != null)
@@ -71,8 +128,13 @@ public class AntStateManager
 
         currentState = interruptState;
         currentState.EnterState(target, subtype);
+        CurrentStateType = interruptState.StateType;
     }
 
+    /// <summary>
+    /// Returns to the previous interrupted state, restoring its snapshot.
+    /// If no interrupted state exists, the ant returns to normal decision-making.
+    /// </summary>
     public void PopInterrupt()
     {
         if (interruptStack.Count == 0)
@@ -87,6 +149,7 @@ public class AntStateManager
 
         currentState = entry.State;
         currentState.EnterState(isResuming: true);
+        CurrentStateType = entry.State.StateType;
     }
 
     /// <summary>
@@ -98,13 +161,12 @@ public class AntStateManager
 
         currentState = forcedState;
         currentState.EnterState(target, subtype);
+        CurrentStateType = forcedState.StateType;
     }
 
     /// <summary>
     /// Takes a snapshot for the current state to be stored on the stack.
     /// </summary>
-    /// <param name="state"></param>
-    /// <returns></returns>
     private AntContextSnapshot CaptureSnapshot(BaseAntState state)
     {
         return new AntContextSnapshot
@@ -116,29 +178,43 @@ public class AntStateManager
         };
     }
 
+    /// <summary>
+    /// Restores the local and ultimate targets from the snapshot.
+    /// </summary>
     private void RestoreSnapshot(AntStateStackEntry entry)
     {
         context.LocalTarget = entry.Snapshot.LocalTarget;
         context.UltimateTarget = entry.Snapshot.UltimateTarget;
     }
 
+    /// <summary>
+    /// Clears all interrupts and decides next state.
+    /// </summary>
     public void ForceReturnToThinking()
     {
         interruptStack.Clear();
         DecideNextState();
     }
 
-    public void StartPlayerIR(int subtype)
+    /// <summary>
+    /// If not carrying food, begins following the player.
+    /// </summary>
+    /// <param name="subtype"></param>
+    public bool StartPlayerIR(int subtype)
     {
         // If ant is already carrying food back to nest, can't follow player.
-        if (currentState == carryFoodIRState) return;
+        if (currentState == carryFoodIRState) return false;
 
-        PushInterrupt(followPlayerIRState, subtype: subtype);
+        HardInterrupt(followPlayerIRState, subtype: subtype);
+        return true;
     }
 
+    /// <summary>
+    /// Exits from the player interrupt state.
+    /// </summary>
     public void StopPlayerIR()
     {
-        PopInterrupt();
+        ForceReturnToThinking();
     }
 
     /// <summary>
@@ -192,7 +268,7 @@ public class AntStateManager
         // Enter state given by strongest pheromone type.
         // Need to include subtype, defining some of the specifics/parameters about what the ant can do.
         PheromoneSubtype sub = pheromoneStats[0].subtype;
-        Vector3 T = pheromoneStats[0].meanTarget;
+        Vector3 T = context.World.FindClosestReachablePoint(pheromoneStats[0].meanTarget);
         if (sub == PheromoneSubtype.UnifiedFollowPath || sub == PheromoneSubtype.SearchPath || sub == PheromoneSubtype.FoodPath)
         {
             ChangeState(followPathState, T);
@@ -215,6 +291,9 @@ public class AntStateManager
         }
     }
 
+    /// <summary>
+    /// Computes the total weight, weighted mean target, and strongest subtype for a pheromone type.
+    /// </summary>
     private (float totalWeight, Vector3 meanTarget, PheromoneSubtype strongestSubtype) GetStats(PheromoneType type)
     {
         if (!pheromones.TryGetValue(type, out var inner) || inner.Count == 0)
@@ -245,5 +324,25 @@ public class AntStateManager
 
         Vector3 meanTarget = total > 0f ? weightedSum / total : Vector3.zero;
         return (total, meanTarget, strongestSubtype);
+    }
+
+    /// <summary>
+    /// Will return whether the ant can place pheromones, checking whether the pheromone density is lower than the pheromoneMajorityThreshold.
+    /// </summary>
+    public bool CanPlacePheromones()
+    {
+        var pheromones = context.EvaluatePheromones();
+
+        foreach (var kvp in pheromones)
+        {
+            var stats = GetStats(kvp.Key);
+            if (stats.totalWeight > pheromoneMajorityThreshold)
+            {
+                // Strength of nearby pheromones is too high.
+                return false;
+            }
+        }
+
+        return true;
     }
 }

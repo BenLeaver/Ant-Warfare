@@ -6772,6 +6772,8 @@ MonoBehaviour:
       m_Image: {fileID: 0}
     - m_Text: Corridor
       m_Image: {fileID: 0}
+    - m_Text: Big Arena
+      m_Image: {fileID: 0}
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []

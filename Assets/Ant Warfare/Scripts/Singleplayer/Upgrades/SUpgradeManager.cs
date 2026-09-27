@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.AI;
 using TMPro;
+using System.Collections.Generic;
 
 /// <summary>
 /// Manages the application of upgrades to ants and the player's colony in singleplayer mode.
@@ -10,7 +11,7 @@ using TMPro;
 public class SUpgradeManager : MonoBehaviour
 {
     public GameObject singleplayerUI;
-    private int thisTeam;
+    private int thisTeam = -1;
 
     /// <summary>
     /// Applies the effect of an upgrade.
@@ -18,7 +19,21 @@ public class SUpgradeManager : MonoBehaviour
     /// <param name="name">The name of the upgrade to apply.</param>
     public void ApplyUpgrade(string name)
     {
-        thisTeam = singleplayerUI.GetComponent<Singleplayer_UI>().playerTeam;
+        if (thisTeam == -1)
+        {
+            // Need to get player team
+            GameObject player = singleplayerUI.GetComponent<Singleplayer_UI>().player;
+            UnitInfo playerInfo = player.GetComponent<Player_Singleplayer>().myInfo;
+            
+            if (playerInfo.IsAliveAndActive())
+            {
+                thisTeam = playerInfo.team;
+            }
+            else
+            {
+                return;
+            }
+        }
         // Black Upgrades
         if (name == "Movement Speed")
         {
@@ -74,55 +89,44 @@ public class SUpgradeManager : MonoBehaviour
 
     void MovementSpeed(float speedMult)
     {
-        foreach (GameObject a in UnitManager.Instance.Ants)
+        List<UnitInfo> friendlyUnits = UnitManager.Instance.GetTeamUnits(thisTeam);
+        foreach (UnitInfo u in friendlyUnits)
         {
-            if (a.GetComponent<SHealth>().team == thisTeam)
+            if (u.playerScript != null)
             {
-                if (a.GetComponent<Player_Singleplayer>())
-                {
-                    a.GetComponent<Player_Singleplayer>().moveSpeed *= speedMult;
-                }
-                if (a.GetComponent<NavMeshAgent>())
-                {
-                    a.GetComponent<NavMeshAgent>().speed *= speedMult;
-                }
+                u.playerScript.moveSpeed *= speedMult;
+            }
+            if (u.antWorld != null)
+            {
+                u.antWorld.UpgradeSpeed(speedMult);
             }
         }
     }
 
     void StrongerSoldiers(float damageMult)
     {
-
-        foreach (GameObject a in UnitManager.Instance.Ants)
+        List<UnitInfo> friendlyUnits = UnitManager.Instance.GetTeamUnits(thisTeam);
+        foreach (UnitInfo u in friendlyUnits)
         {
-            if (a.GetComponent<SHealth>().team == thisTeam)
+            if (u.unitType == UnitType.Soldier)
             {
-                if (a.GetComponent<AntBaseAI>())
-                {
-                    if (a.GetComponent<AntBaseAI>().type == "Soldier")
-                    {
-                        int current = a.GetComponent<AntBaseAI>().attack;
-                        a.GetComponent<AntBaseAI>().attack = Mathf.RoundToInt(current * damageMult);
-                    }
-                }
+                u.antWorld.UpgradeAttack(damageMult);
             }
         }
     }
 
     void LessFoodWaste(float foodMult)
     {
-        foreach (GameObject a in UnitManager.Instance.Ants)
+        List<UnitInfo> friendlyUnits = UnitManager.Instance.GetTeamUnits(thisTeam);
+        foreach (UnitInfo u in friendlyUnits)
         {
-            if (a.GetComponent<SHealth>().team == thisTeam)
+            if (u.playerScript != null)
             {
-                if (a.GetComponent<Player_Singleplayer>())
-                {
-                    a.GetComponent<Player_Singleplayer>().foodMult = foodMult;
-                }
-                if (a.GetComponent<AntBaseAI>())
-                {
-                    a.GetComponent<AntBaseAI>().foodMult = foodMult;
-                }
+                u.playerScript.foodMult = foodMult;
+            }
+            if (u.antWorld != null)
+            {
+                u.antWorld.UpgradeFoodMult(foodMult);
             }
         }
     }
@@ -147,37 +151,28 @@ public class SUpgradeManager : MonoBehaviour
 
     void FirstAid()
     {
-        foreach (GameObject a in UnitManager.Instance.Ants)
+        List<UnitInfo> friendlyUnits = UnitManager.Instance.GetTeamUnits(thisTeam);
+        foreach (UnitInfo u in friendlyUnits)
         {
-            if (a.GetComponent<SHealth>().team == thisTeam)
+            if (u.unitType == UnitType.Soldier)
             {
-                if (a.GetComponent<AntBaseAI>())
-                {
-                    if (a.GetComponent<AntBaseAI>().type == "Soldier")
-                    {
-                        a.GetComponent<AntBaseAI>().firstAid = true;
-                    }
-                }
+                u.antWorld.ActivateFirstAid();
             }
         }
     }
 
     void LongStingers(float damageMult)
     {
-        foreach (GameObject a in UnitManager.Instance.Ants)
+        List<UnitInfo> friendlyUnits = UnitManager.Instance.GetTeamUnits(thisTeam);
+        foreach (UnitInfo u in friendlyUnits)
         {
-            if (a.GetComponent<SHealth>().team == thisTeam)
+            if (u.playerScript != null)
             {
-                if (a.GetComponent<AntBaseAI>())
-                {
-                    int current = a.GetComponent<AntBaseAI>().attack;
-                    a.GetComponent<AntBaseAI>().attack = Mathf.RoundToInt(current * damageMult);
-                }
-                if (a.GetComponent<Player_Singleplayer>())
-                {
-                    int current = a.GetComponent<Player_Singleplayer>().attack;
-                    a.GetComponent<Player_Singleplayer>().attack = Mathf.RoundToInt(current * damageMult);
-                }
+                u.playerScript.UpgradeAttack(damageMult);
+            }
+            if (u.antWorld != null)
+            {
+                u.antWorld.UpgradeAttack(damageMult);
             }
         }
     }
@@ -193,22 +188,13 @@ public class SUpgradeManager : MonoBehaviour
 
     void AggressiveWorkers(float speedMult, float damageMult)
     {
-        foreach (GameObject a in UnitManager.Instance.Ants)
+        List<UnitInfo> friendlyUnits = UnitManager.Instance.GetTeamUnits(thisTeam);
+        foreach (UnitInfo u in friendlyUnits)
         {
-            if (a.GetComponent<SHealth>().team == thisTeam)
+            if (u.unitType == UnitType.Worker)
             {
-                if (a.GetComponent<AntBaseAI>())
-                {
-                    if (a.GetComponent<AntBaseAI>().type == "Worker")
-                    {
-                        int current = a.GetComponent<AntBaseAI>().attack;
-                        a.GetComponent<AntBaseAI>().attack = Mathf.RoundToInt(current * damageMult);
-                        if (a.GetComponent<NavMeshAgent>())
-                        {
-                            a.GetComponent<NavMeshAgent>().speed *= speedMult;
-                        }
-                    }
-                }
+                u.antWorld.UpgradeSpeed(speedMult);
+                u.antWorld.UpgradeAttack(damageMult);
             }
         }
     }
@@ -224,7 +210,7 @@ public class SUpgradeManager : MonoBehaviour
 
     void Supersoldier()
     {
-        Button button = singleplayerUI.GetComponent<Singleplayer_UI>().buySuperSoldier;
+        Button button = singleplayerUI.GetComponent<Singleplayer_UI>().fireSuperSoldier;
         button.gameObject.SetActive(true);
     }
 }

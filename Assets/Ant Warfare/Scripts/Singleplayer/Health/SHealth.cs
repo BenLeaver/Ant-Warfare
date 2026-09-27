@@ -6,48 +6,29 @@ using UnityEngine.UI;
 /// <summary>
 /// Handles health of ants in Singleplayer.
 /// </summary>
-public class SHealth : MonoBehaviour
+public class SHealth : MonoBehaviour, IHealth
 {
-    public float maxHealth = 100f;
-    public float health = 100f;
-    public int team = 1;
-    public Slider slider;
-    public Image fill;
+    [SerializeField] private float maxHealth = 100f;
+    [SerializeField] private float health = 100f;
+    [SerializeField] private Slider slider;
+    [SerializeField] private Image fill;
 
     public GameObject deathObject;
     public GameObject hitParticleEffect;
-    
-    // Start is called before the first frame update
-    void Start()
+
+    public float Health 
     {
-        health = maxHealth;
-        slider.value = health;
-        if(team == 1)
-        {
-            // Red
-            fill.color = new Color32(209, 55, 44, 155);
-        }
-        else if (team == 2)
-        {
-            // Green
-            fill.color = new Color32(59, 219, 60, 155);
-        }
-        else if (team == 3)
-        {
-            // Blue
-            fill.color = new Color32(59, 144, 219, 155);
-        }
-        else if (team == 4)
-        {
-            // Purple
-            fill.color = new Color32(143, 59, 219, 155);
-        }
-        else if (team == 5)
-        {
-            // Grey
-            fill.color = new Color32(128, 128, 128, 155);
-        }
+        get => health;
+        set => health = value;
     }
+
+    public float MaxHealth
+    {
+        get => maxHealth;
+        set => maxHealth = value;
+    }
+
+    public int Team { get; set; } = -1;
 
     /// <summary>
     /// Updates health of this ant, given a damage value. To heal the ant instead of attacking, 
@@ -61,70 +42,96 @@ public class SHealth : MonoBehaviour
             Instantiate(hitParticleEffect, transform.position, Quaternion.identity);
         }
 
-        health -= damage;
-        if (damage > 0)
+        Health -= damage;
+        slider.value = Health;
+
+        if (Health <= 0)
         {
-            gameObject.GetComponent<ObjectAudioManager>().Play("Attack");
+            HandleDeath();
+        }
+        else if (damage > 0)
+        {
+            if (GetComponent<ObjectAudioManager>())
+            {
+                gameObject.GetComponent<ObjectAudioManager>().Play("Attack");
+            }
             if (GetComponent<BeetleStateManager>())
             {
                 gameObject.GetComponent<BeetleStateManager>().DamageTaken();
             }
         }
-        
-        if (health <= 0)
-        {
-            Instantiate(deathObject, gameObject.transform.position, gameObject.transform.rotation);
-            
-            if (GetComponent<IAntWorld>() != null)
-            {
-                gameObject.GetComponent<IAntWorld>().Death();
-            }
-            else if (GetComponent<Player_Singleplayer>())
-            {
-                gameObject.GetComponent<Player_Singleplayer>().Death();
-            }
-            else if (GetComponent<BaseAntQueenAI>())
-            {
-                gameObject.GetComponent<BaseAntQueenAI>().Death();
-            }
-            else if (GetComponent<BugStateManager>())
-            {
-                gameObject.GetComponent<BugStateManager>().Death();
-            }
-            else if (GetComponent<AntTutorialAI>())
-            {
-                gameObject.GetComponent<AntTutorialAI>().Death();
-            }
-            else
-            {
-                Destroy(gameObject);
-            }
-        }
-        slider.value = health;
     }
 
+    public void ResetHealth()
+    {
+        Health = MaxHealth;
+        slider.value = Health;
+    }
+
+    private void HandleDeath()
+    {
+        Instantiate(deathObject, transform.position, transform.rotation);
+
+        if (GetComponent<IAntWorld>() != null)
+        {
+            gameObject.GetComponent<IAntWorld>().Death();
+        }
+        else if (GetComponent<Player_Singleplayer>())
+        {
+            gameObject.GetComponent<Player_Singleplayer>().Death();
+        }
+        else if (GetComponent<BaseAntQueenAI>())
+        {
+            gameObject.GetComponent<BaseAntQueenAI>().Death();
+        }
+        else if (GetComponent<BugStateManager>())
+        {
+            gameObject.GetComponent<BugStateManager>().Death();
+        }
+        else if (GetComponent<AntTutorialAI>())
+        {
+            gameObject.GetComponent<AntTutorialAI>().Death();
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
+
+    /// <summary>
+    /// Initialise the health bar, setting the team colour and setting fill to max.
+    /// </summary>
     public void UpdateTeam(int newTeam)
     {
-        team = newTeam;
-        if (team == 1)
+        //Debug.Log($"Updating team to {newTeam} for {gameObject.name}");
+        Team = newTeam;
+        if (Team == 1)
         {
             // Red
             fill.color = new Color32(209, 55, 44, 255);
         }
-        if (team == 2)
+        else if (Team == 2)
         {
             // Green
             fill.color = new Color32(59, 219, 60, 255);
         }
-        if (team == 3)
+        else if (Team == 3)
         {
             // Blue
             fill.color = new Color32(59, 144, 219, 255);
         }
-        if (team == 4)
+        else if (Team == 4)
         {
             // Purple
             fill.color = new Color32(143, 59, 219, 255);
         }
+        else if (Team == 5)
+        {
+            // Grey
+            fill.color = new Color32(128, 128, 128, 155);
+        }
+
+        Health = MaxHealth;
+        slider.value = Health;
     }
 }

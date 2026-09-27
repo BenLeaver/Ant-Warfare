@@ -11,13 +11,13 @@ public class MenuNavigation : MonoBehaviour
 {
     public void ChangeScene(string sceneName)
     {
-        GameObject.Find("AudioManager").GetComponent<AudioManager>().Play("Select");
+        AudioManager.instance.Play("Select");
         SceneManager.LoadScene(sceneName);
     }
 
     public void StartGame()
     {
-        GameObject.Find("AudioManager").GetComponent<AudioManager>().Play("Select");
+        AudioManager.instance.Play("Select");
         GameObject.Find("SGameManager").GetComponent<SGameManager>().LoadGame();
     }
 }

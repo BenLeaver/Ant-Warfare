@@ -1,11 +1,17 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Ant.AI;
 
 /// <summary>
-/// Ant will explore in a random direction, placing a pheromone path marker in the direction they 
-/// are headed so others can follow.
+/// Exploration state used when an ant has no strong pheromone guidance.
+/// 
+/// Overview:
+/// - Picks a random direction biased away from the queen to encourage outward exploration.
+/// - Moves toward a randomly chosen vaild point within range.
+/// - If the chosen target is far enough (>= 10 units), places a SearchPath pheromone 
+///   so other ants can follow the exploratory direction.
+/// - Periodically checks for interrupts (enemy or food).
+/// - Returns to pheromone-based decision making when reaching the target.
 /// </summary>
 public class AntSearchState : BaseAntState
 {
@@ -23,14 +29,13 @@ public class AntSearchState : BaseAntState
         currentDuration = 0f;
         IRCheckTimer = 0f;
 
-        // TODO: Bias moving further away from queen as better.
 
         if (!isResuming)
         {
             GameObject q = context.World.FindFriendlyQueen();
             Vector3 queenPos = q.transform.position;
 
-            // Slight bias towards moving further away from the queen.
+            // Bias towards moving further away from the queen.
             // Generate two possible positions, and pick the one further away.
             Vector3 p1 = context.GetValidPointWithinRange(context.World.Position, 3f, 20f);
             float p1Dist = Vector3.Distance(p1, queenPos);
@@ -54,7 +59,7 @@ public class AntSearchState : BaseAntState
             if (targetDist >= 10f)
             {
                 // If the target is far away place a pheromone so that other ants follow.
-                context.World.PlacePheromone(PheromoneSubtype.SearchPath, context.LocalTarget);
+                context.World.PlacePheromone(PheromoneSubtype.SearchPath);
             }
             
         }
@@ -102,7 +107,7 @@ public class AntSearchState : BaseAntState
 
     public bool CheckEnemyIR()
     {
-        GameObject closest = context.World.FindClosestEnemy();
+        UnitInfo closest = context.World.FindClosestEnemy();
 
         if (closest == null) return false;
 

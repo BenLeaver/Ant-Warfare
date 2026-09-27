@@ -9,6 +9,8 @@ using Unity.Netcode;
 /// </summary>
 public class AntTutorialAI : MonoBehaviour
 {
+    private UnitInfo myInfo;
+
     [Header("Type and Species")]
     public string type; //e.g., Worker, Soldier
     public string species; //e.g., Black, Fire
@@ -50,7 +52,7 @@ public class AntTutorialAI : MonoBehaviour
     {
         if (UnitManager.Instance != null)
         {
-            UnitManager.Instance.RegisterUnit(gameObject);
+            myInfo = UnitManager.Instance.RegisterUnit(gameObject);
         }
     }
 
@@ -58,7 +60,7 @@ public class AntTutorialAI : MonoBehaviour
     {
         if (UnitManager.Instance != null)
         {
-            UnitManager.Instance.UnregisterUnit(gameObject);
+            UnitManager.Instance.UnregisterUnit(myInfo);
         }
     }
 
@@ -91,20 +93,7 @@ public class AntTutorialAI : MonoBehaviour
     /// </summary>
     void FindClosestEnemy()
     {
-        float closestDistance = -1f;
-        closestEnemy = null;
-        foreach (GameObject a in UnitManager.Instance.Ants)
-        {
-            if (a.GetComponent<SHealth>().team != healthScript.team)
-            {
-                float distance = Vector3.Distance(a.transform.position, mouth.transform.position);
-                if (closestDistance == -1 || distance < closestDistance)
-                {
-                    closestDistance = distance;
-                    closestEnemy = a;
-                }
-            }
-        }
+        closestEnemy = UnitManager.Instance.GetClosestEnemyUnit(mouth.transform.position, 5).go;
     }
 
     /// <summary>

@@ -25,7 +25,7 @@ public class Player_Singleplayer : MonoBehaviour
     public Camera cam;
 
     [Header("Attack")]
-    private GameObject closestEnemy;
+    private UnitInfo closestEnemy;
     public Transform mouth;
     public float attackRange = 1f;
     public float sightRange = 50f;
@@ -33,36 +33,49 @@ public class Player_Singleplayer : MonoBehaviour
     public float attackTimer = 0f;
     public float attackDelay = 1f;
     private bool canAttack = true;
-    private GameObject enemyToAttack;
+    private UnitInfo enemyToAttack;
     private bool fortressBuffApplied = false;
     
     [Header("Food")]
     GameObject[] Food;
-    public float pickupRange = 2f;
+    public float pickupRange = 1f;
     public GameObject foodCarried;
     public float queenRange = 5f;
     public float foodMult = 1f;
     public GameObject queen;
 
+
+    public UnitInfo myInfo;
+    private UnitInfo queenInfo;
+
     // Start is called before the first frame update
     void Start()
     {
         InitialiseCamera();
-    }
-
-    private void OnEnable()
-    {
-        if (UnitManager.Instance != null)
+        queenInfo = queen.GetComponent<BaseAntQueenAI>().myInfo;
+        if (queenInfo == null)
         {
-            UnitManager.Instance.RegisterUnit(gameObject);
+            Debug.LogWarning("Player was unable to get queen unit info.");
         }
     }
+
+    public void Initialise(int team, Vector3 nestSpawn, GameObject queenRef)
+    {
+        this.nestSpawn = nestSpawn;
+        this.queen = queenRef;
+        transform.position = nestSpawn;
+
+        healthScript.UpdateTeam(team);
+
+        myInfo = UnitManager.Instance.RegisterUnit(gameObject);
+    }
+
 
     private void OnDisable()
     {
         if (UnitManager.Instance != null)
         {
-            UnitManager.Instance.UnregisterUnit(gameObject);
+            UnitManager.Instance.UnregisterUnit(myInfo);
         }
     }
 
@@ -76,7 +89,6 @@ public class Player_Singleplayer : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
         attackTimer += Time.deltaTime;
         CheckInput();
         CheckEnemies();
@@ -86,11 +98,7 @@ public class Player_Singleplayer : MonoBehaviour
             foodCarried.transform.rotation = mouth.transform.rotation;
             CheckInNest();
         }
-        if(queen == null)
-        {
-            queen = GameObject.Find(species + "AntQueen" + gameObject.GetComponent<SHealth>().team.ToString());
-        }
-        if (queen.GetComponent<BaseAntQueenAI>().fortress)
+        if (queenInfo.queenScript.fortress)
         {
             UpdateFortressBuff();
         }
@@ -101,12 +109,12 @@ public class Player_Singleplayer : MonoBehaviour
     /// </summary>
     public void UpdateFortressBuff()
     {
-        if (Vector3.Distance(transform.position, queen.transform.position) < 30f && !fortressBuffApplied)
+        if (Vector3.Distance(transform.position, queenInfo.transform.position) < 30f && !fortressBuffApplied)
         {
             fortressBuffApplied = true;
             attack += 15;
         }
-        else if (Vector3.Distance(transform.position, queen.transform.position) >= 30f && fortressBuffApplied)
+        else if (Vector3.Distance(transform.position, queenInfo.transform.position) >= 30f && fortressBuffApplied)
         {
             fortressBuffApplied = false;
             attack -= 15;
@@ -121,18 +129,18 @@ public class Player_Singleplayer : MonoBehaviour
             {
                 GameObject.Find("SGameManager").GetComponent<SGameManager>().tutorialPart = 0;
             }
-            GameObject.Find("AudioManager").GetComponent<AudioManager>().Stop("GameMusic");
-            GameObject.Find("AudioManager").GetComponent<AudioManager>().Play("MenuMusic");
+            AudioManager.instance.Stop("GameMusic");
+            AudioManager.instance.Play("MenuMusic");
             SceneManager.LoadScene("MainMenu");
         }
         if(Input.GetKey(KeyCode.W))
         {
-            transform.position += transform.up * Time.deltaTime * moveSpeed;
+            myInfo.transform.position += myInfo.transform.up * Time.deltaTime * moveSpeed;
             anim.SetBool("isWalking", true);
         }
         else if (Input.GetKey(KeyCode.S))
         {
-            transform.position += transform.up * Time.deltaTime * -moveSpeed;
+            myInfo.transform.position += myInfo.transform.up * Time.deltaTime * -moveSpeed;
             anim.SetBool("isWalking", true);
         }
         else
@@ -141,11 +149,11 @@ public class Player_Singleplayer : MonoBehaviour
         }
         if(Input.GetKey(KeyCode.D))
         {
-            transform.Rotate(0, 0, Time.deltaTime * -clockwise);
+            myInfo.transform.Rotate(0, 0, Time.deltaTime * -clockwise);
         }
         if (Input.GetKey(KeyCode.A))
         {
-            transform.Rotate(0, 0, Time.deltaTime * clockwise);
+            myInfo.transform.Rotate(0, 0, Time.deltaTime * clockwise);
         }
         if (Input.GetKeyDown(KeyCode.E))
         {
@@ -170,33 +178,17 @@ public class Player_Singleplayer : MonoBehaviour
 
     void CheckEnemies()
     {
-        float closestDistance = 0f;
-        foreach (GameObject a in UnitManager.Instance.AllUnits)
-        {
-            if (a.GetComponent<SHealth>().team != healthScript.team)
-            {
-                float distance = Vector3.Distance(a.transform.position, mouth.transform.position);
-                if (distance <= sightRange)
-                {
-                    if (closestDistance == 0 || distance < closestDistance)
-                    {
-                        closestDistance = distance;
-                        closestEnemy = a;
-                    }
-                }
-            }
-        }
-        if (closestDistance <= attackRange && closestDistance != 0)
-        {
-            if (canAttack == true)
-            {
-                if (attackTimer >= attackDelay && closestEnemy != null)
-                {
-                    attackTimer = 0f;
-                    Attack();
-                }
-            }
-        }
+        // Check whether the player is allowed to attack.
+        if (!canAttack) return;
+        if (attackTimer < attackDelay) return;
+
+        // Get closest enemy unit in attack range (if any).
+        closestEnemy = UnitManager.Instance.GetClosestEnemyUnit(mouth.transform.position, myInfo.team, attackRange);
+        if (!closestEnemy.IsAliveAndActive()) return;
+
+        // Attack
+        attackTimer = 0f;
+        Attack();
     }
 
     void Attack()
@@ -210,13 +202,27 @@ public class Player_Singleplayer : MonoBehaviour
     /// </summary>
     IEnumerator AttackDamage()
     {
+        var attacker = gameObject;
+
         anim.SetBool("isAttacking", true);
         yield return new WaitForSeconds(0.25f);
-        if (enemyToAttack != null)
+
+        if (attacker == null) yield break;
+        if (!attacker.activeInHierarchy) yield break;
+
+        if (!enemyToAttack.IsAliveAndActive())
         {
-            enemyToAttack.GetComponent<SHealth>().UpdateHealth(attack);
+            anim.SetBool("isAttacking", false);
+            yield break;
         }
+
+        enemyToAttack.health.UpdateHealth(attack);
+
         yield return new WaitForSeconds(0.10f);
+
+        if (attacker == null) yield break;
+        if (!attacker.activeInHierarchy) yield break;
+
         anim.SetBool("isAttacking", false);
     }
 
@@ -257,11 +263,11 @@ public class Player_Singleplayer : MonoBehaviour
 
     void CheckInNest()
     {
-        float queenDistance = Vector3.Distance(queen.transform.position, mouth.transform.position);
+        float queenDistance = Vector3.Distance(queenInfo.transform.position, mouth.transform.position);
         if(queenDistance <= queenRange)
         {
-            queen.GetComponent<BaseAntQueenAI>().food += Mathf.RoundToInt(foodCarried.GetComponent<Food>().food * foodMult);
-            GameObject.Find("AudioManager").GetComponent<AudioManager>().Play("FoodDropoff");
+            queenInfo.queenScript.food += Mathf.RoundToInt(foodCarried.GetComponent<Food>().food * foodMult);
+            AudioManager.instance.Play("FoodDropoff");
             Destroy(foodCarried);
             foodCarried = null;
             canAttack = true;
@@ -278,19 +284,38 @@ public class Player_Singleplayer : MonoBehaviour
 
     public void Death()
     {
-        if(queen.GetComponent<BaseAntQueenAI>().food >= 0)
+        if(queenInfo.queenScript.food >= 0)
         {
             //Respawns player
-            transform.position = nestSpawn;
-            queen.GetComponent<BaseAntQueenAI>().food -= 30;
-            healthScript.health = healthScript.maxHealth;
+            if (foodCarried != null) FoodDrop();
+            myInfo.transform.position = nestSpawn;
+            queenInfo.queenScript.food -= 30;
+            healthScript.ResetHealth();
         }
         else
         {
-            GameObject.Find("AudioManager").GetComponent<AudioManager>().Stop("GameMusic");
-            GameObject.Find("AudioManager").GetComponent<AudioManager>().Play("MenuMusic");
-            GameObject.Find("AudioManager").GetComponent<AudioManager>().Play("Lose");
+            UnitManager.Instance.UnregisterUnit(myInfo);
+            AudioManager.instance.Stop("GameMusic");
+            AudioManager.instance.Play("MenuMusic");
+            AudioManager.instance.Play("Lose");
             SceneManager.LoadScene("LoseMenu");
+        }
+    }
+
+    public void UpgradeAttack(float mult)
+    {
+        int current = attack;
+
+        // Only apply multiplier on top of base damage without fortress attack buff.
+        if (fortressBuffApplied)
+        {
+            current -= 15;
+            attack = Mathf.RoundToInt(current * mult);
+            attack += 15;
+        }
+        else
+        {
+            attack = Mathf.RoundToInt(current * mult);
         }
     }
 }

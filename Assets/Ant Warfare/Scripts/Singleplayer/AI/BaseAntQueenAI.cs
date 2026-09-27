@@ -11,6 +11,7 @@ public class BaseAntQueenAI : MonoBehaviour
 {
     public GameObject player;
     public string species;
+    public UnitInfo myInfo;
 
     public bool playerOnTeam = false;
     public int food = 100;
@@ -37,7 +38,7 @@ public class BaseAntQueenAI : MonoBehaviour
     public int maxColonySize = 50;
     public GameObject[] Ants;
     public Vector3 attackLocation;
-    public GameObject queenToAttack;
+    public UnitInfo queenToAttack;
 
     [Header("Health")]
     public SHealth healthScript;
@@ -52,19 +53,22 @@ public class BaseAntQueenAI : MonoBehaviour
     public bool aphidFarming = false;
     public bool lastStand = false;
 
-    private void OnEnable()
+    public void Initialise(int team, Vector3 spawnPos, GameObject playerRef=null, int difficulty=0)
     {
-        if (UnitManager.Instance != null)
-        {
-            UnitManager.Instance.RegisterUnit(gameObject);
-        }
+        this.spawnPos = spawnPos;
+        this.player = playerRef;
+        this.difficulty = difficulty;
+        this.playerOnTeam = (playerRef != null);
+
+        healthScript.UpdateTeam(team);
+        myInfo = UnitManager.Instance.RegisterUnit(gameObject);
     }
 
     private void OnDisable()
     {
         if (UnitManager.Instance != null)
         {
-            UnitManager.Instance.UnregisterUnit(gameObject);
+            UnitManager.Instance.UnregisterUnit(myInfo);
         }
     }
 
@@ -126,7 +130,7 @@ public class BaseAntQueenAI : MonoBehaviour
             UpdateFortressHeal();
         }
 
-        if (lastStand && healthScript.health < (healthScript.maxHealth * 0.75f))
+        if (lastStand && healthScript.Health < (healthScript.MaxHealth * 0.75f))
         {
             lastStand = false;
             LastStand();
@@ -136,19 +140,19 @@ public class BaseAntQueenAI : MonoBehaviour
 
     void UpdateFortressHeal()
     {
-        if (healthScript.health < healthScript.maxHealth)
+        if (healthScript.Health < healthScript.MaxHealth)
         {
             lastHealTime += Time.deltaTime;
             if (lastHealTime >= 1f)
             {
                 lastHealTime -= 1f;
-                if (healthScript.health + 5 > healthScript.maxHealth)
+                if (healthScript.Health + 5 > healthScript.MaxHealth)
                 {
-                    healthScript.health = healthScript.maxHealth;
+                    healthScript.Health = healthScript.MaxHealth;
                 }
                 else
                 {
-                    healthScript.health += 5;
+                    healthScript.Health += 5;
                 }
             }
         }
@@ -164,7 +168,7 @@ public class BaseAntQueenAI : MonoBehaviour
             colonySize = totalSoldiers + totalWorkers;
             if (playerOnTeam)
             {
-                GameObject.Find("AudioManager").GetComponent<AudioManager>().Play("Spawn");
+                AudioManager.instance.Play("Spawn");
                 ApplySoldierUpgrades(soldier);
             }
         }
@@ -182,7 +186,7 @@ public class BaseAntQueenAI : MonoBehaviour
             colonySize = totalSoldiers + totalWorkers;
             if (playerOnTeam)
             {
-                GameObject.Find("AudioManager").GetComponent<AudioManager>().Play("Spawn");
+                AudioManager.instance.Play("Spawn");
                 ApplySoldierUpgrades(soldier);
             }
         }
@@ -194,29 +198,27 @@ public class BaseAntQueenAI : MonoBehaviour
         {
             if (u.GetComponent<Upgrade>().upgradeName == "Movement Speed")
             {
-                a.GetComponent<UnityEngine.AI.NavMeshAgent>().speed *= 1.15f;
+                a.GetComponent<IAntWorld>().UpgradeSpeed(1.15f);
             }
             if (u.GetComponent<Upgrade>().upgradeName == "Stronger Soldiers")
             {
-                int current = a.GetComponent<AntBaseAI>().attack;
-                a.GetComponent<AntBaseAI>().attack = Mathf.RoundToInt(current * 1.2f);
+                a.GetComponent<IAntWorld>().UpgradeAttack(1.2f);
             }
             if (u.GetComponent<Upgrade>().upgradeName == "Less Food Waste")
             {
-                a.GetComponent<AntBaseAI>().foodMult = 1.3f;
+                a.GetComponent<IAntWorld>().UpgradeFoodMult(1.3f);
             }
             if (u.GetComponent<Upgrade>().upgradeName == "First Aid")
             {
-                a.GetComponent<AntBaseAI>().firstAid = true;
+                a.GetComponent<IAntWorld>().ActivateFirstAid();
             }
             if (u.GetComponent<Upgrade>().upgradeName == "Rapid Movement")
             {
-                a.GetComponent<UnityEngine.AI.NavMeshAgent>().speed *= 1.2f;
+                a.GetComponent<IAntWorld>().UpgradeSpeed(1.2f);
             }
             if (u.GetComponent<Upgrade>().upgradeName == "Long Stingers")
             {
-                int current = a.GetComponent<AntBaseAI>().attack;
-                a.GetComponent<AntBaseAI>().attack = Mathf.RoundToInt(current * 1.2f);
+                a.GetComponent<IAntWorld>().UpgradeAttack(1.2f);
             }
         }
     }
@@ -232,7 +234,7 @@ public class BaseAntQueenAI : MonoBehaviour
             colonySize = totalSoldiers + totalWorkers;
             if (playerOnTeam)
             {
-                GameObject.Find("AudioManager").GetComponent<AudioManager>().Play("Spawn");
+                AudioManager.instance.Play("Spawn");
                 ApplyWorkerUpgrades(worker);
             }
         }
@@ -244,26 +246,24 @@ public class BaseAntQueenAI : MonoBehaviour
         {
             if (u.GetComponent<Upgrade>().upgradeName == "Movement Speed")
             {
-                a.GetComponent<UnityEngine.AI.NavMeshAgent>().speed *= 1.15f;
+                a.GetComponent<IAntWorld>().UpgradeSpeed(1.15f);
             }
             if (u.GetComponent<Upgrade>().upgradeName == "Less Food Waste")
             {
-                a.GetComponent<AntBaseAI>().foodMult = 1.3f;
+                a.GetComponent<IAntWorld>().UpgradeFoodMult(1.3f);
             }
             if (u.GetComponent<Upgrade>().upgradeName == "Rapid Movement")
             {
-                a.GetComponent<UnityEngine.AI.NavMeshAgent>().speed *= 1.2f;
+                a.GetComponent<IAntWorld>().UpgradeSpeed(1.2f);
             }
             if (u.GetComponent<Upgrade>().upgradeName == "Long Stingers")
             {
-                int current = a.GetComponent<AntBaseAI>().attack;
-                a.GetComponent<AntBaseAI>().attack = Mathf.RoundToInt(current * 1.2f);
+                a.GetComponent<IAntWorld>().UpgradeAttack(1.2f);
             }
             if (u.GetComponent<Upgrade>().upgradeName == "Aggressive Workers")
             {
-                int current = a.GetComponent<AntBaseAI>().attack;
-                a.GetComponent<AntBaseAI>().attack = Mathf.RoundToInt(current * 1.1f);
-                a.GetComponent<UnityEngine.AI.NavMeshAgent>().speed *= 1.1f;
+                a.GetComponent<IAntWorld>().UpgradeAttack(1.1f);
+                a.GetComponent<IAntWorld>().UpgradeSpeed(1.1f);
             }
         }
     }
@@ -278,27 +278,10 @@ public class BaseAntQueenAI : MonoBehaviour
             colonySize = totalSoldiers + totalWorkers;
             if (playerOnTeam)
             {
-                GameObject.Find("AudioManager").GetComponent<AudioManager>().Play("Spawn");
-                ApplySuperSoldierUpgrades(soldier);
+                AudioManager.instance.Play("Spawn");
+                ApplySoldierUpgrades(soldier);
             }
         }
-    }
-
-    public void ApplySuperSoldierUpgrades(GameObject a)
-    {
-        foreach (GameObject u in upgradesSelected)
-        {
-            if (u.GetComponent<Upgrade>().upgradeName == "Rapid Movement")
-            {
-                a.GetComponent<UnityEngine.AI.NavMeshAgent>().speed *= 1.2f;
-            }
-            if (u.GetComponent<Upgrade>().upgradeName == "Long Stingers")
-            {
-                int current = a.GetComponent<AntBaseAI>().attack;
-                a.GetComponent<AntBaseAI>().attack = Mathf.RoundToInt(current * 1.2f);
-            }
-        }
-
     }
 
     /// <summary>
@@ -316,19 +299,28 @@ public class BaseAntQueenAI : MonoBehaviour
         var ant = Instantiate(antPrefab, position, Quaternion.identity);
 
         // Set the ant's team.
-        int team = gameObject.GetComponent<SHealth>().team;
-        ant.GetComponent<SHealth>().UpdateTeam(team);
+        int team = myInfo.team;
+        ant.GetComponent<IHealth>().UpdateTeam(team);
 
         // Initialise the ant with a reference to the queen.
-        ant.GetComponent<SingleplayerAntWorld>().InitializeAntFromQueen(this.gameObject);
+        ant.GetComponent<SingleplayerAntWorld>().InitializeAntFromQueen(myInfo);
 
         return ant;
     }
 
     public void SpawnDecision()
     {
-        while (food >= workerCost)
+        int safety = 0;
+
+        while ((food >= workerCost && colonySize < 30) || (food >= soldierCost && colonySize < maxColonySize))
         {
+            safety++;
+            if (safety > 100)
+            {
+                Debug.LogError("SpawnDecision runaway loop detected");
+                break;
+            }
+
             if (colonySize < 5)
             {
                 SpawnWorker();
@@ -351,7 +343,7 @@ public class BaseAntQueenAI : MonoBehaviour
                     SpawnWorker();
                 }
             }
-            else
+            else if (colonySize < maxColonySize)
             {
                 if (food >= soldierCost)
                 {
@@ -381,14 +373,13 @@ public class BaseAntQueenAI : MonoBehaviour
     {
         int topStrength = -1;
 
-        foreach (GameObject a in Ants)
+        List<UnitInfo> queens = UnitManager.Instance.GetAllQueens();
+
+        foreach (UnitInfo q in queens)
         {
-            if (a.GetComponent<BaseAntQueenAI>())
-            {
-                topStrength = Mathf.Max(a.GetComponent<BaseAntQueenAI>().getStrength(), topStrength);
-            }
+            topStrength = Mathf.Max(q.queenScript.getStrength(), topStrength);
         }
-        return topStrength - this.getStrength();
+        return topStrength - getStrength();
     }
 
     IEnumerator AttackCheck()
@@ -414,18 +405,12 @@ public class BaseAntQueenAI : MonoBehaviour
     {
         command = "attack";
         queenToAttack = null;
-        List<GameObject> enemyQueens = new List<GameObject>();
-        foreach (GameObject a in UnitManager.Instance.Ants)
-        {
-            if (a.GetComponent<BaseAntQueenAI>() && a != this.gameObject)
-            {
-                enemyQueens.Add(a);
-            }
-        }
+        List<UnitInfo> enemyQueens = UnitManager.Instance.GetEnemyQueens(myInfo.team);
 
+        // Pick a random enemy queen to attack
         int randomIndex = Random.Range(0, enemyQueens.Count);
         queenToAttack = enemyQueens[randomIndex];
-        attackLocation = queenToAttack.GetComponent<BaseAntQueenAI>().spawnPos;
+        attackLocation = queenToAttack.queenScript.spawnPos;
 
         float randomSeconds = Random.Range(15f, 50f);
         yield return new WaitForSeconds(randomSeconds);
@@ -438,7 +423,10 @@ public class BaseAntQueenAI : MonoBehaviour
     public void Brain()
     {
         SpawnDecision();
-        AttackCheck();
+        
+        // Attack Check disabled for now as currently ants don't listen to the queen's commands.
+        // It also makes testing easier.
+        //AttackCheck();
 
         if (CheckEnemiesInNest())
         {
@@ -451,7 +439,7 @@ public class BaseAntQueenAI : MonoBehaviour
 
         if (command == "none")
         {
-            StartCoroutine(AttackCheck());
+            //StartCoroutine(AttackCheck());
         }
         else if (command == "attack" && queenToAttack == null)
         {
@@ -490,34 +478,46 @@ public class BaseAntQueenAI : MonoBehaviour
 
     public void Death()
     {
+        UnitManager.Instance.UnregisterUnit(myInfo);
         if (playerOnTeam)
         {
-            GameObject.Find("AudioManager").GetComponent<AudioManager>().Play("Lose");
-            GameObject.Find("AudioManager").GetComponent<AudioManager>().Stop("GameMusic");
-            GameObject.Find("AudioManager").GetComponent<AudioManager>().Play("MenuMusic");
+            AudioManager.instance.Play("Lose");
+            AudioManager.instance.Stop("GameMusic");
+            AudioManager.instance.Play("MenuMusic");
             SceneManager.LoadScene("LoseMenu");
         }
         else
         {
             GameObject.Find("SGameManager").GetComponent<SGameManager>().TeamDied();
+            KillColony();
             Destroy(gameObject);
         }
     }
 
+    /// <summary>
+    /// Return whether the queen can see any enemies (within 20 units).
+    /// </summary>
     private bool CheckEnemiesInNest()
     {
-        foreach (GameObject a in UnitManager.Instance.AllUnits)
+        List<UnitInfo> visibleEnemies = UnitManager.Instance.GetVisibleEnemyUnits(myInfo.transform.position, myInfo.team, 20f);
+        return visibleEnemies.Count > 0;
+    }
+
+    /// <summary>
+    /// Will get all ants in this colony, and kill them instantly.
+    /// </summary>
+    private void KillColony()
+    {
+        var friendlyUnits = UnitManager.Instance.GetTeamUnits(myInfo.team);
+
+        var copy = new List<UnitInfo>(friendlyUnits);
+        foreach (UnitInfo u in copy)
         {
-            if (a.GetComponent<SHealth>().team != healthScript.team)
+            if (u.go != myInfo.go)
             {
-                float distance = Vector3.Distance(a.transform.position, gameObject.transform.position);
-                if (distance <= 10f)
-                {
-                    //Enemy near nest
-                    return true;
-                }
+                // Ensure all other ants in the colony die (no one is surviving 999999 damage).
+                u.health.UpdateHealth(999999);
             }
         }
-        return false;
     }
 }

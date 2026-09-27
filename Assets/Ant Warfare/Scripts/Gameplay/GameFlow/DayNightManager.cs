@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
+using UnityEngine.AI;
 
 /// <summary>
 /// Manages the day-night cycle in the game.
@@ -52,26 +53,25 @@ public class DayNightManager : MonoBehaviour
     /// </summary>
     void SpawnBugs()
     {
-
         // Cockroach
         if (day <= 1)
         {
-            Spawn(0, 1);
+            //Spawn(0, 1);
         }
         else if (day == 2)
         {
-            Spawn(0, 2);
+            //Spawn(0, 2);
         }
         else
         {
-            Spawn(0, 3);
+            //Spawn(0, 3);
         }
 
         // Stag Beetle
-        if (day % 2 == 0 && day != 0)
-        {
-            Spawn(1, 1);
-        }
+        //if (day % 2 == 0 && day != 0)
+        //{
+            //Spawn(1, 1);
+        //}
     }
 
     /// <summary>
@@ -118,15 +118,23 @@ public class DayNightManager : MonoBehaviour
         {
             // Pick a random position in a circle around the center
             Vector2 offset = Random.insideUnitCircle * searchRadius;
-
             Vector3 testPosition = center + new Vector3(offset.x, offset.y, 0);
 
-            // Check if there are any ants within the safeRadius
+            // 1. Must be on the NavMesh
+            Vector3 navPos;
+            if (!TryGetNavMeshPosition(testPosition, out navPos))
+                continue;
+
+            // 2. Check if there are any ants within the safeRadius
             bool occupied = false;
-            foreach (GameObject ant in UnitManager.Instance.ants)
+
+            var allAnts = UnitManager.Instance.GetAllAnts();
+            float safeRadiusSqr = safeRadius * safeRadius;
+            foreach (UnitInfo ant in allAnts)
             {
-                if (ant == null) continue;
-                if (Vector3.Distance(testPosition, ant.transform.position) < safeRadius)
+                if (ant.go == null) continue;
+                Vector3 diff = ant.transform.position - navPos;
+                if (diff.sqrMagnitude < safeRadiusSqr)
                 {
                     occupied = true;
                     break;
@@ -135,7 +143,7 @@ public class DayNightManager : MonoBehaviour
 
             if (!occupied)
             {
-                return testPosition; // Found a clear spot!
+                return navPos; // Found a clear spot!
             }
         }
 
@@ -143,6 +151,20 @@ public class DayNightManager : MonoBehaviour
         return center;
     }
 
+    private bool TryGetNavMeshPosition(Vector3 position, out Vector3 navPos, float maxDistance=2f)
+    {
+        NavMeshHit hit;
+        if (NavMesh.SamplePosition(position, out hit, maxDistance, NavMesh.AllAreas))
+        {
+            navPos = hit.position;
+            return true;
+        }
+
+        navPos = position;
+        return false;
+    }
+
 }
+
 
 

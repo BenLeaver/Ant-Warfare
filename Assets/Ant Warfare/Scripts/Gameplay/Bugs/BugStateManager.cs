@@ -21,6 +21,8 @@ public class BugStateManager : StateManager
         None
     }
 
+    public UnitInfo myInfo;
+
     //[Header("NavMesh & Movement")]
     public UnityEngine.AI.NavMeshAgent Agent;
     private NavMeshPath _path;
@@ -47,7 +49,7 @@ public class BugStateManager : StateManager
     {
         if (UnitManager.Instance != null)
         {
-            UnitManager.Instance.RegisterUnit(gameObject);
+            myInfo = UnitManager.Instance.RegisterUnit(gameObject);
         }
     }
 
@@ -55,7 +57,7 @@ public class BugStateManager : StateManager
     {
         if (UnitManager.Instance != null)
         {
-            UnitManager.Instance.UnregisterUnit(gameObject);
+            UnitManager.Instance.UnregisterUnit(myInfo);
         }
     }
 
@@ -89,7 +91,7 @@ public class BugStateManager : StateManager
     /// </summary>
     protected void RotateTowardsMovementTarget()
     {
-        Vector3 direction = Agent.steeringTarget - transform.position;
+        Vector3 direction = Agent.steeringTarget - myInfo.transform.position;
         if (direction.sqrMagnitude > 0.1f)
         {
             Quaternion targetRotation = Quaternion.LookRotation(Vector3.forward, direction);
@@ -99,122 +101,66 @@ public class BugStateManager : StateManager
 
     protected void RotateTowardsClosestEnemy()
     {
-        GameObject enemy = FindNearestEnemy();
+        UnitInfo enemy = FindNearestEnemy();
 
         if (enemy == null) return;
 
-        Vector3 direction = enemy.transform.position - transform.position;
+        Vector3 direction = enemy.transform.position - myInfo.transform.position;
 
         if (direction.sqrMagnitude > 0.1f)
         {
             Quaternion targetRotation = Quaternion.LookRotation(Vector3.forward, direction);
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * rotationSpeed);
+            myInfo.transform.rotation = Quaternion.Slerp(myInfo.transform.rotation, targetRotation, Time.deltaTime * rotationSpeed);
         }
     }
 
     /// <summary>
-    /// Finds the nearest enemy unit based on team in SHealth.
+    /// Finds the nearest enemy unit within sight range.
     /// </summary>
     /// <returns>The closest enemy, or null if none exist.</returns>
-    public GameObject FindNearestEnemy()
+    public UnitInfo FindNearestEnemy()
     {
-        GameObject nearest = null;
-        float minDist = Mathf.Infinity;
-
-        foreach (GameObject a in UnitManager.Instance.AllUnits)
-        {
-            if (a.GetComponent<SHealth>())
-            {
-                if (a.GetComponent<SHealth>().team != GetComponent<SHealth>().team)
-                {
-                    float dist = Vector3.Distance(transform.position, a.transform.position);
-                    if (dist < minDist)
-                    {
-                        minDist = dist;
-                        nearest = a;
-                    }
-                }
-            }
-        }
-        return nearest;
+        return UnitManager.Instance.GetClosestEnemyUnit(myInfo.transform.position, myInfo.team, 20f);
     }
 
     /// <summary>
     /// Finds the nearest enemy that is not a queen.
     /// </summary>
     /// <returns></returns>
-    public GameObject FindNearestNonQueenEnemy()
+    public UnitInfo FindNearestNonQueenEnemy()
     {
-        GameObject nearest = null;
-        float minDist = Mathf.Infinity;
-
-        foreach (GameObject a in UnitManager.Instance.AllUnits)
-        {
-            if (a.GetComponent<BaseAntQueenAI>())
-            {
-                continue;
-            }
-
-            if (a.GetComponent<SHealth>())
-            {
-                if (a.GetComponent<SHealth>().team != GetComponent<SHealth>().team)
-                {
-                    float dist = Vector3.Distance(transform.position, a.transform.position);
-                    if (dist < minDist)
-                    {
-                        minDist = dist;
-                        nearest = a;
-                    }
-                }
-            }
-        }
-        return nearest;
+        return UnitManager.Instance.GetClosestNonQueenEnemy(myInfo.transform.position, myInfo.team, 20f);
     }
 
     public float FindNearestEnemyDist()
     {
-        float minDist = Mathf.Infinity;
-        foreach (GameObject a in UnitManager.Instance.AllUnits)
-        {
-            SHealth health = a.GetComponent<SHealth>();
+        UnitInfo nearest = FindNearestEnemy();
 
-            if (!health || health.team != GetComponent<SHealth>().team)
-            {
-                float dist = Vector3.Distance(transform.position, a.transform.position);
-                if (dist < minDist)
-                {
-                    minDist = dist;
-                }
-            }
-        }
-        return minDist;
+        // If there are no enemies in sight range, just return the sight range.
+        if (nearest == null) return 20f;
+
+        return Vector3.Distance(myInfo.transform.position, nearest.transform.position);
     }
 
     /// <summary>
     /// Finds the furthest enemy within a given range, excluding a specific enemy.
     /// </summary>
-    public GameObject FindFurthestEnemyInRange(float maxRange, float minRange, GameObject exclude)
+    public UnitInfo FindFurthestEnemyInRange(float sightRange, float minRange, GameObject exclude)
     {
-        GameObject furthest = null;
-        float maxDist = 0f;
+        var visibleEnemies = UnitManager.Instance.GetVisibleEnemyUnits(myInfo.transform.position, myInfo.team, sightRange);
+        UnitInfo furthest = null;
+        float maxDist = float.MinValue;
 
-        foreach (GameObject a in UnitManager.Instance.AllUnits)
+        foreach (UnitInfo u in visibleEnemies)
         {
-            if (a == exclude) continue;
+            if (u.go == exclude) continue;
 
-            SHealth health = a.GetComponent<SHealth>();
+            float dist = Vector3.Distance(myInfo.transform.position, u.transform.position);
 
-            if (!health || health.team == GetComponent<SHealth>().team)
-            {
-                continue;
-            }
-
-            float dist = Vector3.Distance(transform.position, a.transform.position);
-
-            if (dist <= maxRange && dist > maxDist && dist >= minRange)
+            if (dist > maxDist && dist >= minRange)
             {
                 maxDist = dist;
-                furthest = a;
+                furthest = u;
             }
         }
         return furthest;
@@ -238,6 +184,10 @@ public class BugStateManager : StateManager
             Vector2 randomCircle = Random.insideUnitCircle * dropRadius;
             Vector3 randomPos = transform.position + new Vector3(randomCircle.x, randomCircle.y, 0);
             Instantiate(foodPrefab, randomPos, Quaternion.identity);
+        }
+        if (UnitManager.Instance != null)
+        {
+            UnitManager.Instance.UnregisterUnit(myInfo);
         }
         Destroy(gameObject);
     }
@@ -312,7 +262,7 @@ public class BugStateManager : StateManager
     /// </returns>
     public Vector3 GetRetreatPoint(int maxAttempts = 20)
     {
-        GameObject enemy = FindNearestEnemy();
+        UnitInfo enemy = FindNearestEnemy();
 
         // No enemy: fallback to a generic movement point
         if (enemy == null)
@@ -352,7 +302,7 @@ public class BugStateManager : StateManager
         {
             Debug.LogWarning(
                 $"[{name}] Retreat failed: no valid reachable retreat point found. " +
-                $"Enemy: {enemy.name}");
+                $"Enemy: {enemy.go.name}");
         }
 
         return retreatPoint;

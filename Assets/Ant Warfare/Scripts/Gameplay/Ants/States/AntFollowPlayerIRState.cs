@@ -1,8 +1,21 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Ant.AI;
 
+/// <summary>
+/// Interrupt state used when an ant is following the player.
+/// 
+/// Overview:
+/// -   Continuously moves toward a point near the player, with follow range increasing as the colony grows (prevents crowding).
+/// -   Periodically updates the target position to stay near the player.
+/// -   Subtype determines which interrupts are allowed:
+///     
+///     Subtype     Allowed Interrupts
+///     0 (strict)  None — always follow player
+///     1 (food)    EnemyIR + FoodIR
+///     2 (attack)  EnemyIR only
+///     
+/// </summary>
 public class AntFollowPlayerIRState : BaseAntState
 {
 
@@ -81,12 +94,12 @@ public class AntFollowPlayerIRState : BaseAntState
 
     public bool CheckEnemyIR()
     {
-        GameObject closest = context.World.FindClosestEnemy();
+        UnitInfo closest = context.World.FindClosestEnemy();
 
         if (closest == null) return false;
 
         float dist = Vector3.Distance(closest.transform.position, context.World.Position);
-        if (dist < context.SightRange)
+        if (dist < context.SightRange / 2)
         {
             // Enemy in sight - interrupt.
             manager.PushInterrupt(manager.enemyIRState);
@@ -102,7 +115,7 @@ public class AntFollowPlayerIRState : BaseAntState
         if (closest == null) return false;
 
         float dist = Vector3.Distance(closest.transform.position, context.World.Position);
-        if (dist < context.SightRange)
+        if (dist < context.SightRange / 2)
         {
             // Food in sight - interrupt.
             manager.PushInterrupt(manager.foodIRState);

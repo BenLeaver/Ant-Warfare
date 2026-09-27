@@ -417,6 +417,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   commandDescription: {fileID: 8276071870323689143}
+  amountText: {fileID: 0}
+  uiScript: {fileID: 0}
+  subtype: 0
+  isRemoveButton: 0
 --- !u!114 &2402846554445980010
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1451,6 +1455,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   commandDescription: {fileID: 8936796625836118672}
+  amountText: {fileID: 0}
+  uiScript: {fileID: 0}
+  subtype: 0
+  isRemoveButton: 0
 --- !u!114 &6809310965988981537
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3474,6 +3482,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   commandDescription: {fileID: 8616901248070738064}
+  amountText: {fileID: 0}
+  uiScript: {fileID: 0}
+  subtype: 0
+  isRemoveButton: 0
 --- !u!114 &8986214828666156823
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4304,6 +4316,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   commandDescription: {fileID: 4663262933104027183}
+  amountText: {fileID: 0}
+  uiScript: {fileID: 0}
+  subtype: 0
+  isRemoveButton: 0
 --- !u!114 &4476298031751123893
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4900,6 +4916,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   commandDescription: {fileID: 8313029031999998505}
+  amountText: {fileID: 0}
+  uiScript: {fileID: 0}
+  subtype: 0
+  isRemoveButton: 0
 --- !u!114 &603286804522631580
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7280,7 +7300,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &112694256603435464
 RectTransform:
   m_ObjectHideFlags: 0
@@ -8074,6 +8094,9 @@ MonoBehaviour:
   colonySizeText: {fileID: 9009712454806312868}
   helpUI: {fileID: 2807491243109283307}
   upgradeUI: {fileID: 5975936259717059911}
+  commandUI: {fileID: 0}
+  spawnUI: {fileID: 0}
+  mainCanvas: {fileID: 0}
   upgradeTier: 0
   upgrades:
   - {fileID: 6347261123557046902}
@@ -8086,8 +8109,10 @@ MonoBehaviour:
   - {fileID: 5076385276447765192}
   - {fileID: 2419918462259206380}
   - {fileID: 864216198230865170}
-  lastLifePostProcessing: {fileID: 0}
+  lastLifeVolume: {fileID: 0}
   inTutorial: 0
+  positiveFoodTextColor: {r: 0, g: 0, b: 0, a: 0}
+  negativeFoodTextColor: {r: 0, g: 0, b: 0, a: 0}
   markerAmountTexts:
   - {fileID: 991737796823750091}
   - {fileID: 3956350962328433714}
@@ -9487,6 +9512,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   commandDescription: {fileID: 8601204761231474794}
+  amountText: {fileID: 0}
+  uiScript: {fileID: 0}
+  subtype: 0
+  isRemoveButton: 0
 --- !u!114 &6044355415003110730
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10298,6 +10327,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   commandDescription: {fileID: 4652402105379517154}
+  amountText: {fileID: 0}
+  uiScript: {fileID: 0}
+  subtype: 0
+  isRemoveButton: 0
 --- !u!114 &7024350945625932078
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10973,6 +11006,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   commandDescription: {fileID: 5277149160831079189}
+  amountText: {fileID: 0}
+  uiScript: {fileID: 0}
+  subtype: 0
+  isRemoveButton: 0
 --- !u!114 &3432401382781219124
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11703,6 +11740,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   commandDescription: {fileID: 3878722196123738780}
+  amountText: {fileID: 0}
+  uiScript: {fileID: 0}
+  subtype: 0
+  isRemoveButton: 0
 --- !u!114 &2785805813522923722
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13325,6 +13366,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   commandDescription: {fileID: 6494318751402752124}
+  amountText: {fileID: 0}
+  uiScript: {fileID: 0}
+  subtype: 0
+  isRemoveButton: 0
 --- !u!114 &327160009380881798
 MonoBehaviour:
   m_ObjectHideFlags: 0

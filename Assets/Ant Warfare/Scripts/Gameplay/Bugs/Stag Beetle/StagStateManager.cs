@@ -46,11 +46,11 @@ public class StagStateManager : BugStateManager
 
     public Vector3 GetEnemyThrowTarget(GameObject thrownAnt)
     {
-        const float maxThrowRange = 25f;
+        const float maxThrowRange = 20f;
         const float minThrowRange = 10f;
         const int attempts = 100;
 
-        GameObject targetEnemy = FindFurthestEnemyInRange(maxThrowRange, minThrowRange, thrownAnt);
+        UnitInfo targetEnemy = FindFurthestEnemyInRange(maxThrowRange, minThrowRange, thrownAnt);
         Vector3 targetPos;
 
         if (targetEnemy != null)
@@ -77,7 +77,7 @@ public class StagStateManager : BugStateManager
             float dist = Random.Range(maxThrowRange * 0.5f, maxThrowRange);
 
             Vector3 candidate =
-                transform.position +
+                myInfo.transform.position +
                 new Vector3(dir.x, dir.y, 0f) * dist;
 
             if (!UnityEngine.AI.NavMesh.SamplePosition(candidate, out UnityEngine.AI.NavMeshHit hit, 5f, UnityEngine.AI.NavMesh.AllAreas))
@@ -89,6 +89,6 @@ public class StagStateManager : BugStateManager
 
         Debug.LogWarning($"[{name}] GetEnemyThrowTarget failed: no reachable target found.");
 
-        return transform.position;
+        return myInfo.transform.position;
     }
 }

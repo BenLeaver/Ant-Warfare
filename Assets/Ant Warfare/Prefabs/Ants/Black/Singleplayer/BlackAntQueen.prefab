@@ -85,7 +85,7 @@ MonoBehaviour:
   m_MinValue: 0
   m_MaxValue: 1000
   m_WholeNumbers: 0
-  m_Value: 1
+  m_Value: 1.03
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -381,7 +381,7 @@ MonoBehaviour:
   species: Black
   playerOnTeam: 0
   food: 100
-  superSoldierPrefab: {fileID: 0}
+  superSoldierPrefab: {fileID: 8200308034547834947, guid: a7c31273352036841a2d6499f1fd156c, type: 3}
   superSoldierCost: 200
   soldierPrefab: {fileID: 2655473375775372679, guid: d9741310303172d49b949bd1d088a3a9, type: 3}
   soldierCost: 50
@@ -396,7 +396,6 @@ MonoBehaviour:
   maxColonySize: 50
   Ants: []
   attackLocation: {x: 0, y: 0, z: 0}
-  queenToAttack: {fileID: 0}
   healthScript: {fileID: 8564992431610467717}
   fortress: 0
   lastHealTime: 0
@@ -416,7 +415,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxHealth: 1000
   health: 1000
-  team: 4
   slider: {fileID: 8564992430830142432}
   fill: {fileID: 8564992431013339997}
   deathObject: {fileID: 8053489751011682950, guid: 257a7d08a069a2f49be6a4ff2cbf1a30, type: 3}

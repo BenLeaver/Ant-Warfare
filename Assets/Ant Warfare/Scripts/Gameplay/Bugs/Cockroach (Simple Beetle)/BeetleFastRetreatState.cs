@@ -8,6 +8,7 @@ public class BeetleFastRetreatState : BeetleBaseState
 {
     private float retreatDuration;
     private float elapsed;
+    private float checkTimer;
 
     public BeetleFastRetreatState(BeetleStateManager beetle) : base(beetle) { }
 
@@ -37,18 +38,16 @@ public class BeetleFastRetreatState : BeetleBaseState
             return;
         }
 
-        GameObject nearestEnemy = manager.FindNearestEnemy();
-        if (nearestEnemy == null)
+        // Periodically check whether any enemies are still visible
+        if (checkTimer > 0.5f)
         {
-            manager.ChangeState(manager.IdleState);
-            return;
-        }
-
-        float distance = Vector3.Distance(manager.transform.position, nearestEnemy.transform.position);
-        if (distance > 30f)
-        {
-            manager.ChangeState(manager.IdleState);
-            return;
+            checkTimer = 0f;
+            UnitInfo nearestEnemy = manager.FindNearestEnemy();
+            if (nearestEnemy == null)
+            {
+                manager.ChangeState(manager.IdleState);
+                return;
+            }
         }
 
         if (!manager.Agent.pathPending && manager.Agent.remainingDistance <= 0.5f)

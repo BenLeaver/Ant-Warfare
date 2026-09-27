@@ -10,8 +10,9 @@ public class StagThrowState : StagBaseState
     public const float totalAttackTime = (45f / 60f);
     public const float throwTime = (30f / 60f);
 
-    private GameObject closestEnemy;
+    private UnitInfo closestEnemy;
     private bool attacked;
+    private GameObject stag;
 
     public override void EnterState() {
         manager.currentStateName = "SimpleAttack";
@@ -19,6 +20,7 @@ public class StagThrowState : StagBaseState
         manager.anim.SetInteger("attackDecision", 2);
         elapsed = 0f;
         attacked = false;
+        stag = manager.gameObject;
     }
 
     public override void UpdateState() {
@@ -26,6 +28,11 @@ public class StagThrowState : StagBaseState
         elapsed += Time.deltaTime;
 
         if (closestEnemy == null)
+        {
+            EndAttack();
+            return;
+        }
+        if (closestEnemy.go == null)
         {
             EndAttack();
             return;
@@ -41,6 +48,7 @@ public class StagThrowState : StagBaseState
         {
             ThrowClosest();
             attacked = true;
+            EndAttack();
         }
     }
 
@@ -58,9 +66,10 @@ public class StagThrowState : StagBaseState
     /// </summary>
     private void ThrowClosest()
     {
-        if (closestEnemy == null) return;
+        if (!closestEnemy.IsAliveAndActive()) return;
+        if (stag == null || !stag.activeInHierarchy) return;
 
-        Vector3 targetPoint = manager.GetEnemyThrowTarget(closestEnemy);
+        Vector3 targetPoint = manager.GetEnemyThrowTarget(closestEnemy.go);
 
         if (!manager.HasValidPath(targetPoint))
         {
@@ -68,9 +77,9 @@ public class StagThrowState : StagBaseState
             return;
         }
 
-        ThrownAnt thrown = closestEnemy.AddComponent<ThrownAnt>();
+        ThrownAnt thrown = closestEnemy.go.AddComponent<ThrownAnt>();
 
-        thrown.Initialise(targetPoint, 0.6f, manager.throwDamage, manager.throwImpactEffect);
+        thrown.Initialise(targetPoint, 0.6f, manager.throwDamage, manager.throwImpactEffect, closestEnemy);
     }
 
     public override void OnDamageTaken() { }

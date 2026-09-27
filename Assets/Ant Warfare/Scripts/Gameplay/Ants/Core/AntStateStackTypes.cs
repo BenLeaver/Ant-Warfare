@@ -3,9 +3,8 @@ using UnityEngine;
 namespace Ant.AI
 {
     /// <summary>
-    /// Snapshot of the ant's working memory at the moment
+    /// Snapshot of the ant's working memory/intent at the moment
     /// an interrupt is pushed onto the stack.
-    /// Stores INTENT — not mechanics.
     /// </summary>
     public struct AntContextSnapshot
     {
@@ -20,7 +19,7 @@ namespace Ant.AI
     }
 
     /// <summary>
-    /// Represents a paused state + its snapshot.
+    /// Represents a paused state and its snapshot.
     /// This is what gets pushed onto the interrupt stack.
     /// </summary>
     public struct AntStateStackEntry

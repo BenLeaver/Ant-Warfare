@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.AI;
 
 [System.Serializable]
 public class PheromoneInfo
@@ -58,8 +59,8 @@ public class ColonyPheromonesManager : MonoBehaviour
                 {
                     subtype = PheromoneSubtype.UnifiedFollowPath,
                     prefab = unifiedFollowPrefab,
-                    total = 100,
-                    remaining = 100
+                    total = 40,
+                    remaining = 40
                 }
             },
             {
@@ -68,8 +69,8 @@ public class ColonyPheromonesManager : MonoBehaviour
                 {
                     subtype = PheromoneSubtype.SoldierAttackPath,
                     prefab = soldierAttackPrefab,
-                    total = 100,
-                    remaining = 100
+                    total = 40,
+                    remaining = 40
                 }
             },
             {
@@ -78,8 +79,8 @@ public class ColonyPheromonesManager : MonoBehaviour
                 {
                     subtype = PheromoneSubtype.WorkerGatheringPath,
                     prefab = workerGatheringPrefab,
-                    total = 100,
-                    remaining = 100
+                    total = 40,
+                    remaining = 40
                 }
             },
             {
@@ -88,8 +89,8 @@ public class ColonyPheromonesManager : MonoBehaviour
                 {
                     subtype = PheromoneSubtype.FoodReturnPath,
                     prefab = foodReturnPrefab,
-                    total = 100,
-                    remaining = 100
+                    total = 40,
+                    remaining = 40
                 }
             },
             {
@@ -98,8 +99,8 @@ public class ColonyPheromonesManager : MonoBehaviour
                 {
                     subtype = PheromoneSubtype.GuardPoint,
                     prefab = guardPrefab,
-                    total = 100,
-                    remaining = 100
+                    total = 40,
+                    remaining = 40
                 }
             },
             {
@@ -108,8 +109,8 @@ public class ColonyPheromonesManager : MonoBehaviour
                 {
                     subtype = PheromoneSubtype.SearchPath,
                     prefab = searchPrefab,
-                    total = 100,
-                    remaining = 100
+                    total = 40,
+                    remaining = 40
                 }
             },
             {
@@ -118,11 +119,21 @@ public class ColonyPheromonesManager : MonoBehaviour
                 {
                     subtype = PheromoneSubtype.FoodPath,
                     prefab = foodPrefab,
-                    total = 100,
-                    remaining = 100
+                    total = 40,
+                    remaining = 40
                 }
             }
         };
+    }
+
+    void LateUpdate()
+    {
+        // Clean up destroyed markers so the Inspector never sees null entries
+        for (int i = markers.Count - 1; i >= 0; i--)
+        {
+            if (markers[i] == null)
+                markers.RemoveAt(i);
+        }
     }
 
     /// <summary>
@@ -172,7 +183,7 @@ public class ColonyPheromonesManager : MonoBehaviour
     /// <summary>
     /// Places a pheremone marker of a specific type, at a given position and rotation.
     /// 
-    /// Assumes the target will be 10 units in the upwards direction of the marker.
+    /// Ensures there is a valid path to the target point. If not, the distance to the target is reduced until it is.
     /// 
     /// Only limited numbers of markers from each type can be placed, and markers must be placed at 
     /// least 1 unit away from each other.
@@ -199,10 +210,43 @@ public class ColonyPheromonesManager : MonoBehaviour
 
             GameObject newMarker = Instantiate(info.prefab, markerPos, markerRotation);
             Vector3 direction = markerRotation * Vector3.up;
-            newMarker.GetComponent<MarkerData>().target = markerPos + direction.normalized * 10f;
+
+            float targetDist = 20f;
+            Vector3 target = markerPos + direction.normalized * targetDist;
+
+            // Reduce target distance by 2 until target is reachable.
+            while (targetDist > 0f && !HasValidPath(markerPos, target))
+            {
+                targetDist -= 2f;
+                target = markerPos + direction.normalized * targetDist;
+            }
+
+            newMarker.GetComponent<MarkerData>().target = target;
+
             newMarker.GetComponent<MarkerData>().mgr = this;
             markers.Add(newMarker);
         }
+    }
+
+    /// <summary>
+    /// Checks whether there exists a valid navmesh path from the start to the end point.
+    /// </summary>
+    private bool HasValidPath(Vector3 start, Vector3 end)
+    {
+        // Flatten
+        start.z = 0f;
+        end.z = 0f;
+
+        // Snap start and end to navmesh
+        if (!NavMesh.SamplePosition(start, out NavMeshHit hitStart, 1f, NavMesh.AllAreas))
+            return false;
+
+        if (!NavMesh.SamplePosition(end, out NavMeshHit hitEnd, 1f, NavMesh.AllAreas))
+            return false;
+
+        NavMeshPath path = new NavMeshPath();
+        bool found = NavMesh.CalculatePath(start, end, NavMesh.AllAreas, path);
+        return found && path.status == NavMeshPathStatus.PathComplete;
     }
 
     /// <summary>
@@ -295,6 +339,8 @@ public class ColonyPheromonesManager : MonoBehaviour
     /// </summary>
     public void RemoveMarkerObject(GameObject m)
     {
+        if (m == null) return;
+
         var subtype = m.GetComponent<MarkerData>().subtype;
         var info = pheromoneDict[subtype];
 

@@ -14,7 +14,7 @@ public class StagAttackIdleState : StagBaseState
     private float decisionTime;
     private float elapsed;
     public StagAttackIdleState(StagStateManager manager) : base(manager) { }
-    private GameObject closestEnemy;
+    private UnitInfo closestEnemy;
 
     public override void EnterState() {
         manager.currentStateName = "AttackIdle";
@@ -35,6 +35,15 @@ public class StagAttackIdleState : StagBaseState
         {
             elapsed = 0f;
             closestEnemy = manager.FindNearestEnemy();
+
+            if (!closestEnemy.IsAliveAndActive())
+            {
+                manager.ChangeState(manager.IdleState);
+                return;
+            }
+                
+                
+
             float closestEnemyDist = Vector3.Distance(manager.transform.position, closestEnemy.transform.position);
 
             if (closestEnemyDist > 15f)
@@ -57,7 +66,7 @@ public class StagAttackIdleState : StagBaseState
     private void AttackDecision()
     {
         int decisionIndex = Random.Range(1, 7);
-        if (decisionIndex <= 4 || closestEnemy.GetComponent<BaseAntQueenAI>())
+        if (decisionIndex <= 4 || closestEnemy.queenScript != null)
         {
             // If closest enemy is a queen, don't throw it.
             manager.ChangeState(manager.SimpleAttackState);

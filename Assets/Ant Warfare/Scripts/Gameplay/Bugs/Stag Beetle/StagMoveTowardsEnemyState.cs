@@ -12,7 +12,7 @@ public class StagMoveTowardsEnemyState : StagBaseState
     }
 
     public override void UpdateState() {
-        GameObject closestEnemy = manager.FindNearestEnemy();
+        UnitInfo closestEnemy = manager.FindNearestEnemy();
         manager.Agent.SetDestination(closestEnemy.transform.position);
 
         float closestEnemyDist = Vector3.Distance(manager.transform.position, closestEnemy.transform.position);

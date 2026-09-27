@@ -10204,6 +10204,7 @@ MonoBehaviour:
   inTutorial: 0
   positiveFoodTextColor: {r: 0.67058825, g: 0.5803922, b: 0.47843137, a: 1}
   negativeFoodTextColor: {r: 0.68235296, g: 0.13725491, b: 0.20392157, a: 1}
+  pfButton: {fileID: 197531906961765190}
 --- !u!1 &5400677904911150360
 GameObject:
   m_ObjectHideFlags: 0

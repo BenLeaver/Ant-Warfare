@@ -66,6 +66,7 @@ public class SGameManager : MonoBehaviour
     private GameObject queen; //Used temporarily to spawn in queens.
 
     [Header("Game UI")]
+    public GameObject singleplayerUI;
     public GameObject BlackUI;
     public GameObject FireUI;
     private GameObject tutorialUI; //Singleplayer UI only used in tutorial
@@ -116,143 +117,143 @@ public class SGameManager : MonoBehaviour
             enemy3SpeciesDropdown = GameObject.Find("ESpeciesDropdown3").GetComponent<TMPro.TMP_Dropdown>();
             reset = true;
         }
-        if(SceneManager.GetActiveScene().name == "Tutorial")
-        {
-            //Will run through different parts of the tutorial
-            
-            if(tutorialPart == 0)
-            {
-                GameObject.Find("AudioManager").GetComponent<AudioManager>().Play("GameMusic");
-                GameObject.Find("AudioManager").GetComponent<AudioManager>().Stop("MenuMusic");
-                StartCoroutine(TutorialStart());
-            }
-            else if (tutorialPart == 1)
-            {
-                tutorialText.text = "Use WASD to move";
-                if(Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.D))
-                {
-                    tutorialPart = 2;
-                }
-            }
-            else if (tutorialPart == 2)
-            {
-                tutorialText.text = "Use mouse wheel to zoom in and out";
-                if(Input.mouseScrollDelta.y == 1 || Input.mouseScrollDelta.y == -1)
-                {
-                    tutorialPart = 3;
-                }
-            }
-            else if (tutorialPart == 3)
-            {
-                tutorialText.text = "Fight the enemy ant - you will attack automatically when an enemy is near your mouth";
-                Instantiate(tutorialEnemyPrefab, new Vector3(20, 0, 0), Quaternion.identity);
-                tutorialPart = 4;
-            }
-            else if (tutorialPart == 5)
-            {
-                tutorialUI = Instantiate(BlackUI);
-                player = GameObject.Find("Player_Singleplayer(Black)");
-                player.GetComponent<Player_Singleplayer>().inTutorial = true;
-                tutorialPart = 6;
-            }
-            else if (tutorialPart == 6)
-            {
-                tutorialText.text = "Pick up food by pressing E when near a food pellet";
-                if(player.GetComponent<Player_Singleplayer>().foodCarried != null)
-                {
-                    tutorialPart = 7;
-                }
-            }
-            else if (tutorialPart == 7)
-            {
-                tutorialText.text = "Drop food by pressing E again";
-                if (player.GetComponent<Player_Singleplayer>().foodCarried == null)
-                {
-                    tutorialPart = 8;
-                }
-            }
-            else if (tutorialPart == 8)
-            {
-                tutorialText.text = "Pick up the food again and carry it towards your queen in the nest";
-            }
-            else if (tutorialPart == 9)
-            {
-                tutorialText.text = "Buy workers by pressing the button in the top left";
-                tutorialUI.GetComponent<Singleplayer_UI>().inTutorial = true;
-            }
-            else if (tutorialPart == 10)
-            {
-                tutorialText.text = "Press 1 to command your ants to follow you";
-                if(Input.GetKeyDown(KeyCode.Alpha1))
-                {
-                    tutorialPart = 11;
-                }
-            }
-            else if (tutorialPart == 11)
-            {
-                tutorialText.text = "Press 0 to allow your ants to act on their own and gather food or attack enemies";
-                if (Input.GetKeyDown(KeyCode.Alpha0))
-                {
-                    tutorialPart = 12;
-                }
-            }
-            else if (tutorialPart == 12)
-            {
-                tutorialText.text = "Press 2 to command your ants to retreat to the nest";
-                if (Input.GetKeyDown(KeyCode.Alpha2))
-                {
-                    tutorialPart = 13;
-                }
-            }
-            else if (tutorialPart == 13)
-            {
-                tutorialText.text = "Press 4 to command your ants to gather food";
-                if (Input.GetKeyDown(KeyCode.Alpha4))
-                {
-                    tutorialPart = 14;
-                }
-            }
-            else if (tutorialPart == 14)
-            {
-                tutorialText.text = "Press 3 to command your ants to attack enemies";
-                Instantiate(tutorialEnemyPrefab, new Vector3(60, 0, 0), Quaternion.identity);
-                Instantiate(tutorialEnemyPrefab, new Vector3(60, 0, 0), Quaternion.identity);
-                Instantiate(tutorialEnemyPrefab, new Vector3(60, 0, 0), Quaternion.identity);
-                tutorialPart = 15;
-            }
-            else if (tutorialPart == 18)
-            {
-                tutorialText.text = "Press U or the upgrade button to open the upgrades menu. You can buy 1 upgrade for each tier.";
-                if (Input.GetKeyDown(KeyCode.U) || tutorialUI.GetComponent<Singleplayer_UI>().isUpgradeUIActive())
-                {
-                    tutorialPart = 19;
-                }
-            }
-            else if (tutorialPart >= 19)
-            {
-                //Tutorial finished
-                if(tutorialPart == 19)
-                {
-                    GameObject.Find("AudioManager").GetComponent<AudioManager>().Play("Win");
-                    tutorialPart = 20;
-                }
-                tutorialText.text = "Tutorial Complete! Press Esc to leave.";
-                if (Input.GetKeyDown(KeyCode.Escape))
-                {
-                    tutorialPart = 0;
-                    GameObject.Find("AudioManager").GetComponent<AudioManager>().Play("MenuMusic");
-                    GameObject.Find("AudioManager").GetComponent<AudioManager>().Stop("GameMusic");
-                    SceneManager.LoadScene("MainMenu");
-                }
-            }
-            
-        }
+
+        //if(SceneManager.GetActiveScene().name == "Tutorial")
+        //{
+        //    //Will run through different parts of the tutorial
+        //    if(tutorialPart == 0)
+        //    {
+        //        AudioManager.instance.Play("GameMusic");
+        //        AudioManager.instance.Stop("MenuMusic");
+        //        StartCoroutine(TutorialStart());
+        //    }
+        //    else if (tutorialPart == 1)
+        //    {
+        //        tutorialText.text = "Use WASD to move";
+        //        if(Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.D))
+        //        {
+        //            tutorialPart = 2;
+        //        }
+        //    }
+        //    else if (tutorialPart == 2)
+        //    {
+        //        tutorialText.text = "Use mouse wheel to zoom in and out";
+        //        if(Input.mouseScrollDelta.y == 1 || Input.mouseScrollDelta.y == -1)
+        //        {
+        //            tutorialPart = 3;
+        //        }
+        //    }
+        //    else if (tutorialPart == 3)
+        //    {
+        //        tutorialText.text = "Fight the enemy ant - you will attack automatically when an enemy is near your mouth";
+        //        Instantiate(tutorialEnemyPrefab, new Vector3(20, 0, 0), Quaternion.identity);
+        //        tutorialPart = 4;
+        //    }
+        //    else if (tutorialPart == 5)
+        //    {
+        //        tutorialUI = Instantiate(BlackUI);
+        //        player = GameObject.Find("Player_Singleplayer(Black)");
+        //        player.GetComponent<Player_Singleplayer>().inTutorial = true;
+        //        tutorialPart = 6;
+        //    }
+        //    else if (tutorialPart == 6)
+        //    {
+        //        tutorialText.text = "Pick up food by pressing E when near a food pellet";
+        //        if(player.GetComponent<Player_Singleplayer>().foodCarried != null)
+        //        {
+        //            tutorialPart = 7;
+        //        }
+        //    }
+        //    else if (tutorialPart == 7)
+        //    {
+        //        tutorialText.text = "Drop food by pressing E again";
+        //        if (player.GetComponent<Player_Singleplayer>().foodCarried == null)
+        //        {
+        //            tutorialPart = 8;
+        //        }
+        //    }
+        //    else if (tutorialPart == 8)
+        //    {
+        //        tutorialText.text = "Pick up the food again and carry it towards your queen in the nest";
+        //    }
+        //    else if (tutorialPart == 9)
+        //    {
+        //        tutorialText.text = "Buy workers by pressing the button in the top left";
+        //        tutorialUI.GetComponent<Singleplayer_UI>().inTutorial = true;
+        //    }
+        //    else if (tutorialPart == 10)
+        //    {
+        //        tutorialText.text = "Press 1 to command your ants to follow you";
+        //        if(Input.GetKeyDown(KeyCode.Alpha1))
+        //        {
+        //            tutorialPart = 11;
+        //        }
+        //    }
+        //    else if (tutorialPart == 11)
+        //    {
+        //        tutorialText.text = "Press 0 to allow your ants to act on their own and gather food or attack enemies";
+        //        if (Input.GetKeyDown(KeyCode.Alpha0))
+        //        {
+        //            tutorialPart = 12;
+        //        }
+        //    }
+        //    else if (tutorialPart == 12)
+        //    {
+        //        tutorialText.text = "Press 2 to command your ants to retreat to the nest";
+        //        if (Input.GetKeyDown(KeyCode.Alpha2))
+        //        {
+        //            tutorialPart = 13;
+        //        }
+        //    }
+        //    else if (tutorialPart == 13)
+        //    {
+        //        tutorialText.text = "Press 4 to command your ants to gather food";
+        //        if (Input.GetKeyDown(KeyCode.Alpha4))
+        //        {
+        //            tutorialPart = 14;
+        //        }
+        //    }
+        //    else if (tutorialPart == 14)
+        //    {
+        //        tutorialText.text = "Press 3 to command your ants to attack enemies";
+        //        Instantiate(tutorialEnemyPrefab, new Vector3(60, 0, 0), Quaternion.identity);
+        //        Instantiate(tutorialEnemyPrefab, new Vector3(60, 0, 0), Quaternion.identity);
+        //        Instantiate(tutorialEnemyPrefab, new Vector3(60, 0, 0), Quaternion.identity);
+        //        tutorialPart = 15;
+        //    }
+        //    else if (tutorialPart == 18)
+        //    {
+        //        tutorialText.text = "Press U or the upgrade button to open the upgrades menu. You can buy 1 upgrade for each tier.";
+        //        if (Input.GetKeyDown(KeyCode.U) || tutorialUI.GetComponent<Singleplayer_UI>().isUpgradeUIActive())
+        //        {
+        //            tutorialPart = 19;
+        //        }
+        //    }
+        //    else if (tutorialPart >= 19)
+        //    {
+        //        //Tutorial finished
+        //        if (tutorialPart == 19)
+        //        {
+        //            AudioManager.instance.Play("Win");
+        //            tutorialPart = 20;
+        //        }
+        //        tutorialText.text = "Tutorial Complete! Press Esc to leave.";
+        //        if (Input.GetKeyDown(KeyCode.Escape))
+        //        {
+        //            tutorialPart = 0;
+        //            AudioManager.instance.Play("MenuMusic");
+        //            AudioManager.instance.Stop("GameMusic");
+        //            SceneManager.LoadScene("MainMenu");
+        //        }
+        //    }
+
+        //}
     }
 
     public void LoadGame()
     {
-        GameObject.Find("AudioManager").GetComponent<AudioManager>().Stop("MenuMusic");
-        GameObject.Find("AudioManager").GetComponent<AudioManager>().Play("GameMusic");
+        AudioManager.instance.Stop("MenuMusic");
+        AudioManager.instance.Play("GameMusic");
 
         enemy1 = enemy1Dropdown.value;
         enemy2 = enemy2Dropdown.value;
@@ -356,9 +357,7 @@ public class SGameManager : MonoBehaviour
                     {
                         player = Instantiate(playerFirePrefab);
                     }
-                    player.transform.position = nestSpawns[team - 1];
-                    player.GetComponent<Player_Singleplayer>().nestSpawn = nestSpawns[team - 1];
-                    player.GetComponent<SHealth>().UpdateTeam(team);
+
 
                     //Also need to delete pre-existing camera
                     Destroy(GameObject.Find("LoadingCamera"));
@@ -372,12 +371,16 @@ public class SGameManager : MonoBehaviour
                         queen = Instantiate(fireAntQueenPrefab, queenSpawns[team - 1].position, queenSpawns[team - 1].rotation);
                     }
                     queen.name = playerSpecies[0] + "AntQueen" + team;//Rename queen so it can be correctly accessed
-                    queen.GetComponent<BaseAntQueenAI>().playerOnTeam = true; //Queen will know it is on player's team
-                    queen.GetComponent<BaseAntQueenAI>().player = player;
-                    queen.GetComponent<SHealth>().UpdateTeam(team);
-                    queen.GetComponent<BaseAntQueenAI>().spawnPos = nestSpawns[team - 1];
+                    queen.GetComponent<BaseAntQueenAI>().Initialise(
+                        team: team,
+                        spawnPos: nestSpawns[team-1],
+                        playerRef: player
+                        );
 
-                    player.GetComponent<Player_Singleplayer>().queen = queen; // Ensure player has a reference to it's queen.
+                    player.GetComponent<Player_Singleplayer>().Initialise(
+                        team: team,
+                        nestSpawn: nestSpawns[team - 1],
+                        queenRef: queen);
                 }
                 else if(team == playerTeams[1])
                 {
@@ -390,9 +393,11 @@ public class SGameManager : MonoBehaviour
                         queen = Instantiate(fireAntQueenPrefab, queenSpawns[team - 1].position, queenSpawns[team - 1].rotation);
                     }
                     queen.name = playerSpecies[1] + "AntQueen" + team;
-                    queen.GetComponent<BaseAntQueenAI>().difficulty = enemy1;
-                    queen.GetComponent<SHealth>().UpdateTeam(team);
-                    queen.GetComponent<BaseAntQueenAI>().spawnPos = nestSpawns[team - 1];
+                    queen.GetComponent<BaseAntQueenAI>().Initialise(
+                        team: team,
+                        spawnPos: nestSpawns[team - 1],
+                        difficulty: enemy1
+                        );
                 }
                 else if (team == playerTeams[2])
                 {
@@ -405,9 +410,11 @@ public class SGameManager : MonoBehaviour
                         queen = Instantiate(fireAntQueenPrefab, queenSpawns[team - 1].position, queenSpawns[team - 1].rotation);
                     }
                     queen.name = playerSpecies[2] + "AntQueen" + team;
-                    queen.GetComponent<BaseAntQueenAI>().difficulty = enemy2;
-                    queen.GetComponent<SHealth>().UpdateTeam(team);
-                    queen.GetComponent<BaseAntQueenAI>().spawnPos = nestSpawns[team - 1];
+                    queen.GetComponent<BaseAntQueenAI>().Initialise(
+                        team: team,
+                        spawnPos: nestSpawns[team - 1],
+                        difficulty: enemy2
+                        );
                 }
                 else if (team == playerTeams[3])
                 {
@@ -420,9 +427,11 @@ public class SGameManager : MonoBehaviour
                         queen = Instantiate(fireAntQueenPrefab, queenSpawns[team - 1].position, queenSpawns[team - 1].rotation);
                     }
                     queen.name = playerSpecies[3] + "AntQueen" + team;
-                    queen.GetComponent<BaseAntQueenAI>().difficulty = enemy3;
-                    queen.GetComponent<SHealth>().UpdateTeam(team);
-                    queen.GetComponent<BaseAntQueenAI>().spawnPos = nestSpawns[team - 1];
+                    queen.GetComponent<BaseAntQueenAI>().Initialise(
+                        team: team,
+                        spawnPos: nestSpawns[team - 1],
+                        difficulty: enemy3
+                        );
                 }
             }
         }
@@ -433,9 +442,9 @@ public class SGameManager : MonoBehaviour
         numberTeams -= 1;
         if(numberTeams == 1)
         {
-            GameObject.Find("AudioManager").GetComponent<AudioManager>().Play("Win");
-            GameObject.Find("AudioManager").GetComponent<AudioManager>().Stop("GameMusic");
-            GameObject.Find("AudioManager").GetComponent<AudioManager>().Play("MenuMusic");
+            AudioManager.instance.Play("Win");
+            AudioManager.instance.Play("MenuMusic");
+            AudioManager.instance.Stop("GameMusic");
             SceneManager.LoadScene("WinMenu");
         }
     }
@@ -468,19 +477,26 @@ public class SGameManager : MonoBehaviour
             nestSpawns[2] = new Vector3(70, 20, 0);
             nestSpawns[3] = new Vector3(70, -20, 0);
         }
+        else if (gameScene == "Big Arena")
+        {
+            nestSpawns[0] = new Vector3(-30, 70, 0);
+            nestSpawns[1] = new Vector3(70, 0, 0);
+            nestSpawns[2] = new Vector3(30, -70, 0);
+            nestSpawns[3] = new Vector3(-70, 0, 0);
+        }
     }
 
     public void CreateUI()
     {
-        GameObject ui = null;
+        GameObject ui = Instantiate(singleplayerUI);
 
-        if(playerSpecies[0] == "Black")
+        if (playerSpecies[0] == "Black")
         {
-            ui = Instantiate(BlackUI);
+            ui.GetComponent<Singleplayer_UI>().speciesIndex = 0;
         }
         else if (playerSpecies[0] == "Fire")
         {
-            ui = Instantiate(FireUI);
+            ui.GetComponent<Singleplayer_UI>().speciesIndex = 1;
         }
         ui.GetComponent<Singleplayer_UI>().player = player;
         ui.GetComponent<Singleplayer_UI>().playerQueen = player.GetComponent<Player_Singleplayer>().queen;

@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 838271910960409948}
   - component: {fileID: 838271910960409951}
   - component: {fileID: 1534956279189112771}
+  - component: {fileID: 105237230377089062}
   m_Layer: 0
   m_Name: SGameManager
   m_TagString: Untagged
@@ -47,6 +48,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   blackAntQueenPrefab: {fileID: 8564992431610467721, guid: 591fcb9c99c5d024bbc49b28b86ef7aa, type: 3}
   fireAntQueenPrefab: {fileID: 8564992431610467721, guid: 6b39f2524db20cc4a9743745a2259e5a, type: 3}
+  queenSpawns:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   enemy1: 0
   enemy2: 0
   enemy3: 0
@@ -72,11 +78,7 @@ MonoBehaviour:
   - {x: 50, y: 0, z: 0}
   - {x: 0, y: -50, z: 0}
   - {x: -50, y: 0, z: 0}
-  queenSpawns:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  singleplayerUI: {fileID: 5366978905723964851, guid: 9c3d3dc3fec47af4c85b1d2482662cd7, type: 3}
   BlackUI: {fileID: 5366978905723964851, guid: 51c8ca6992725f641bdb379fc9bc45b4, type: 3}
   FireUI: {fileID: 5366978905723964851, guid: d3a0f35d103b3f6418d77d5f673eaf3f, type: 3}
   tutorialPart: 0
@@ -91,5 +93,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 623ca98477f39bd479adab41e925c170, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cellSize: 20
+--- !u!114 &105237230377089062
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 838271910960409950}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 700d4e32abfdcfc4b922246abb4cb510, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 

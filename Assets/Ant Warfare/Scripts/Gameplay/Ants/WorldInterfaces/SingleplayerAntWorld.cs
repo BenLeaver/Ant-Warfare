@@ -4,41 +4,48 @@ using UnityEngine;
 using UnityEngine.AI;
 using Ant.AI;
 
+/// <summary>
+/// Implementation of IAntWorld for singleplayer, acting as a bridge between the world and the 
+/// ant AI state machine.
+/// 
+/// Initialises and stores a reference to both the state manager and the context.
+/// 
+/// Each worker/soldier ant owns an instance of this class.
+/// </summary>
 [RequireComponent(typeof(NavMeshAgent))]
 public class SingleplayerAntWorld : MonoBehaviour, IAntWorld
 {
     [SerializeField] private AntStateManager stateManager;
     [SerializeField] private AntContext context;
 
+    private UnitInfo myInfo;
+
     private NavMeshAgent agent;
     private Animator anim;
     public SHealth healthScript;
     public Transform mouth;
 
-    public GameObject queen;
+    public UnitInfo queen;
     private BaseAntQueenAI queenScript;
     private GameObject player;
     public GameObject foodCarried;
 
     public float queenRange = 5f;
-    public AntType Type;
+    public AntType Type { get; set; }
     public string species;
     public int attackDamage;
 
     [SerializeField] private float sightRange = 20f;
     public float SightRange => sightRange;
-    [SerializeField] private float attackRange = 2.5f;
+    [SerializeField] private float attackRange = 1f;
     public float AttackRange => attackRange;
     [SerializeField] private float attackDelay = 1f;
     public float AttackDelay => attackDelay;
-    [SerializeField] private float pickupRange = 2f;
+    [SerializeField] private float pickupRange = 1f;
     public float PickupRange => pickupRange;
 
-
-    public Vector3 Position => transform.position;
-
-    
-
+    public Vector3 Position => myInfo.transform.position;
+    public Vector3 MouthPosition => mouth.position;
 
     private bool isDying = false;
 
@@ -54,53 +61,74 @@ public class SingleplayerAntWorld : MonoBehaviour, IAntWorld
         agent = GetComponent<UnityEngine.AI.NavMeshAgent>();
         agent.updateRotation = false;
         agent.updateUpAxis = false;
+
         healthScript = GetComponent<SHealth>();
         anim = GetComponent<Animator>();
-
     }
 
     /// <summary>
+    /// Called by the queen when this ant is spawned.
+    /// 
     /// Sets references to queen, queenScript and player. 
     /// 
     /// After that initialises the state manager system 
     /// (which will automatically check for nearby pheromones).
     /// </summary>
-    public void InitializeAntFromQueen(GameObject q)
+    public void InitializeAntFromQueen(UnitInfo q)
     {
         queen = q;
-        queenScript = q.GetComponent<BaseAntQueenAI>();
+        queenScript = q.queenScript;
         player = queenScript.player;
 
+        // Initialise Team
+        GetComponent<IHealth>().UpdateTeam(q.team);
+
+        // Register unit in manager
+        myInfo = UnitManager.Instance.RegisterUnit(gameObject);
+
+        // Initialise state system.
         context = new AntContext(this);
         stateManager = new AntStateManager(context);
 
         stateManager.Initialize();
+
+        // Initialise AI brain debugging system.
+        if (GetComponent<AntAIDebug>())
+        {
+            GetComponent<AntAIDebug>().context = context;
+            GetComponent<AntAIDebug>().manager = stateManager;
+        }
     }
 
     private void OnEnable()
     {
-        if (UnitManager.Instance != null)
-        {
-            UnitManager.Instance.RegisterUnit(gameObject);
-        }
+        //if (UnitManager.Instance != null)
+        //{
+        //    myInfo = UnitManager.Instance.RegisterUnit(gameObject);
+        //}
     }
 
     private void OnDisable()
     {
         if (UnitManager.Instance != null)
         {
-            UnitManager.Instance.UnregisterUnit(gameObject);
+            UnitManager.Instance.UnregisterUnit(myInfo);
         }
     }
 
     public float DeltaTime => Time.deltaTime;
 
     /// <summary>
-    /// Will be called from the player to make ant follow player.
+    /// Will be called from the player to start player-follow interrupt.
+    /// 
+    /// Subtypes:
+    /// 0: Never Interrupt
+    /// 1: Only interrupt to pick up food
+    /// 2: Only interrupt to attack nearby enemies
     /// </summary>
-    public void PlayerFollowStart(int subtype)
+    public bool PlayerFollowStart(int subtype)
     {
-        stateManager.StartPlayerIR(subtype);
+        return stateManager.StartPlayerIR(subtype);
     }
 
     /// <summary>
@@ -114,23 +142,15 @@ public class SingleplayerAntWorld : MonoBehaviour, IAntWorld
     // Update is called once per frame
     void Update()
     {
-        CheckQueenExists();
         CheckUpgradesOnUpdate();
         stateManager.Tick(Time.deltaTime);
 
+        // Keep carried food attached to mouth
         if (foodCarried != null)
         {
             foodCarried.transform.position = mouth.transform.position;
             foodCarried.transform.rotation = mouth.transform.rotation;
         }
-    }
-
-    private void CheckQueenExists()
-    {
-        if (queen != null) return;
-
-        //Will kill themselves if no queen
-        Death();
     }
 
     private void CheckUpgradesOnUpdate()
@@ -155,8 +175,8 @@ public class SingleplayerAntWorld : MonoBehaviour, IAntWorld
         direction.z = 0f;
         Quaternion targetRotation = Quaternion.LookRotation(Vector3.forward, direction.normalized);
 
-        transform.rotation = Quaternion.Slerp(
-            transform.rotation, 
+        myInfo.transform.rotation = Quaternion.Slerp(
+            myInfo.transform.rotation, 
             targetRotation, 
             rotationSpeed * Time.deltaTime);
     }
@@ -165,6 +185,7 @@ public class SingleplayerAntWorld : MonoBehaviour, IAntWorld
     {
         if (!agent.enabled) return;
 
+        anim.SetBool("isWalking", true);
         agent.isStopped = false;
         agent.SetDestination(target);
     }
@@ -173,6 +194,7 @@ public class SingleplayerAntWorld : MonoBehaviour, IAntWorld
     {
         if (!agent.enabled) return;
 
+        anim.SetBool("isWalking", false);
         agent.isStopped = true;
         agent.ResetPath();
     }
@@ -197,56 +219,95 @@ public class SingleplayerAntWorld : MonoBehaviour, IAntWorld
         if (!agent.isOnNavMesh)
         {
             Debug.LogWarning("Ant is not on NavMesh");
-            return transform.position;
+            return myInfo.transform.position;
         }
+
+        // Ensure the origin is on the navmesh.
+        if (!NavMesh.SamplePosition(origin, out NavMeshHit originHit, Mathf.Infinity, agent.areaMask))
+        {
+            origin = agent.transform.position;
+        }
+        else
+        {
+            origin = originHit.position;
+        }
+
         for (int i=0; i<attempts; i++)
         {
             Vector2 dir2D = Random.insideUnitCircle.normalized;
-            float dist = Random.Range(minRange, maxRange);
+            float t = Random.value;
+            float dist = Mathf.Lerp(minRange, maxRange, t * t);
 
             Vector3 candidate = origin + new Vector3(dir2D.x, dir2D.y, 0f) * dist;
 
-            //Debug.Log($"Candidate {candidate}, valid {NavMesh.SamplePosition(candidate, out NavMeshHit h, snapDistance, agent.areaMask)}");
-
             if (!NavMesh.SamplePosition(candidate, out NavMeshHit hit, snapDistance, agent.areaMask)) continue;
 
-            
             Vector3 flattened = new Vector3(hit.position.x, hit.position.y, 0f);
-            //Debug.Log($"Flattened {flattened}");
-            return flattened;
-            //if (HasValidPath(flattened))
-                //Debug.Log($"Valid path found for {candidate}");
-                //return flattened;
+
+            if (HasValidPath(flattened))
+                return flattened;
         }
-        Debug.LogWarning("No valid navmesh point found");
-        return transform.position;
+        Debug.LogWarning($"No valid navmesh point found for origin {origin}, maxRange {maxRange}");
+        return myInfo.transform.position;
     }
 
     private bool HasValidPath(Vector3 target)
     {
-        if (agent.isOnNavMesh) return false;
-
         NavMeshPath _path = new NavMeshPath();
         NavMesh.CalculatePath(agent.transform.position, target, NavMesh.AllAreas, _path);
         return _path.status == NavMeshPathStatus.PathComplete;
     }
 
+    /// <summary>
+    /// Finds the closest reachable point on the current navmesh to the target.
+    /// </summary>
+    public Vector3 FindClosestReachablePoint(Vector3 target)
+    {
+        NavMeshHit hit;
+
+        // Snap target to navmesh
+        if (!NavMesh.SamplePosition(target, out hit, 5f, NavMesh.AllAreas))
+            return agent.transform.position; // fallback to current position
+
+        // Check if reachable
+        NavMeshPath path = new NavMeshPath();
+        NavMesh.CalculatePath(agent.transform.position, hit.position, NavMesh.AllAreas, path);
+
+        if (path.status == NavMeshPathStatus.PathComplete)
+            return hit.position;
+
+        // Not reachable -> find closest reachable point
+        // Try sampling points around the target
+        for (float r = 2f; r <= 20f; r += 2f)
+        {
+            for (int i = 0; i < 12; i++)
+            {
+                float angle = i * 30f;
+                Vector3 offset = new Vector3(Mathf.Cos(angle), Mathf.Sin(angle), 0f) * r;
+                Vector3 candidate = target + offset;
+
+                if (NavMesh.SamplePosition(candidate, out hit, 1f, NavMesh.AllAreas))
+                {
+                    NavMesh.CalculatePath(agent.transform.position, hit.position, NavMesh.AllAreas, path);
+                    if (path.status == NavMeshPathStatus.PathComplete)
+                        return hit.position;
+                }
+            }
+        }
+
+        return agent.transform.position;
+    }
+
+
+
     public GameObject FindFriendlyQueen()
     {
-        if (queen != null)
-        {
-            return queen;
-        }
-        else
-        {
-            return GameObject.Find(species + "AntQueen" + gameObject.GetComponent<SHealth>().team.ToString());
-        }
+        return queen.go;
     }
 
     public float GetFriendlyQueenDist()
     {
-        GameObject q = FindFriendlyQueen();
-        return Vector3.Distance(q.transform.position, Position);
+        return Vector3.Distance(queen.transform.position, MouthPosition);
     }
 
     public GameObject FindFriendlyPlayer()
@@ -254,24 +315,9 @@ public class SingleplayerAntWorld : MonoBehaviour, IAntWorld
         return player;
     }
 
-    public GameObject FindClosestEnemy()
+    public UnitInfo FindClosestEnemy()
     {
-        float closestDistance = -1f;
-        GameObject closestEnemy = null;
-
-        foreach (GameObject a in UnitManager.Instance.AllUnits)
-        {
-            if (a.GetComponent<SHealth>().team != healthScript.team)
-            {
-                float distance = Vector3.Distance(a.transform.position, mouth.transform.position);
-                if (closestDistance == -1 || distance < closestDistance)
-                {
-                    closestDistance = distance;
-                    closestEnemy = a;
-                }
-            }
-        }
-        return closestEnemy;
+        return UnitManager.Instance.GetClosestEnemyUnit(myInfo.transform.position, myInfo.team, 20f);
     }
 
     public GameObject FindClosestFood()
@@ -296,25 +342,19 @@ public class SingleplayerAntWorld : MonoBehaviour, IAntWorld
 
     public int GetFriendlyColonySize()
     {
-        GameObject q = FindFriendlyQueen();
-        int size = q.GetComponent<BaseAntQueenAI>().colonySize;
+        int size = queenScript.colonySize;
 
         if (size < 0) return 0;
 
         return size; 
     }
 
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <returns></returns>
     public Dictionary<PheromoneType, Dictionary<float, (PheromoneSubtype subtype, Vector3 target)>> GetPheromonesNearby()
     {
         Dictionary<PheromoneType, Dictionary<float, (PheromoneSubtype subtype, Vector3)>> pheromones 
             = new Dictionary<PheromoneType, Dictionary<float, (PheromoneSubtype subtype, Vector3)>>();
 
-
-        List<GameObject> markers = queen.GetComponent<ColonyPheromonesManager>().markers;
+        List<GameObject> markers = queen.go.GetComponent<ColonyPheromonesManager>().markers;
         foreach (GameObject m in markers)
         {
             var mData = m.GetComponent<MarkerData>();
@@ -332,8 +372,9 @@ public class SingleplayerAntWorld : MonoBehaviour, IAntWorld
             PheromoneType type = mData.type;
             PheromoneSubtype subtype = mData.subtype;
             float strength = mData.strength;
-            float weight = (20f-dist) * strength;
             Vector3 target = mData.target;
+
+            float weight = (20f - dist) * strength;
 
 
             if (!pheromones.TryGetValue(type, out var innerDict))
@@ -351,7 +392,7 @@ public class SingleplayerAntWorld : MonoBehaviour, IAntWorld
         Dictionary<float, (PheromoneSubtype, Vector3)> foodReturnPheromones
             = new Dictionary<float, (PheromoneSubtype, Vector3)>();
 
-        List<GameObject> markers = queen.GetComponent<ColonyPheromonesManager>().markers;
+        List<GameObject> markers = queen.go.GetComponent<ColonyPheromonesManager>().markers;
         foreach (GameObject m in markers)
         {
             var mData = m.GetComponent<MarkerData>();
@@ -372,28 +413,45 @@ public class SingleplayerAntWorld : MonoBehaviour, IAntWorld
         return foodReturnPheromones;
     }
 
-    public void PlacePheromone(PheromoneSubtype subtype, Vector3 target)
+    public void PlacePheromone(PheromoneSubtype subtype)
     {
-        //queen.GetComponent<ColonyPheromonesManager>().PlaceMarker(
-        //    subtype, transform.position, transform.rotation, target);
-        queen.GetComponent<ColonyPheromonesManager>().PlacePathMarker(subtype, transform.position, transform.rotation);
+        PlacePheromone(subtype, myInfo.transform.rotation);
     }
 
-    public void Attack(GameObject targetEnemy)
+    public void PlacePheromone(PheromoneSubtype subtype, Quaternion markerRotation)
+    {
+        queen.go.GetComponent<ColonyPheromonesManager>().PlacePathMarker(subtype, myInfo.transform.position, markerRotation);
+    }
+
+    public void Attack(UnitInfo targetEnemy)
     {
         anim.SetBool("isAttacking", true);
         StartCoroutine(AttackDamage(targetEnemy));
     }
 
-    IEnumerator AttackDamage(GameObject targetEnemy)
+    IEnumerator AttackDamage(UnitInfo targetEnemy)
     {
+        var attacker = myInfo.go;
+
         yield return new WaitForSeconds(0.25f);
-        if (targetEnemy != null)
+
+        // Check attacker is still alive
+        if (attacker == null || !attacker.activeInHierarchy)
+            yield break;
+
+        if (!targetEnemy.IsAliveAndActive())
         {
-            var health = targetEnemy.GetComponent<SHealth>();
-            if (health != null) health.UpdateHealth(attackDamage);
+            anim.SetBool("isAttacking", false);
+            yield break;
         }
+
+        if (targetEnemy.health != null) targetEnemy.health.UpdateHealth(attackDamage);
+
         yield return new WaitForSeconds(0.10f);
+
+        if (attacker == null || !attacker.activeInHierarchy)
+            yield break;
+
         anim.SetBool("isAttacking", false);
     }
 
@@ -429,17 +487,20 @@ public class SingleplayerAntWorld : MonoBehaviour, IAntWorld
         float queenDistance = Vector3.Distance(queen.transform.position, mouth.transform.position);
         if (queenDistance <= queenRange)
         {
-            queen.GetComponent<BaseAntQueenAI>().food += Mathf.RoundToInt(foodCarried.GetComponent<Food>().food * foodMult);
+            queenScript.food += Mathf.RoundToInt(foodCarried.GetComponent<Food>().food * foodMult);
             Destroy(foodCarried);
             foodCarried = null;
 
-            if (queen.GetComponent<BaseAntQueenAI>().playerOnTeam == true)
+            if (queenScript.playerOnTeam == true)
             {
-                GameObject.Find("AudioManager").GetComponent<AudioManager>().Play("FoodDropoff");
+                AudioManager.instance.Play("FoodDropoff");
             }
         }
     }
 
+    /// <summary>
+    /// Returns whether the food target game object is still vaild to be picked up.
+    /// </summary>
     public bool CheckValid(GameObject food)
     {
         if (food == null) return false;
@@ -468,6 +529,9 @@ public class SingleplayerAntWorld : MonoBehaviour, IAntWorld
                 queenScript.totalWorkers -= 1;
             }
         }
+
+        UnitManager.Instance.UnregisterUnit(myInfo);
+
         isDying = true;
         Destroy(gameObject);
     }
@@ -477,12 +541,12 @@ public class SingleplayerAntWorld : MonoBehaviour, IAntWorld
     /// </summary>
     public void UpdateFortressBuff()
     {
-        if (Vector3.Distance(transform.position, queen.transform.position) < 30f && !fortressBuffApplied)
+        if (Vector3.Distance(myInfo.transform.position, queen.transform.position) < 30f && !fortressBuffApplied)
         {
             fortressBuffApplied = true;
             attackDamage += 15;
         }
-        else if (Vector3.Distance(transform.position, queen.transform.position) >= 30f && fortressBuffApplied)
+        else if (Vector3.Distance(myInfo.transform.position, queen.transform.position) >= 30f && fortressBuffApplied)
         {
             fortressBuffApplied = false;
             attackDamage -= 15;
@@ -496,22 +560,66 @@ public class SingleplayerAntWorld : MonoBehaviour, IAntWorld
     {
         if (Type == AntType.Soldier)
         {
-            if (healthScript.health < healthScript.maxHealth)
+            if (healthScript.Health < healthScript.MaxHealth)
             {
                 lastHealTime += Time.deltaTime;
                 if (lastHealTime > 1f)
                 {
                     lastHealTime -= 1f;
-                    if (healthScript.health + 2 > healthScript.maxHealth)
+                    if (healthScript.Health + 2 > healthScript.MaxHealth)
                     {
-                        healthScript.health = healthScript.maxHealth;
+                        healthScript.Health = healthScript.MaxHealth;
                     }
                     else
                     {
-                        healthScript.health += 2;
+                        healthScript.Health += 2;
                     }
                 }
             }
         }
+    }
+
+    public void Enable()
+    {
+        enabled = true;
+    }
+
+    public void Disable()
+    {
+        enabled = false;
+    }
+
+    // ---- Upgrade Methods ----
+
+    public void UpgradeAttack(float mult)
+    {
+        int current = attackDamage;
+
+        // Only apply multiplier on top of base damage without fortress attack buff.
+        if (fortressBuffApplied)
+        {
+            current -= 15;
+            attackDamage = Mathf.RoundToInt(current * mult);
+            attackDamage += 15;
+        }
+        else
+        {
+            attackDamage = Mathf.RoundToInt(current * mult);
+        }
+    }
+
+    public void UpgradeSpeed(float mult)
+    {
+        agent.speed *= mult;
+    }
+
+    public void UpgradeFoodMult(float mult)
+    {
+        foodMult *= mult;
+    }
+
+    public void ActivateFirstAid()
+    {
+        firstAid = true;
     }
 }

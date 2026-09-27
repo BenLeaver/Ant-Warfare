@@ -3,6 +3,20 @@ using System.Collections.Generic;
 using UnityEngine;
 using Ant.AI;
 
+/// <summary>
+/// Abstract base class for all ant AI states.
+/// 
+/// Responsibilities:
+/// - Stores references to the AntContext and AntStateManager.
+/// - Tracks duration spent in the state and enforces a maximum duration.
+/// - Provides virtual entry and update methods for derived states to extend.
+/// - Handles subtype assignment (used by some states to restrict interrupts).
+/// 
+/// Derived states are expected to:
+/// - Override EnterState() to initialize movement targets or timers.
+/// - Override UpdateState() to implement behaviour logic.
+/// - Call base.UpdateState() to ensure duration tracking and timeout behaviour.
+/// </summary>
 public abstract class BaseAntState
 {
     protected AntContext context;

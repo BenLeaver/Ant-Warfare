@@ -458,24 +458,7 @@ public class MAntBaseAI : NetworkBehaviour
     /// </summary>
     void FindClosestEnemy()
     {
-        float closestDistance = -1f;
-        closestEnemy = null;
-        foreach (GameObject a in UnitManager.Instance.AllUnits)
-        {
-            if (a.GetComponent<MHealth>().team != healthScript.team)
-            {
-                float distance = Vector3.Distance(a.transform.position, mouth.transform.position);
-                if (closestDistance == -1 || distance < closestDistance)
-                {
-                    closestDistance = distance;
-                    closestEnemy = a;
-                }
-            }
-        }
-        if (closestDistance == -1f)
-        {
-            Debug.LogWarning("No enemies found");
-        }
+        closestEnemy = UnitManager.Instance.GetClosestEnemyUnit(mouth.transform.position, healthScript.team).go;
     }
 
     /// <summary>

@@ -211,7 +211,7 @@ public class PlayerController : NetworkBehaviour
         {
             if (IsOwner)
             {
-                GameObject.Find("AudioManager").GetComponent<AudioManager>().Play("FoodDropoff");
+                AudioManager.instance.Play("FoodDropoff");
                 DepositFoodServerRpc(foodCarried.GetComponent<NetworkObject>());
                 foodCarried = null;
             }
@@ -322,31 +322,17 @@ public class PlayerController : NetworkBehaviour
 
     private void CheckEnemies()
     {
-        float closestDistance = 0f;
-        foreach (GameObject a in UnitManager.Instance.AllUnits)
-        {
-            if (a.GetComponent<MHealth>().team != playerTeam)
-            {
-                float distance = Vector3.Distance(a.transform.position, mouth.transform.position);
-                if (closestDistance == 0 || distance < closestDistance)
-                {
-                    closestDistance = distance;
-                    closestEnemy = a;
-                }
-            }
-        }
-        
-        if (closestDistance <= attackRange && closestDistance != 0)
-        {
-            if (canAttack)
-            {
-                if(attackTimer >= attackDelay && closestEnemy != null)
-                {
-                    attackTimer = 0f;
-                    Attack();
-                }
-            }
-        }
+        // Check whether the player is allowed to attack.
+        if (!canAttack) return;
+        if (attackTimer < attackDelay) return;
+
+        // Get closest enemy unit in attack range (if any).
+        closestEnemy = UnitManager.Instance.GetClosestEnemyUnit(mouth.transform.position, playerTeam, attackRange).go;
+        if (closestEnemy == null) return;
+
+        // Attack
+        attackTimer = 0f;
+        Attack();
     }
 
     private void Attack()
@@ -569,17 +555,17 @@ public class PlayerController : NetworkBehaviour
         }
         playerCamera.GetComponent<Camera>().enabled = false;
         playerCamera.GetComponent<AudioListener>().enabled = false;
-        GameObject.Find("AudioManager").GetComponent<AudioManager>().Stop("GameMusic");
-        GameObject.Find("AudioManager").GetComponent<AudioManager>().Play("MenuMusic");
+        AudioManager.instance.Stop("GameMusic");
+        AudioManager.instance.Play("MenuMusic");
         if(playerLost)
         {
             Debug.Log("Player Lost");
-            GameObject.Find("AudioManager").GetComponent<AudioManager>().Play("Lose");
+            AudioManager.instance.Play("Lose");
         }
         else
         {
             Debug.Log("Player Won");
-            GameObject.Find("AudioManager").GetComponent<AudioManager>().Play("Win");
+            AudioManager.instance.Play("Win");
             StartSpectator();
             DeleteTeamServerRPC(playerTeam);
         }
@@ -627,13 +613,13 @@ public class PlayerController : NetworkBehaviour
         {
             return;
         }
-        foreach (GameObject a in UnitManager.Instance.Ants)
-        {
-            if(a.GetComponent<MHealth>().team == team)
-            {
-                Destroy(a);
-            }
-        }
+        //foreach (UnitInfo a in UnitManager.Instance.Ants)
+        //{
+        //    if(a.GetComponent<MHealth>().team == team)
+        //    {
+        //        Destroy(a);
+        //    }
+        //}
     }
 
     [Rpc(SendTo.Everyone)]
@@ -641,7 +627,7 @@ public class PlayerController : NetworkBehaviour
     {
         if (IsOwner)
         {
-            GameObject.Find("AudioManager").GetComponent<AudioManager>().Play("FoodDropoff");
+            AudioManager.instance.Play("FoodDropoff");
         }
     }
 
@@ -650,7 +636,7 @@ public class PlayerController : NetworkBehaviour
     {
         if (IsOwner)
         {
-            GameObject.Find("AudioManager").GetComponent<AudioManager>().Play("Spawn");
+            AudioManager.instance.Play("Spawn");
         }
     }
 }

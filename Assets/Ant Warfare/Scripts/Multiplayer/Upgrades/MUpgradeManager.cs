@@ -22,7 +22,7 @@ public class MUpgradeManager : MonoBehaviour
         
         if (GameObject.Find("ProjectSceneManager"))
         {
-            GameObject.Find("ProjectSceneManager").GetComponent<Upgrader>().SyncUpgradeRpc(thisTeam, name);
+            //GameObject.Find("ProjectSceneManager").GetComponent<Upgrader>().SyncUpgradeRpc(thisTeam, name);
         }
     }
 }

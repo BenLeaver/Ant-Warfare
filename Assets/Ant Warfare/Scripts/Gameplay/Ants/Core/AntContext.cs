@@ -7,6 +7,9 @@ using Ant.AI;
 /// Essentially functions as memory for the state manager. 
 /// Therefore not tied to singleplayer or multiplayer implementation.
 /// Centralizes data from IAntWorld.
+/// 
+/// Stores the LocalTarget (where the ant is actually moving towards) and the UltimateTarget, 
+/// which is the final destination of the ant in its current state.
 /// </summary>
 public class AntContext
 {
@@ -17,7 +20,7 @@ public class AntContext
     public Vector3 LocalTarget;
     public Vector3 UltimateTarget;
 
-    public GameObject CurrentEnemyTarget;
+    public UnitInfo CurrentEnemyTarget;
     public GameObject CurrentFoodTarget;
 
     public float AttackTimer;
@@ -35,15 +38,12 @@ public class AntContext
 
     public Dictionary<PheromoneType, Dictionary<float, (PheromoneSubtype subtype, Vector3 target)>> EvaluatePheromones()
     {
-        //1. Check Pheromone applies
-        //2. Add to dict, including pheromone target and weight
-        //3. Check the greatest weight sum passes threshold -> If not allow placing and transition to search state.
-        //4. Calculate the mean target pos of greatest pheromone type.
-        //5. Transition to state given by pheromone type.
-
         return World.GetPheromonesNearby();
     }
 
+    /// <summary>
+    /// Returns the total weight and mean target of the nearby food return path pheromones.
+    /// </summary>
     public (float totalWeight, Vector3 meanTarget) GetFoodReturnPathTarget()
     {
         float total = 0f;
@@ -63,7 +63,10 @@ public class AntContext
         return (total, meanTarget);
     }
 
-
+    /// <summary>
+    /// Rotate the ant to face a point.
+    /// </summary>
+    /// <param name="point"></param>
     public void FacePoint(Vector3 point)
     {
         Vector3 direction = point - World.Position;
@@ -74,16 +77,28 @@ public class AntContext
         World.SetRotation(direction);
     }
 
+    /// <summary>
+    /// Rotate the ant to face the local target.
+    /// </summary>
     public void FaceLocalTarget()
     {
         FacePoint(LocalTarget);
     }
 
+    /// <summary>
+    /// Attack the CurrentEnemyTarget.
+    /// </summary>
     public void AttackEnemy()
     {
         World.Attack(CurrentEnemyTarget);
     }
 
+    /// <summary>
+    /// Given an origin, returns a reachable point on the navmesh within 
+    /// the minimum and maximum range.
+    /// 
+    /// If no reachable point was found, just returns this ant's current world position.
+    /// <returns></returns>
     public Vector3 GetValidPointWithinRange(Vector3 origin, float minRange, float maxRange)
     {
         return World.GetReachableNavMeshPoint(origin, minRange, maxRange);

@@ -9,7 +9,8 @@ public class StagSimpleAttackState : StagBaseState
     public const float totalAttackTime = (25f/60f);
     public const float attackDamageTime = (15f / 60f);
 
-    private GameObject closestEnemy;
+    private UnitInfo closestEnemy;
+    private GameObject stag;
     private bool attacked;
 
     public override void EnterState() {
@@ -18,13 +19,23 @@ public class StagSimpleAttackState : StagBaseState
         manager.anim.SetInteger("attackDecision", 1);
         elapsed = 0f;
         attacked = false;
+        stag = manager.gameObject;
     }
 
     public override void UpdateState() {
         closestEnemy = manager.FindNearestEnemy();
         elapsed += Time.deltaTime;
 
-        if (closestEnemy == null) return;
+        if (closestEnemy == null)
+        {
+            EndAttack();
+            return;
+        }
+        if (closestEnemy.go == null)
+        {
+            EndAttack();
+            return;
+        }
 
         float closestEnemyDist = Vector3.Distance(manager.transform.position, closestEnemy.transform.position);
 
@@ -36,6 +47,7 @@ public class StagSimpleAttackState : StagBaseState
         {
             DamageClosest();
             attacked = true;
+            EndAttack();
         }
     }
 
@@ -53,7 +65,11 @@ public class StagSimpleAttackState : StagBaseState
     /// </summary>
     private void DamageClosest()
     {
-        closestEnemy.GetComponent<SHealth>().UpdateHealth(manager.simpleAttackDamage);
+        if (stag == null || !stag.activeInHierarchy) return;
+
+        if (!closestEnemy.IsAliveAndActive()) return;
+        
+        closestEnemy.health.UpdateHealth(manager.simpleAttackDamage);
     }
 
     public override void OnDamageTaken() { }

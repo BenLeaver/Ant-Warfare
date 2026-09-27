@@ -1,24 +1,20 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Ant.AI;
 
 /// <summary>
+/// State used when an ant is following a pheromone path.
+/// 
+/// Overview:
+/// -   Moves toward the mean pheromone target with slight random variation.
+/// -   Subtype determines which interrupts are allowed:
+///         0 (default) -> Allow both EnemyIR & FoodIR
+///         1 -> Attack-only
+///         2 -> Food-only (and Attack interrupt if enemy VERY close)
 /// Ant will move towards the mean pheromone target, with some random variation.
 /// </summary>
 public class AntFollowPathState : BaseAntState
 {
-
-    /// <summary>
-    /// 
-    /// Subtype             Interrupts Allowed
-    /// 0 (default)         Attack & Food
-    /// 1 (attack)          Attack
-    /// 2 (food)            Food
-    /// 
-    /// </summary>
-    /// 
-
     private float IRCheckTimer = 0f;
 
     public AntFollowPathState(AntStateManager manager, AntContext context, AntStateType stateType)
@@ -73,27 +69,48 @@ public class AntFollowPathState : BaseAntState
 
         IRCheckTimer = 0f;
 
-        if (SubType != 2)
+        if (SubType == 0) // Default
+        {
+            if (CheckEnemyIR()) return true;
+            if (CheckFoodIR()) return true;
+        }
+        else if (SubType == 1) // Attack
         {
             if (CheckEnemyIR()) return true;
         }
-
-        if (SubType != 1)
+        else if (SubType == 2) // Food
         {
+            if (CheckEnemyCloseIR()) return true;
             if (CheckFoodIR()) return true;
         }
-
         return false;
     }
 
     public bool CheckEnemyIR()
     {
-        GameObject closest = context.World.FindClosestEnemy();
+        UnitInfo closest = context.World.FindClosestEnemy();
 
         if (closest == null) return false;
 
         float dist = Vector3.Distance(closest.transform.position, context.World.Position);
         if (dist < context.SightRange)
+        {
+            // Enemy in sight - interrupt.
+            manager.PushInterrupt(manager.enemyIRState);
+            return true;
+        }
+        return false;
+    }
+
+    public bool CheckEnemyCloseIR()
+    {
+        // Only interrupts if enemy is very close
+        UnitInfo closest = context.World.FindClosestEnemy();
+
+        if (closest == null) return false;
+
+        float dist = Vector3.Distance(closest.transform.position, context.World.Position);
+        if (dist < context.SightRange / 4)
         {
             // Enemy in sight - interrupt.
             manager.PushInterrupt(manager.enemyIRState);

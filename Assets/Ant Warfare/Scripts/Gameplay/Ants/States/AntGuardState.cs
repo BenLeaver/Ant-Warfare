@@ -1,14 +1,16 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Ant.AI;
 
 /// <summary>
-/// Ant will stay idle for 2-5 seconds, and will then generate a random point nearby the target, 
-/// and move towards that point.
+/// Guard behavior state.
 /// 
-/// If interrupted, the currentDuration will not be reset. This means that if the ant has already 
-/// completed the idle stage, it won't go back to it.
+/// Overview:
+/// -   When first entered, the ant idles for 2-5 seconds.
+/// -   After idling, it moves towards a random point near the assigned guard target.
+/// -   If interrupted or later resumed, the idle period is not repeated.
+/// -   Periodically checks for enemy interrupts.
+/// -   Decides next state after reaching the local target.
 /// </summary>
 public class AntGuardState : BaseAntState
 {
@@ -75,7 +77,7 @@ public class AntGuardState : BaseAntState
 
     public bool CheckEnemyIR()
     {
-        GameObject closest = context.World.FindClosestEnemy();
+        UnitInfo closest = context.World.FindClosestEnemy();
 
         if (closest == null) return false;
 

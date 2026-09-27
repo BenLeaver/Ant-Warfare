@@ -14,37 +14,68 @@ using UnityEngine.Rendering.Universal;
 /// </summary>
 public class Singleplayer_UI : MonoBehaviour
 {
-    public Button buySoldier;
-    public Button buyWorker;
-    public Button buySuperSoldier;
+    /// <summary>
+    /// Black - 0
+    /// Fire - 1
+    /// </summary>
+    public int speciesIndex;
+
+    public GameObject[] BuyMenus;
+
+    public GameObject[] UpgradeMenus;
+
+    public Button fireSuperSoldier;
+
+    [System.Serializable]
+    public class SpeciesUpgrades
+    {
+        public GameObject[] upgrades = new GameObject[6];
+        public GameObject[] tiers = new GameObject[3];
+    }
+
+    public SpeciesUpgrades[] speciesUpgrades;
 
     public int playerTeam;
     public string playerSpecies;
     public GameObject playerQueen;
     public GameObject player;
+    private BaseAntQueenAI queenScript;
+    private PheromoneMarkerManager playerMarkerManager;
+    private PlayerVision playerVision;
+
     public TMP_Text foodText;
     public TMP_Text colonySizeText;
+
+    private int lastFood;
+    private int lastColonySize;
+    private int lastMaxColonySize;
+    private int lastUpgradeTier;
+
     public GameObject helpUI;
     public GameObject upgradeUI;
+    public GameObject commandUI;
+    public GameObject spawnUI;
     public Canvas mainCanvas;
+
     public int upgradeTier = 0;
     public GameObject[] upgrades;
     public GameObject[] tiers;
     public GameObject lastLifeVolume;
+    private bool upgradeUIActive = false;
 
     public bool inTutorial = false;
 
-    [Header("Commands")]
-    public GameObject[] markerAmountTexts;
+    public Color positiveFoodTextColor;
+    public Color negativeFoodTextColor;
+
+    public PlayerFollowUIButton pfButton;
 
     void Start()
     {
-        buySoldier.onClick.AddListener(BuySoldier);
-        buyWorker.onClick.AddListener(BuyWorker);
-        if (buySuperSoldier != null)
-        {
-            buySuperSoldier.onClick.AddListener(BuySuperSoldier);
-        }
+        queenScript = playerQueen.GetComponent<BaseAntQueenAI>();
+        playerMarkerManager = player.GetComponent<PheromoneMarkerManager>();
+        playerVision = player.GetComponent<PlayerVision>();
+
         if (GameObject.Find("LastLifeVolume"))
         {
             lastLifeVolume = GameObject.Find("LastLifeVolume");
@@ -53,45 +84,75 @@ public class Singleplayer_UI : MonoBehaviour
         {
             Debug.LogError("LastLifeVolume could not be found.");
         }
+        InitialiseCorrectSpeciesUI();
+    }
 
+    void InitialiseCorrectSpeciesUI()
+    {
+        for(int i=0; i<BuyMenus.Length; i++)
+        {
+            if (i == speciesIndex)
+            {
+                BuyMenus[i].SetActive(true);
+                upgradeUI = UpgradeMenus[i];
+                UpgradeMenus[i].SetActive(false);
+                upgrades = speciesUpgrades[i].upgrades;
+                tiers = speciesUpgrades[i].tiers;
+            }
+            else
+            {
+                BuyMenus[i].SetActive(false);
+                UpgradeMenus[i].SetActive(false);
+            }
+        }
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (playerQueen == null)
+        if (playerQueen != null)
         {
-            playerTeam = GameObject.Find("SGameManager").GetComponent<SGameManager>().playerTeams[0];
-            playerSpecies = GameObject.Find("SGameManager").GetComponent<SGameManager>().playerSpecies[0];
-            if (GameObject.Find(playerSpecies + "AntQueen" + playerTeam))
+            if (queenScript.food != lastFood)
             {
-                playerQueen = GameObject.Find(playerSpecies + "AntQueen" + playerTeam);
+                if (queenScript.food < 0)
+                {
+                    foodText.color = negativeFoodTextColor;
+                    lastLifeVolume.GetComponent<Volume>().enabled = true;
+                }
+                else
+                {
+                    foodText.color = positiveFoodTextColor;
+                    lastLifeVolume.GetComponent<Volume>().enabled = false;
+                }
+                foodText.text = queenScript.food.ToString();
             }
-            
-        }
-        else if (playerQueen != null)
-        {
-            int food = playerQueen.GetComponent<BaseAntQueenAI>().food;
-            if (food < 0)
+            if (queenScript.colonySize != lastColonySize || queenScript.maxColonySize != lastMaxColonySize)
             {
-                foodText.color = new Color(0.566f, 0.0275f, 0.0275f, 1f);
-                lastLifeVolume.GetComponent<Volume>().enabled = true;
+                colonySizeText.text = queenScript.colonySize.ToString()
+                    + "/" + queenScript.maxColonySize.ToString();
             }
-            else
+            if (upgradeUIActive)
             {
-                foodText.color = new Color(0.0275f, 0.0275f, 0.0275f, 1f);
-                lastLifeVolume.GetComponent<Volume>().enabled = false;
+                // Only update upgrade UI if it is active.
+                if (upgradeTier != lastUpgradeTier || queenScript.food != lastFood)
+                {
+                    UpdateUpgradeBoxes();
+                }
+                if (upgradeTier != lastUpgradeTier)
+                {
+                    UpdateUpgradeTiers();
+                }
             }
-            foodText.text = food.ToString();
-            colonySizeText.text = playerQueen.GetComponent<BaseAntQueenAI>().colonySize.ToString() 
-                + "/" + playerQueen.GetComponent<BaseAntQueenAI>().maxColonySize.ToString();
-            UpdateUpgradeBoxes();
-            UpdateUpgradeTiers();
+
+            lastFood = queenScript.food;
+            lastColonySize = queenScript.colonySize;
+            lastMaxColonySize = queenScript.maxColonySize;
+            lastUpgradeTier = upgradeTier;
         }
 
         if(Input.GetKeyDown(KeyCode.H))
         {
-            ToggleHelpUI();
+            //ToggleHelpUI();
         }
         if(Input.GetKeyDown(KeyCode.U))
         {
@@ -100,6 +161,24 @@ public class Singleplayer_UI : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.J))
         {
             ToggleMainUI();
+        }
+        if (Input.GetKeyDown(KeyCode.B))
+        {
+            ToggleSpawnUI();
+        }
+        if (Input.GetKeyDown(KeyCode.C))
+        {
+            ToggleCommandUI();
+        }
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            RecruitPlayerFollow();
+            pfButton.Activate();
+        }
+        if (Input.GetKeyDown(KeyCode.G))
+        {
+            DisbandPlayerFollow();
+            pfButton.Deactivate();
         }
     }
 
@@ -112,7 +191,16 @@ public class Singleplayer_UI : MonoBehaviour
     public void ToggleUpgradeUI()
     {
         bool isActive = upgradeUI.activeSelf;
+
+        upgradeUIActive = !isActive;
         upgradeUI.SetActive(!isActive);
+
+        if (upgradeUIActive)
+        {
+            // If the upgrade menu has just been opened, make sure to update the boxes and tiers.
+            UpdateUpgradeBoxes();
+            UpdateUpgradeTiers();
+        }
     }
 
     public bool isUpgradeUIActive()
@@ -126,9 +214,21 @@ public class Singleplayer_UI : MonoBehaviour
         mainCanvas.enabled = !isEnabled;
     }
 
+    public void ToggleCommandUI()
+    {
+        bool isActive = commandUI.activeSelf;
+        commandUI.SetActive(!isActive);
+    }
+
+    public void ToggleSpawnUI()
+    {
+        bool isActive = spawnUI.activeSelf;
+        spawnUI.SetActive(!isActive);
+    }
+
     public void PlacePheremone(PheromoneSubtype subtype)
     {
-        player.GetComponent<PheromoneMarkerManager>().PlaceMarker(subtype);
+        playerMarkerManager.PlaceMarker(subtype);
     }
 
     public void Place_FoodReturnPath()
@@ -158,7 +258,28 @@ public class Singleplayer_UI : MonoBehaviour
 
     public void RemovePheremone()
     {
-        player.GetComponent<PheromoneMarkerManager>().RemoveMarker();
+        playerMarkerManager.RemoveMarker();
+    }
+
+    public void RecruitPlayerFollow()
+    {
+        playerMarkerManager.RecruitPlayerFollow();
+    }
+
+    public void DisbandPlayerFollow()
+    {
+        playerMarkerManager.DisbandPlayerFollow();
+
+    }
+
+    public void ShowFollowRange()
+    {
+        playerVision.ShowFollowCircle();
+    }
+
+    public void HideFollowRange()
+    {
+        playerVision.HideFollowCircle();
     }
 
     /// <summary>
@@ -171,14 +292,14 @@ public class Singleplayer_UI : MonoBehaviour
     {
         if (playerQueen != null)
         {
-            int food = playerQueen.GetComponent<BaseAntQueenAI>().food;
+            int food = queenScript.food;
             GameObject upgrade = upgrades[upgradeIndex];
             int cost = upgrade.GetComponent<Upgrade>().cost;
             if (food >= cost)
             {
                 upgradeTier += 1;
-                playerQueen.GetComponent<BaseAntQueenAI>().food -= cost;
-                playerQueen.GetComponent<BaseAntQueenAI>().AddSelectedUpgrade(upgrade);
+                queenScript.food -= cost;
+                queenScript.AddSelectedUpgrade(upgrade);
                 upgrade.GetComponent<Upgrade>().Selected();
                 foreach (GameObject u in upgrades)
                 {
@@ -192,6 +313,9 @@ public class Singleplayer_UI : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Updates image background for Upgrade Tier title boxes to indicate whether that upgrade tier is unlocked.
+    /// </summary>
     void UpdateUpgradeTiers()
     {
         if (upgradeTier == 0)
@@ -214,6 +338,9 @@ public class Singleplayer_UI : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Updates the upgrade boxes to darken unavailable upgrades (either due to cost or unlocked tier).
+    /// </summary>
     void UpdateUpgradeBoxes()
     {
         foreach (GameObject u in upgrades)
@@ -223,12 +350,12 @@ public class Singleplayer_UI : MonoBehaviour
                 
                 if (u.GetComponent<Upgrade>().tier > upgradeTier + 1)
                 {
-                    // Higher tiers locked until lower tiers have been bought.
+                    // Higher tiers locked until lower tiers have been bought.`
                     u.GetComponent<Upgrade>().Darken();
                 }
                 else
                 {
-                    int food = playerQueen.GetComponent<BaseAntQueenAI>().food;
+                    int food = queenScript.food;
                     if (u.GetComponent<Upgrade>().cost > food)
                     {
                         u.GetComponent<Upgrade>().Darken();
@@ -242,14 +369,14 @@ public class Singleplayer_UI : MonoBehaviour
         }
     }
 
-    void BuySoldier()
+    public void BuySoldier()
     {
-        playerQueen.GetComponent<BaseAntQueenAI>().SpawnSoldier();
+        queenScript.SpawnSoldier();
     }
 
-    void BuyWorker()
+    public void BuyWorker()
     {
-        playerQueen.GetComponent<BaseAntQueenAI>().SpawnWorker();
+        queenScript.SpawnWorker();
         if (inTutorial)
         {
             if (GameObject.Find("SGameManager").GetComponent<SGameManager>().tutorialPart == 9)
@@ -259,8 +386,8 @@ public class Singleplayer_UI : MonoBehaviour
         }
     }
 
-    void BuySuperSoldier()
+    public void BuySuperSoldier()
     {
-        playerQueen.GetComponent<BaseAntQueenAI>().SpawnSuperSoldier();
+        queenScript.SpawnSuperSoldier();
     }
 }

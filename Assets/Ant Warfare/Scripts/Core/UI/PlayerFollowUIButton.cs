@@ -23,12 +23,12 @@ public class PlayerFollowUIButton : MonoBehaviour
         disbandButton.onClick.AddListener(Deactivate);
     }
 
-    void Activate()
+    public void Activate()
     {
         buttonImage.sprite = active;
     }
 
-    void Deactivate()
+    public void Deactivate()
     {
         buttonImage.sprite = inactive;
     }

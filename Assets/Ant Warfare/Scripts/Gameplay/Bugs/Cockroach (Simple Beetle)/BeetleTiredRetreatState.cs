@@ -7,6 +7,7 @@ using UnityEngine.AI;
 public class BeetleTiredRetreatState : BeetleBaseState
 {
     private float elapsed;
+    private float checkTimer;
 
     public BeetleTiredRetreatState(BeetleStateManager beetle) : base(beetle) { }
 
@@ -27,19 +28,18 @@ public class BeetleTiredRetreatState : BeetleBaseState
     public override void UpdateState()
     {
         elapsed += Time.deltaTime;
+        checkTimer += Time.deltaTime;
 
-        GameObject nearestEnemy = manager.FindNearestEnemy();
-        if (nearestEnemy == null)
+        // Periodically check whether any enemies are still visible
+        if (checkTimer > 0.5f)
         {
-            manager.ChangeState(manager.IdleState);
-            return;
-        }
-
-        float distance = Vector3.Distance(manager.transform.position, nearestEnemy.transform.position);
-        if (distance > 20f)
-        {
-            manager.ChangeState(manager.IdleState);
-            return;
+            checkTimer = 0f;
+            UnitInfo nearestEnemy = manager.FindNearestEnemy();
+            if (nearestEnemy == null)
+            {
+                manager.ChangeState(manager.IdleState);
+                return;
+            }
         }
 
         float t = Mathf.Clamp01(elapsed / 20f);

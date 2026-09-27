@@ -207,10 +207,10 @@ GameObject:
   - component: {fileID: 8200308034547834945}
   - component: {fileID: 8200308034547834944}
   - component: {fileID: 4911060122612294663}
-  - component: {fileID: -2783890975971717584}
   - component: {fileID: 8456778941846023881}
   - component: {fileID: 4117572639574396759}
   - component: {fileID: -7743638104146851355}
+  - component: {fileID: -4110333519508002980}
   m_Layer: 9
   m_Name: SuperSoldier(Fire)
   m_TagString: Ant
@@ -301,7 +301,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxHealth: 1000
   health: 1000
-  team: 1
   slider: {fileID: 2451201463131142813}
   fill: {fileID: 2642601103791535669}
   deathObject: {fileID: 8053489751011682950, guid: bee72454c32d09043b80710031da5783, type: 3}
@@ -341,33 +340,6 @@ CapsuleCollider2D:
   m_Offset: {x: 0.002285242, y: -0.07729757}
   m_Size: {x: 0.75413084, y: 2.1792924}
   m_Direction: 0
---- !u!114 &-2783890975971717584
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8200308034547834947}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 23c1e767a709492409f1c47c5abca673, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  type: Super Soldier
-  species: Fire
-  target: {x: 0, y: 0, z: 0}
-  anim: {fileID: 8456778941846023881}
-  healthScript: {fileID: 8200308034547834944}
-  attack: 60
-  attackTimer: 0
-  foodCarried: {fileID: 0}
-  queenRange: 5
-  foodMult: 1
-  playerCommandIndex: -1
-  friendlyPlayer: {fileID: 0}
-  closestMarker: {fileID: 0}
-  mouth: {fileID: 8480871882801946560}
-  firstAid: 0
 --- !u!95 &8456778941846023881
 Animator:
   serializedVersion: 5
@@ -442,6 +414,30 @@ MonoBehaviour:
     pitch: 1
     loop: 0
     source: {fileID: 0}
+--- !u!114 &-4110333519508002980
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8200308034547834947}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5e4fa0e069290434491657ede20a1049, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  healthScript: {fileID: 8200308034547834944}
+  mouth: {fileID: 8480871882801946560}
+  foodCarried: {fileID: 0}
+  queenRange: 5
+  species: Fire
+  attackDamage: 60
+  sightRange: 20
+  attackRange: 1
+  attackDelay: 1
+  pickupRange: 1
+  firstAid: 0
+  foodMult: 1
 --- !u!1 &8253315209348739095
 GameObject:
   m_ObjectHideFlags: 0

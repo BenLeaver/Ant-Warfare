@@ -92,7 +92,6 @@ public class MHealth : NetworkBehaviour
     /// </summary>
     private void HandleDeath()
     {
-        Debug.Log("HandleDeath()");
         Instantiate(deathObject, gameObject.transform.position, gameObject.transform.rotation);
         if (GetComponent<PlayerController>())
         {

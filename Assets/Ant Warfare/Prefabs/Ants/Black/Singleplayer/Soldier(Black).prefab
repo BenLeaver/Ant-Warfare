@@ -90,7 +90,6 @@ GameObject:
   - component: {fileID: 5495364663072833869}
   - component: {fileID: -3798370578742763871}
   - component: {fileID: 3655779975121140863}
-  - component: {fileID: 361519724592583808}
   - component: {fileID: 2920640915019271832}
   m_Layer: 9
   m_Name: Soldier(Black)
@@ -217,7 +216,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxHealth: 100
   health: 100
-  team: 1
   slider: {fileID: 3153451436875777275}
   fill: {fileID: 4303249051509882779}
   deathObject: {fileID: 8053489751011682950, guid: 257a7d08a069a2f49be6a4ff2cbf1a30, type: 3}
@@ -296,33 +294,6 @@ MonoBehaviour:
     pitch: 1
     loop: 0
     source: {fileID: 0}
---- !u!114 &361519724592583808
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2655473375775372679}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 23c1e767a709492409f1c47c5abca673, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  type: Soldier
-  species: Black
-  target: {x: 0, y: 0, z: 0}
-  anim: {fileID: 5495364663072833869}
-  healthScript: {fileID: -7358069411971158963}
-  attack: 30
-  attackTimer: 5
-  foodCarried: {fileID: 0}
-  queenRange: 5
-  foodMult: 1
-  playerCommandIndex: -1
-  friendlyPlayer: {fileID: 0}
-  closestMarker: {fileID: 0}
-  mouth: {fileID: 2655473376059334497}
-  firstAid: 0
 --- !u!114 &2920640915019271832
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -337,16 +308,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   healthScript: {fileID: -7358069411971158963}
   mouth: {fileID: 2655473376059334497}
-  queen: {fileID: 0}
   foodCarried: {fileID: 0}
   queenRange: 5
-  Type: 1
   species: Black
   attackDamage: 30
   sightRange: 20
-  attackRange: 2.5
+  attackRange: 1
   attackDelay: 1
-  pickupRange: 2
+  pickupRange: 1
   firstAid: 0
   foodMult: 1
 --- !u!1 &2655473376059334496

@@ -1,23 +1,17 @@
-using System.Collections;
+ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Ant.AI;
+
 /// <summary>
-/// Da plan:
-/// If within nest range (10 units?), deposit food to queen, and exit state (normal state decision).
-/// Else if pheromone food retreat markers nearby, follow the average target of them.
-/// Else generate navmesh path to nest, but and some natural randomness:
-/// - Offset destination slightly.
-/// - Could mess around with getting corners and then setting that as a 'sub-destination'
+/// State used when the ant is carrying food back towards the nest.
 /// 
-/// But maybe simpler method that avoids needing to perfectly interface with the navmesh corner system:
-/// - If close to nest (e.g. within 20 units) just set local destination to nest (with some randomisation)
-/// - Else, attempt to set destination to location 10-20 units away that is closer to the nest. Try 20 times, and take the one that gets you the closest.
-/// - If no closer destination was found (i.e. current location is about the closest you can possibly get within 10-20 units - unlikely) just set destination to the nest as a fallback.
-/// 
-/// Just realised what happens when state time runs out -> base state calls DecideNextState -> Need to override UpdateState method and DON'T call the superclass version.
-/// Instead could still have a currentDuration timer, but each time it runs out check distance to nest and generate destination again.
-/// Only exit state when the food has been deposited.
+/// Overview:
+/// -   Continuously moves ant closer to the queen/nest.
+/// -   Follows existing food-return pheromone paths when strong enough.
+/// -   Otherwise selects a destination that reduces distance to the queen.
+/// -   Can place food path pheromones pointing back towards the food source.
+/// -   Self-loops until the ant reaches the queen or is interrupted.
 /// </summary>
 public class AntCarryFoodIRState : BaseAntState
 {
@@ -34,7 +28,6 @@ public class AntCarryFoodIRState : BaseAntState
         maxDuration = 10f;
         currentDuration = 0f;
 
-        // TODO: Allow placing of Food Path markers.
         InitializeDestination();
     }
 
@@ -48,11 +41,9 @@ public class AntCarryFoodIRState : BaseAntState
         if (queenDist <= 5f)
         {
             // Deposit food and exit state.
-            
             context.World.CheckInNest();
             manager.DecideNextState();
             return;
-
         }
         else if (stats.totalWeight > foodReturnMajorityThreshold)
         {
@@ -61,6 +52,7 @@ public class AntCarryFoodIRState : BaseAntState
             context.UltimateTarget = stats.meanTarget;
             context.LocalTarget = context.GetValidPointWithinRange(stats.meanTarget, 0f, 5f);
             context.World.SetDestination(context.LocalTarget);
+            TryPlaceFoodPathMarker();
         }
         else if (queenDist <= 25f)
         {
@@ -69,6 +61,7 @@ public class AntCarryFoodIRState : BaseAntState
             context.UltimateTarget = queenPos;
             context.LocalTarget = context.GetValidPointWithinRange(queenPos, 0f, 5f);
             context.World.SetDestination(context.LocalTarget);
+            TryPlaceFoodPathMarker();
         }
         else
         {
@@ -97,11 +90,23 @@ public class AntCarryFoodIRState : BaseAntState
 
             context.LocalTarget = bestPos;
             context.World.SetDestination(context.LocalTarget);
+            TryPlaceFoodPathMarker();
         }
     }
 
     public override void UpdateState(float deltaTime)
     {
+        // Check whether ant is able to deposit food
+        float queenDist = context.World.GetFriendlyQueenDist();
+
+        if (queenDist <= 5f)
+        {
+            // Deposit food and exit state.
+            context.World.CheckInNest();
+            manager.DecideNextState();
+            return;
+        }
+
         context.FaceLocalTarget();
 
         currentDuration += deltaTime;
@@ -118,6 +123,28 @@ public class AntCarryFoodIRState : BaseAntState
         {
             context.World.SetDestination(context.LocalTarget);
         }
+    }
+
+    private void TryPlaceFoodPathMarker()
+    {
+        // Check pheromone density
+        if (!manager.CanPlacePheromones()) return;
+
+        // Compute direction opposite to the ant's movement direction
+        // Ant is moving from antPos -> LocalTarget
+        // So pheromone should point from LocalTarget -> antPos
+
+        Vector3 antPos = context.World.Position;
+        Vector3 localTarget = context.LocalTarget;
+
+        Vector2 movementDir = (localTarget - antPos).normalized;
+        Vector3 oppositeDir = -movementDir;
+
+        // Convert direction to rotation
+        Quaternion rot = Quaternion.FromToRotation(Vector3.up, oppositeDir);
+
+        // Place pheromone at ants current position
+        context.World.PlacePheromone(PheromoneSubtype.FoodPath, rot);
     }
 
 

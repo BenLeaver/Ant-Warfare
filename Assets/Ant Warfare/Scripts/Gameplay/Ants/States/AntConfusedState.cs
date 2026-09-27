@@ -74,7 +74,7 @@ public class AntConfusedState : BaseAntState
 
     public bool CheckEnemyIR()
     {
-        GameObject closest = context.World.FindClosestEnemy();
+        UnitInfo closest = context.World.FindClosestEnemy();
 
         if (closest == null) return false;
 

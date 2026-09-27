@@ -32,12 +32,23 @@ public class ObjectAudioManager : MonoBehaviour
     /// </summary>
     public void Play (string name)
     {
+        // Find Sound
         Sound s = Array.Find(sounds, sound => sound.name == name);
         if(s == null)
         {
             Debug.LogWarning("Sound: " + name + " not found!");
             return;
         }
+
+        // Validate the AudioSource
+        if (s.source == null)
+        {
+            Debug.LogWarning($"[ObjectAudioManager] Sound '{name}' has no AudioSource on {gameObject.name}");
+            return;
+        }
+        if (!s.source.enabled || !s.source.gameObject.activeInHierarchy)
+            return;
+
         s.source.Play();
     }
 }

@@ -286,7 +286,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxHealth: 1500
   health: 1500
-  team: 5
   slider: {fileID: 8898983605418767916}
   fill: {fileID: 2642601103791535669, guid: 4ebe39001ba815e47aded383ef8d0c5d, type: 3}
   deathObject: {fileID: 8053489751011682950, guid: 257a7d08a069a2f49be6a4ff2cbf1a30, type: 3}
@@ -472,7 +471,7 @@ Transform:
   m_GameObject: {fileID: 5697821607644276510}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 10.421801, y: 7.049362, z: 0}
+  m_LocalPosition: {x: 0, y: 1.57, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

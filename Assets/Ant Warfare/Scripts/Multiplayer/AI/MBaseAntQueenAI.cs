@@ -345,6 +345,15 @@ public class MBaseAntQueenAI : NetworkBehaviour
     {
         SpawnDecision();
         command = "none";
+        // This is just a temporary workaround to stop compiler errors as I will update
+        // all the multiplayer scripts later anyway.
+        var allQueens = UnitManager.Instance.GetAllQueens();
+        List<GameObject> allQueenGO = new List<GameObject>(4);
+        foreach (UnitInfo q in allQueens)
+        {
+            allQueenGO.Add(q.go);
+        }
+
         if (difficulty == 0) //Easy
         {
             if (CheckEnemiesInNest())
@@ -360,7 +369,7 @@ public class MBaseAntQueenAI : NetworkBehaviour
                 //Will store the ranking of the colony relative to enemy colonies
                 // - so better judgement can be made about whether to attack
                 strengthRanking = 1; 
-                foreach (GameObject a in UnitManager.Instance.Ants)
+                foreach (GameObject a in allQueenGO)
                 {
                     if (a.GetComponent<MBaseAntQueenAI>())
                     {
@@ -403,7 +412,9 @@ public class MBaseAntQueenAI : NetworkBehaviour
                 int strongestEnemySoldiers = 0;
                 //int attackChance = 0; //will be used to determine if an attack should be carried out - will only happen when this colony is one of the stronger ones
                 strengthRanking = 1; //Will store the ranking of the colony relative to enemy colonies - so better judgement can be made about whether to attack
-                foreach (GameObject a in UnitManager.Instance.Ants)
+                
+
+                foreach (GameObject a in allQueenGO)
                 {
                     if (a.GetComponent<MBaseAntQueenAI>())
                     {
@@ -446,7 +457,7 @@ public class MBaseAntQueenAI : NetworkBehaviour
                 int strongestEnemySoldiers = 0;
                 //int attackChance = 0; //will be used to determine if an attack should be carried out - will only happen when this colony is one of the stronger ones
                 strengthRanking = 1; //Will store the ranking of the colony relative to enemy colonies - so better judgement can be made about whether to attack
-                foreach (GameObject a in UnitManager.Instance.Ants)
+                foreach (GameObject a in allQueenGO)
                 {
                     if (a.GetComponent<MBaseAntQueenAI>())
                     {
@@ -488,15 +499,22 @@ public class MBaseAntQueenAI : NetworkBehaviour
         if (playerOnTeam)
         {
             m_player.GetComponent<PlayerController>().ColonyDied();
-            GameObject.Find("AudioManager").GetComponent<AudioManager>().Play("Lose");
-            GameObject.Find("AudioManager").GetComponent<AudioManager>().Stop("GameMusic");
-            GameObject.Find("AudioManager").GetComponent<AudioManager>().Play("MenuMusic");
+            AudioManager.instance.Play("Lose");
+            AudioManager.instance.Stop("GameMusic");
+            AudioManager.instance.Play("MenuMusic");
         }
     }
 
     private bool CheckEnemiesInNest()
     {
-        foreach (GameObject a in UnitManager.Instance.AllUnits)
+        var allQueens = UnitManager.Instance.GetAllQueens();
+        List<GameObject> allQueenGO = new List<GameObject>(4);
+        foreach (UnitInfo q in allQueens)
+        {
+            allQueenGO.Add(q.go);
+        }
+
+        foreach (GameObject a in allQueenGO)
         {
             if (a.GetComponent<MHealth>().team != healthScript.team)
             {

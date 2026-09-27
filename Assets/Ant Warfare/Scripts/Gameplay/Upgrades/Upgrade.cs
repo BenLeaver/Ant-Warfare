@@ -22,12 +22,16 @@ public class Upgrade : MonoBehaviour
     public int cost;
 
     private bool available = true;
+    private Image image;
+    private Button button;
 
-    void Start()
+    void Awake()
     {
+        image = GetComponent<Image>();
+        button = GetComponent<Button>();
         nameText.text = upgradeName;
         descriptionText.text = description;
-        gameObject.GetComponent<Image>().sprite = frontImage;
+        image.sprite = frontImage;
         InitialiseCost();
     }
 
@@ -49,14 +53,14 @@ public class Upgrade : MonoBehaviour
 
     public void DisplayBack()
     {
-        gameObject.GetComponent<Image>().sprite = backImage;
+        image.sprite = backImage;
         nameText.enabled = false; 
         descriptionText.enabled = true;
     }
 
     public void DisplayFront()
     {
-        gameObject.GetComponent<Image>().sprite = frontImage;
+        image.sprite = frontImage;
         nameText.enabled = true;
         descriptionText.enabled = false;
     }
@@ -68,8 +72,8 @@ public class Upgrade : MonoBehaviour
     {
         if (available)
         {
-            gameObject.GetComponent<Image>().color = new Color(0.3f, 0.3f, 0.3f, 0.6f);
-            gameObject.GetComponent<Button>().interactable = false;
+            image.color = new Color(0.3f, 0.3f, 0.3f, 0.6f);
+            button.interactable = false;
         }
     }
 
@@ -80,8 +84,8 @@ public class Upgrade : MonoBehaviour
     {
         if (available)
         {
-            gameObject.GetComponent<Image>().color = new Color(1f, 1f, 1f, 0.9f);
-            gameObject.GetComponent<Button>().interactable = true;
+            image.color = new Color(1f, 1f, 1f, 0.9f);
+            button.interactable = true;
         }
     }
 
@@ -91,8 +95,8 @@ public class Upgrade : MonoBehaviour
     /// </summary>
     public void MakeUnavailable()
     {
-        gameObject.GetComponent<Image>().color = new Color(0.2f, 0.2f, 0.2f, 0.5f);
-        gameObject.GetComponent<Button>().interactable = false;
+        image.color = new Color(0.2f, 0.2f, 0.2f, 0.5f);
+        button.interactable = false;
         available = false;
     }
 
@@ -102,17 +106,17 @@ public class Upgrade : MonoBehaviour
     /// </summary>
     public void Selected()
     {
-        gameObject.GetComponent<Image>().color = new Color(0.75f, 0.75f, 0.75f, 0.8f);
-        gameObject.GetComponent<Button>().interactable = false;
+        image.color = new Color(0.75f, 0.75f, 0.75f, 0.8f);
+        button.interactable = false;
         available = false;
 
         if (GetComponent<SUpgradeManager>())
         {
             GetComponent<SUpgradeManager>().ApplyUpgrade(upgradeName);
         }
-        if (GetComponent<MUpgradeManager>())
-        {
-            GetComponent<MUpgradeManager>().ApplyUpgrade(upgradeName);
-        }
+        //if (GetComponent<MUpgradeManager>())
+        //{
+        //    GetComponent<MUpgradeManager>().ApplyUpgrade(upgradeName);
+        //}
     }
 }

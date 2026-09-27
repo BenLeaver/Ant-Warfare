@@ -39,7 +39,7 @@ public class FoodSpawn : MonoBehaviour
                 }
                 else
                 {
-                    GameObject.Find("ProjectSceneManager").GetComponent<MFoodSpawner>().SpawnFood(rX, rY, foodTypeIndex);
+                    //GameObject.Find("ProjectSceneManager").GetComponent<MFoodSpawner>().SpawnFood(rX, rY, foodTypeIndex);
                 }
             }
             foodTimer = 0;
