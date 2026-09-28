@@ -24,7 +24,7 @@ When `dev` becomes stable, merge it into `main`.
 Used for new features, refactors, or experiments.
 
 **Naming:**
-feature/<short-description>
+feature/short-description
 
 **Workflow:**
 1. Branch from `dev`
@@ -39,7 +39,7 @@ feature/<short-description>
 Used only when `main` has a critical issue that must be fixed immediately.
 
 **Naming:**
-hotfix/<issue-name>
+hotfix/issue-name
 
 
 **Workflow:**
