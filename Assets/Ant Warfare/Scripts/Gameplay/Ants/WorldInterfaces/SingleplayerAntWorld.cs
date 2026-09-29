@@ -31,7 +31,11 @@ public class SingleplayerAntWorld : MonoBehaviour, IAntWorld
     public GameObject foodCarried;
 
     public float queenRange = 5f;
-    public AntType Type { get; set; }
+    [SerializeField]
+    private AntType type;
+
+    public AntType Type => type;
+
     public string species;
     public int attackDamage;
 

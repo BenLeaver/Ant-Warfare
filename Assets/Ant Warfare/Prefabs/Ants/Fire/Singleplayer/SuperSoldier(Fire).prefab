@@ -430,6 +430,7 @@ MonoBehaviour:
   mouth: {fileID: 8480871882801946560}
   foodCarried: {fileID: 0}
   queenRange: 5
+  type: 1
   species: Fire
   attackDamage: 60
   sightRange: 20

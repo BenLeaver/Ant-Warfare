@@ -310,6 +310,7 @@ MonoBehaviour:
   mouth: {fileID: 2655473376059334497}
   foodCarried: {fileID: 0}
   queenRange: 5
+  type: 1
   species: Black
   attackDamage: 30
   sightRange: 20

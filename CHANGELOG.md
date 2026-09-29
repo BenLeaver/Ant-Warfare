@@ -10,3 +10,7 @@ This changelog begins at **v0.0.0**, marking the start of formal versioning.
 - Added lightweight branching strategy (`main`, `dev`, feature and hotfix branches)  
 - Added semantic versioning model (MAJOR.MINOR.PATCH)  
 - Created initial `CHANGELOG.md` to track future development  
+
+## v0.0.1 Fixed AntType Assignment
+- Restored proper AntType serialization in `SingleplayerAntWorld`
+- Ensured ant prefabs correctly store and expose their type

@@ -231,11 +231,11 @@ public class AntStateManager
         {
             var stats = GetStats(kvp.Key);
             pheromoneStats.Add((kvp.Key, stats.totalWeight, stats.meanTarget, stats.strongestSubtype));
+            
         }
 
         // Sort descending by sum
         pheromoneStats.Sort((a, b) => b.sum.CompareTo(a.sum));
-
 
         if (pheromoneStats.Count == 0)
         {
@@ -284,6 +284,7 @@ public class AntStateManager
         else if (sub == PheromoneSubtype.GuardPoint)
         {
             ChangeState(guardState, T);
+
         }
         else
         {

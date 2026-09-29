@@ -15,7 +15,7 @@ using Ant.AI;
 /// </summary>
 public interface IAntWorld
 {
-    AntType Type { get; set; }
+    AntType Type { get; }
     float DeltaTime { get; }
 
     // Control
