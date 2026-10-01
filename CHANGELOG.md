@@ -14,3 +14,6 @@ This changelog begins at **v0.0.0**, marking the start of formal versioning.
 ## v0.0.1 Fixed AntType Assignment
 - Restored proper AntType serialization in `SingleplayerAntWorld`
 - Ensured ant prefabs correctly store and expose their type
+
+## v0.0.2 Enabled Bug Spawning
+- Allowed bug spawning again every night

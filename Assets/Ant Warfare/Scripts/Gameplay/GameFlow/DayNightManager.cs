@@ -56,22 +56,22 @@ public class DayNightManager : MonoBehaviour
         // Cockroach
         if (day <= 1)
         {
-            //Spawn(0, 1);
+            Spawn(0, 1);
         }
         else if (day == 2)
         {
-            //Spawn(0, 2);
+            Spawn(0, 2);
         }
         else
         {
-            //Spawn(0, 3);
+            Spawn(0, 3);
         }
 
         // Stag Beetle
-        //if (day % 2 == 0 && day != 0)
-        //{
-            //Spawn(1, 1);
-        //}
+        if (day % 2 == 0 && day != 0)
+        {
+            Spawn(1, 1);
+        }
     }
 
     /// <summary>
