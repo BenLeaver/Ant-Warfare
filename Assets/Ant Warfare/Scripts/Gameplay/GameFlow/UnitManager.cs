@@ -51,7 +51,6 @@ public class UnitManager : MonoBehaviour
                 Debug.Log($"Unit: {u.go.name}, Team: {u.team}, Type: {u.unitType}, AntWorld: {u.antWorld}");
             }
         }
-
     }
 
     /// <summary>

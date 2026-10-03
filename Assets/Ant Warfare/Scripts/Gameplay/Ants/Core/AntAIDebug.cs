@@ -56,6 +56,10 @@ public class AntAIDebug : MonoBehaviour
                 $"State: {manager.CurrentStateType}"
             );
         }
+        else
+        {
+            Debug.Log("Manger is null");
+        }
 #endif
     }
 }

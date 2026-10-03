@@ -53,6 +53,8 @@ public class DayNightManager : MonoBehaviour
     /// </summary>
     void SpawnBugs()
     {
+        Spawn(0, 1);
+        Spawn(1, 1);
         // Cockroach
         if (day <= 1)
         {

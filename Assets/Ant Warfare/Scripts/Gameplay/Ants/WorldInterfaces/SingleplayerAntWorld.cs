@@ -104,22 +104,6 @@ public class SingleplayerAntWorld : MonoBehaviour, IAntWorld
         }
     }
 
-    private void OnEnable()
-    {
-        //if (UnitManager.Instance != null)
-        //{
-        //    myInfo = UnitManager.Instance.RegisterUnit(gameObject);
-        //}
-    }
-
-    private void OnDisable()
-    {
-        if (UnitManager.Instance != null)
-        {
-            UnitManager.Instance.UnregisterUnit(myInfo);
-        }
-    }
-
     public float DeltaTime => Time.deltaTime;
 
     /// <summary>
