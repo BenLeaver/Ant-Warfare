@@ -227,4 +227,10 @@ public class SpatialGrid
         }
         return result;
     }
+
+    public void Clear()
+    {
+        unitCells.Clear();
+        foodCells.Clear();
+    }
 }

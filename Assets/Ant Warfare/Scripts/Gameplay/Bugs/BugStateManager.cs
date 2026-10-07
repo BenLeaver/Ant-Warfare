@@ -53,14 +53,6 @@ public class BugStateManager : StateManager
         }
     }
 
-    private void OnDisable()
-    {
-        if (UnitManager.Instance != null)
-        {
-            UnitManager.Instance.UnregisterUnit(myInfo);
-        }
-    }
-
     public override void Update()
     {
         base.Update();

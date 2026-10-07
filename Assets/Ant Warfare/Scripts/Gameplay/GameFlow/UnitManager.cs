@@ -307,5 +307,17 @@ public class UnitManager : MonoBehaviour
         return result;
     }
 
+    /// <summary>
+    /// Remove all units from unit manager.
+    /// 
+    /// Should be called when the scene is changed to ensure unit data is cleared.
+    /// </summary>
+    public void ClearAllUnits()
+    {
+        grid.Clear();
 
+        allUnits.Clear();
+        unitsByTeam.Clear();
+        queenDict.Clear();
+    }
 }

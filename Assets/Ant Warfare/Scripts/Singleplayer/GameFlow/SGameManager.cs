@@ -442,9 +442,13 @@ public class SGameManager : MonoBehaviour
         numberTeams -= 1;
         if(numberTeams == 1)
         {
+            if (UnitManager.Instance != null)
+                UnitManager.Instance.ClearAllUnits();
+
             AudioManager.instance.Play("Win");
             AudioManager.instance.Play("MenuMusic");
             AudioManager.instance.Stop("GameMusic");
+
             SceneManager.LoadScene("WinMenu");
         }
     }

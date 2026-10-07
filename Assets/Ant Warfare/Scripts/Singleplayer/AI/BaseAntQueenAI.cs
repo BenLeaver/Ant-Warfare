@@ -64,14 +64,6 @@ public class BaseAntQueenAI : MonoBehaviour
         myInfo = UnitManager.Instance.RegisterUnit(gameObject);
     }
 
-    private void OnDisable()
-    {
-        if (UnitManager.Instance != null)
-        {
-            UnitManager.Instance.UnregisterUnit(myInfo);
-        }
-    }
-
     /// <summary>
     /// Adds an upgrade to a list of selected upgrades, used to ensure the upgrades apply to 
     /// newly spawned ants.
@@ -478,9 +470,15 @@ public class BaseAntQueenAI : MonoBehaviour
 
     public void Death()
     {
-        UnitManager.Instance.UnregisterUnit(myInfo);
+        if (UnitManager.Instance != null)
+        {
+            UnitManager.Instance.UnregisterUnit(myInfo);
+        }
+
         if (playerOnTeam)
         {
+            if (UnitManager.Instance != null)
+                UnitManager.Instance.ClearAllUnits();
             AudioManager.instance.Play("Lose");
             AudioManager.instance.Stop("GameMusic");
             AudioManager.instance.Play("MenuMusic");
