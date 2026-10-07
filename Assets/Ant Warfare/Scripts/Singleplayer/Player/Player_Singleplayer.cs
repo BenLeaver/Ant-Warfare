@@ -70,15 +70,6 @@ public class Player_Singleplayer : MonoBehaviour
         myInfo = UnitManager.Instance.RegisterUnit(gameObject);
     }
 
-
-    private void OnDisable()
-    {
-        if (UnitManager.Instance != null)
-        {
-            UnitManager.Instance.UnregisterUnit(myInfo);
-        }
-    }
-
     void InitialiseCamera()
     {
         var camera = Instantiate(playerCameraPrefab);
@@ -125,12 +116,16 @@ public class Player_Singleplayer : MonoBehaviour
     {
         if(Input.GetKey(KeyCode.Escape))
         {
+            if (UnitManager.Instance != null)
+                UnitManager.Instance.ClearAllUnits();
+
             if(SceneManager.GetActiveScene().name == "Tutorial")
             {
                 GameObject.Find("SGameManager").GetComponent<SGameManager>().tutorialPart = 0;
             }
             AudioManager.instance.Stop("GameMusic");
             AudioManager.instance.Play("MenuMusic");
+
             SceneManager.LoadScene("MainMenu");
         }
         if(Input.GetKey(KeyCode.W))
@@ -294,7 +289,8 @@ public class Player_Singleplayer : MonoBehaviour
         }
         else
         {
-            UnitManager.Instance.UnregisterUnit(myInfo);
+            if (UnitManager.Instance != null)
+                UnitManager.Instance.ClearAllUnits();
             AudioManager.instance.Stop("GameMusic");
             AudioManager.instance.Play("MenuMusic");
             AudioManager.instance.Play("Lose");
