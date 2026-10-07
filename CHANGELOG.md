@@ -21,3 +21,6 @@ This changelog begins at **v0.0.0**, marking the start of formal versioning.
 ## v0.0.3 Fixed 'Ghost Ants'
 - No longer unregister from unit manager on ant world disable
 - Previously after being thrown ants were invisible to their enemies
+
+## v0.0.4 Fixed UnitManager on Scene Change
+- Clear all units from the unit manager when the game scene is changed
