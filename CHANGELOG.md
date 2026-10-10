@@ -24,3 +24,7 @@ This changelog begins at **v0.0.0**, marking the start of formal versioning.
 
 ## v0.0.4 Fixed UnitManager on Scene Change
 - Clear all units from the unit manager when the game scene is changed
+
+## v0.0.5 Bug Fixes
+- Stag beetle returns to idle state when the nearest enemy was not found
+- Healing upgrades now affect the health bar display
