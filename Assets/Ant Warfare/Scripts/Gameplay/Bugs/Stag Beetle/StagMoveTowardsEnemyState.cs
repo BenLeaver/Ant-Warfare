@@ -16,13 +16,11 @@ public class StagMoveTowardsEnemyState : StagBaseState
 
         if (closestEnemy == null)
         {
-            Debug.Log("closest enemy null");
             manager.ChangeState(manager.IdleState);
             return;
         }
         if (closestEnemy.transform.position == null)
         {
-            Debug.Log("Transform pos null");
             manager.ChangeState(manager.IdleState);
             return;
         }
