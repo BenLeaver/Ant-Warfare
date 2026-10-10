@@ -138,14 +138,7 @@ public class BaseAntQueenAI : MonoBehaviour
             if (lastHealTime >= 1f)
             {
                 lastHealTime -= 1f;
-                if (healthScript.Health + 5 > healthScript.MaxHealth)
-                {
-                    healthScript.Health = healthScript.MaxHealth;
-                }
-                else
-                {
-                    healthScript.Health += 5;
-                }
+                healthScript.UpdateHealth(-5f);
             }
         }
     }

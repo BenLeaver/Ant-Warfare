@@ -41,6 +41,16 @@ public class SHealth : MonoBehaviour, IHealth
         {
             Instantiate(hitParticleEffect, transform.position, Quaternion.identity);
         }
+        if (damage < 0)
+        {
+            // Heal ant - cap health at max
+            Health -= damage;
+
+            if (Health > MaxHealth)
+                Health = MaxHealth;
+            slider.value = Health;
+            return;
+        }
 
         Health -= damage;
         slider.value = Health;

@@ -493,7 +493,11 @@ public class SingleplayerAntWorld : MonoBehaviour, IAntWorld
     {
         if (food == null) return false;
 
-        if (food.GetComponent<Food>().carried == true) return false;
+        if (!food) return false;
+
+        Food f = food.GetComponent<Food>();
+        if (f == null) return false;
+        if (f.carried) return false;
 
         return true;
     }
@@ -554,14 +558,7 @@ public class SingleplayerAntWorld : MonoBehaviour, IAntWorld
                 if (lastHealTime > 1f)
                 {
                     lastHealTime -= 1f;
-                    if (healthScript.Health + 2 > healthScript.MaxHealth)
-                    {
-                        healthScript.Health = healthScript.MaxHealth;
-                    }
-                    else
-                    {
-                        healthScript.Health += 2;
-                    }
+                    healthScript.UpdateHealth(-2f);
                 }
             }
         }
