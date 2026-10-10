@@ -30,8 +30,10 @@ public class StagIdleState : StagBaseState
         elapsed += Time.deltaTime;
         if (manager.FindNearestEnemyDist() <= 15f){
             manager.ChangeState(manager.MoveTowardsEnemyState);
+            return;
         } else if (elapsed >= idleTime){
             manager.ChangeState(manager.MoveState);
+            return;
         }
     }
 

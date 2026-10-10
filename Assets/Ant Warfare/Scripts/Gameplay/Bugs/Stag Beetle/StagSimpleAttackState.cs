@@ -42,12 +42,14 @@ public class StagSimpleAttackState : StagBaseState
         if (elapsed > totalAttackTime || closestEnemyDist > 5f)
         {
             EndAttack();
+            return;
         }
         else if (elapsed > attackDamageTime && !attacked)
         {
             DamageClosest();
             attacked = true;
             EndAttack();
+            return;
         }
     }
 
