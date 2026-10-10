@@ -20,6 +20,7 @@ public class BeetleWalkState : BeetleBaseState
         if (randomPoint == manager.transform.position)
         {
             manager.ChangeState(manager.IdleState);
+            return;
         }
         else
         {

@@ -19,6 +19,7 @@ public class StagMoveState : StagBaseState
         if (randomPoint == manager.transform.position)
         {
             manager.ChangeState(manager.IdleState);
+            return;
         }
         else
         {
@@ -29,9 +30,11 @@ public class StagMoveState : StagBaseState
     public override void UpdateState() {
         if (manager.FindNearestEnemyDist() <= 15f){
             manager.ChangeState(manager.MoveTowardsEnemyState);
+            return;
         }
         else if (!manager.Agent.pathPending && manager.Agent.remainingDistance <= 1f){
             manager.ChangeState(manager.IdleState);
+            return;
         }
     }
 
