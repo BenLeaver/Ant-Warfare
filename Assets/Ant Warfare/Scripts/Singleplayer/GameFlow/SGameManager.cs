@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.SceneManagement;
+using Ant.Navigation;
 
 /// <summary>
 /// Central game manager for handling spawning of teams, map selection, UI, and tutorial.
@@ -100,6 +101,7 @@ public class SGameManager : MonoBehaviour
         }
         if (gameStart == true)
         {
+            NavigationManager.Instance.BakeGrid();
             SpawnTeams();
             CreateUI();
             gameStart = false;

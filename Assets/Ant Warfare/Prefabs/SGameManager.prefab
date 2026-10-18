@@ -11,6 +11,8 @@ GameObject:
   - component: {fileID: 838271910960409948}
   - component: {fileID: 838271910960409951}
   - component: {fileID: 1534956279189112771}
+  - component: {fileID: 4736857523063978230}
+  - component: {fileID: 5970845336599330971}
   m_Layer: 0
   m_Name: SGameManager
   m_TagString: Untagged
@@ -95,3 +97,38 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cellSize: 20
+--- !u!114 &4736857523063978230
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 838271910960409950}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a7a90ea2a86d53847b5cafe578279b81, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  width: 100
+  height: 100
+  cellSize: 1
+  obstacleMask:
+    serializedVersion: 2
+    m_Bits: 1024
+--- !u!114 &5970845336599330971
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 838271910960409950}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8759ee2ceed8568419223d7b1477d3a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  nav: {fileID: 0}
+  drawGrid: 1
+  drawWalkable: 1
+  drawBlocked: 1
+  alpha: 0.25

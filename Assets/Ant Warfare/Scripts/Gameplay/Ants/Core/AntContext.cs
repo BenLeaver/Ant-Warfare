@@ -93,6 +93,7 @@ public class AntContext
         World.Attack(CurrentEnemyTarget);
     }
 
+
     /// <summary>
     /// Given an origin, returns a reachable point on the navmesh within 
     /// the minimum and maximum range.

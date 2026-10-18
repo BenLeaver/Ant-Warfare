@@ -286,8 +286,6 @@ public class SingleplayerAntWorld : MonoBehaviour, IAntWorld
         return agent.transform.position;
     }
 
-
-
     public GameObject FindFriendlyQueen()
     {
         return queen.go;
