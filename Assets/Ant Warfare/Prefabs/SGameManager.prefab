@@ -129,6 +129,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   nav: {fileID: 0}
   drawGrid: 1
-  drawWalkable: 1
+  drawWalkable: 0
   drawBlocked: 1
+  debugRadius: 50
   alpha: 0.25

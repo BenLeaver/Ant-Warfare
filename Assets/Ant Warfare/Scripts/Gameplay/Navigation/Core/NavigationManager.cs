@@ -35,16 +35,19 @@ namespace Ant.Navigation
 
         public void BakeGrid()
         {
+            var mapInfo = FindObjectOfType<NavigationMapInfo>();
+
             OverworldGrid = new NavigationGrid(
-                width,
-                height,
-                cellSize);
+                mapInfo.width,
+                mapInfo.height,
+                mapInfo.cellSize,
+                mapInfo.origin);
 
             Debug.Log("Baking navigation grid...");
 
-            for (int x = 0; x < width; x++)
+            for (int x = 0; x < mapInfo.width; x++)
             {
-                for (int y = 0; y < height; y++)
+                for (int y = 0; y < mapInfo.height; y++)
                 {
                     Vector2Int cellCoord = new Vector2Int(x, y);
 

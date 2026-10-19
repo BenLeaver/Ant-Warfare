@@ -135,7 +135,7 @@ GameObject:
   - component: {fileID: 33419869}
   - component: {fileID: 33419868}
   - component: {fileID: 33419870}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Wall
   m_TagString: Environment
   m_Icon: {fileID: 0}
@@ -343,7 +343,7 @@ GameObject:
   - component: {fileID: 53182243}
   - component: {fileID: 53182242}
   - component: {fileID: 53182244}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Wall (2)
   m_TagString: Environment
   m_Icon: {fileID: 0}
@@ -629,7 +629,7 @@ GameObject:
   - component: {fileID: 188595999}
   - component: {fileID: 188595998}
   - component: {fileID: 188596000}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Square (6)
   m_TagString: Environment
   m_Icon: {fileID: 0}
@@ -9848,7 +9848,7 @@ GameObject:
   - component: {fileID: 507351098}
   - component: {fileID: 507351097}
   - component: {fileID: 507351099}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Wall (1)
   m_TagString: Environment
   m_Icon: {fileID: 0}
@@ -9995,7 +9995,7 @@ GameObject:
   - component: {fileID: 551336183}
   - component: {fileID: 551336182}
   - component: {fileID: 551336184}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Wall
   m_TagString: Environment
   m_Icon: {fileID: 0}
@@ -10142,7 +10142,7 @@ GameObject:
   - component: {fileID: 665008891}
   - component: {fileID: 665008890}
   - component: {fileID: 665008892}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Wall (2)
   m_TagString: Environment
   m_Icon: {fileID: 0}
@@ -80554,7 +80554,7 @@ GameObject:
   - component: {fileID: 865276925}
   - component: {fileID: 865276924}
   - component: {fileID: 865276926}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Square (2)
   m_TagString: Environment
   m_Icon: {fileID: 0}
@@ -80732,7 +80732,7 @@ GameObject:
   - component: {fileID: 904898182}
   - component: {fileID: 904898181}
   - component: {fileID: 904898183}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Wall (2)
   m_TagString: Environment
   m_Icon: {fileID: 0}
@@ -80924,6 +80924,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Rock1 (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 4580089768349539368, guid: a765964254602d942839a1bac6dc45c8, type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 4580089768349539370, guid: a765964254602d942839a1bac6dc45c8, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
@@ -81080,7 +81084,7 @@ GameObject:
   - component: {fileID: 1045433802}
   - component: {fileID: 1045433801}
   - component: {fileID: 1045433803}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Square (4)
   m_TagString: Environment
   m_Icon: {fileID: 0}
@@ -81227,7 +81231,7 @@ GameObject:
   - component: {fileID: 1050073881}
   - component: {fileID: 1050073880}
   - component: {fileID: 1050073882}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Wall (2)
   m_TagString: Environment
   m_Icon: {fileID: 0}
@@ -81602,6 +81606,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Rock2
       objectReference: {fileID: 0}
+    - target: {fileID: 4580089768349539368, guid: 21d2f4355d732b34fa82e6329fcbbb17, type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 4580089768349539370, guid: 21d2f4355d732b34fa82e6329fcbbb17, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
@@ -81696,7 +81704,7 @@ GameObject:
   - component: {fileID: 1297325395}
   - component: {fileID: 1297325394}
   - component: {fileID: 1297325396}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Square (3)
   m_TagString: Environment
   m_Icon: {fileID: 0}
@@ -81931,7 +81939,7 @@ GameObject:
   - component: {fileID: 1376262144}
   - component: {fileID: 1376262143}
   - component: {fileID: 1376262145}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Wall (1)
   m_TagString: Environment
   m_Icon: {fileID: 0}
@@ -86459,7 +86467,7 @@ GameObject:
   - component: {fileID: 1444217547}
   - component: {fileID: 1444217546}
   - component: {fileID: 1444217548}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Square
   m_TagString: Environment
   m_Icon: {fileID: 0}
@@ -86604,6 +86612,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1516127316}
   - component: {fileID: 1516127315}
+  - component: {fileID: 1516127317}
   m_Layer: 0
   m_Name: DayCycleManager
   m_TagString: Untagged
@@ -86680,6 +86689,22 @@ Transform:
   - {fileID: 2101566110}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1516127317
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1516127314}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 376cd8a3a936b5745b7d23c4613508f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  width: 200
+  height: 200
+  cellSize: 1
+  origin: {x: -100, y: -100}
 --- !u!1 &1527767756
 GameObject:
   m_ObjectHideFlags: 0
@@ -86726,6 +86751,10 @@ PrefabInstance:
     - target: {fileID: 4580089768349539368, guid: a765964254602d942839a1bac6dc45c8, type: 3}
       propertyPath: m_Name
       value: Rock1 (3)
+      objectReference: {fileID: 0}
+    - target: {fileID: 4580089768349539368, guid: a765964254602d942839a1bac6dc45c8, type: 3}
+      propertyPath: m_Layer
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 4580089768349539370, guid: a765964254602d942839a1bac6dc45c8, type: 3}
       propertyPath: m_Materials.Array.data[0]
@@ -86821,7 +86850,7 @@ GameObject:
   - component: {fileID: 1595247037}
   - component: {fileID: 1595247036}
   - component: {fileID: 1595247038}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Wall
   m_TagString: Environment
   m_Icon: {fileID: 0}
@@ -87013,7 +87042,7 @@ GameObject:
   - component: {fileID: 1834378720}
   - component: {fileID: 1834378719}
   - component: {fileID: 1834378721}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Wall (1)
   m_TagString: Environment
   m_Icon: {fileID: 0}
@@ -87160,7 +87189,7 @@ GameObject:
   - component: {fileID: 1853060608}
   - component: {fileID: 1853060607}
   - component: {fileID: 1853060609}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Square (8)
   m_TagString: Environment
   m_Icon: {fileID: 0}
@@ -87307,7 +87336,7 @@ GameObject:
   - component: {fileID: 1941088918}
   - component: {fileID: 1941088917}
   - component: {fileID: 1941088919}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Wall
   m_TagString: Environment
   m_Icon: {fileID: 0}
@@ -87454,7 +87483,7 @@ GameObject:
   - component: {fileID: 1955784510}
   - component: {fileID: 1955784509}
   - component: {fileID: 1955784511}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Square (7)
   m_TagString: Environment
   m_Icon: {fileID: 0}
@@ -87600,6 +87629,10 @@ PrefabInstance:
     - target: {fileID: 4580089768349539368, guid: a765964254602d942839a1bac6dc45c8, type: 3}
       propertyPath: m_Name
       value: Rock1 (2)
+      objectReference: {fileID: 0}
+    - target: {fileID: 4580089768349539368, guid: a765964254602d942839a1bac6dc45c8, type: 3}
+      propertyPath: m_Layer
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 4580089768349539370, guid: a765964254602d942839a1bac6dc45c8, type: 3}
       propertyPath: m_Materials.Array.data[0]
@@ -87941,7 +87974,7 @@ GameObject:
   - component: {fileID: 2118495189}
   - component: {fileID: 2118495188}
   - component: {fileID: 2118495190}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Wall (1)
   m_TagString: Environment
   m_Icon: {fileID: 0}
@@ -88088,7 +88121,7 @@ GameObject:
   - component: {fileID: 2123693854}
   - component: {fileID: 2123693853}
   - component: {fileID: 2123693855}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Square (5)
   m_TagString: Environment
   m_Icon: {fileID: 0}
@@ -88304,6 +88337,10 @@ PrefabInstance:
     - target: {fileID: 4580089768349539368, guid: a765964254602d942839a1bac6dc45c8, type: 3}
       propertyPath: m_Name
       value: Rock1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4580089768349539368, guid: a765964254602d942839a1bac6dc45c8, type: 3}
+      propertyPath: m_Layer
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 4580089768349539370, guid: a765964254602d942839a1bac6dc45c8, type: 3}
       propertyPath: m_Materials.Array.data[0]

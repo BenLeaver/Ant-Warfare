@@ -10,8 +10,9 @@ namespace Ant.Navigation
 
         [Header("Visual Settings")]
         public bool drawGrid = true;
-        public bool drawWalkable = true;
+        public bool drawWalkable = false;
         public bool drawBlocked = true;
+        public int debugRadius = 50;
 
         [Range(0f, 1f)]
         public float alpha = 0.25f;
@@ -33,9 +34,26 @@ namespace Ant.Navigation
 
             NavigationGrid grid = nav.OverworldGrid;
 
-            for (int x = 0; x < grid.Width; x++)
+#if UNITY_EDITOR
+            if (UnityEditor.SceneView.lastActiveSceneView == null)
+                return;
+
+            Vector3 cameraPos = UnityEditor.SceneView.lastActiveSceneView.camera.transform.position;
+
+            Vector2Int cameraCell = grid.WorldToCell(cameraPos);
+
+            int cellRadius = Mathf.CeilToInt(debugRadius / grid.CellSize);
+
+            int minX = Mathf.Max(0, cameraCell.x - cellRadius);
+            int maxX = Mathf.Min(grid.Width - 1, cameraCell.x + cellRadius);
+
+            int minY = Mathf.Max(0, cameraCell.y - cellRadius);
+            int maxY = Mathf.Min(grid.Height - 1, cameraCell.y + cellRadius);
+
+
+            for (int x = minX; x <= maxX; x++)
             {
-                for (int y = 0; y < grid.Height; y++)
+                for (int y = minY; y <= maxY; y++)
                 {
                     NavigationCell cell =
                         grid.GetCell(new Vector2Int(x, y));
@@ -56,14 +74,9 @@ namespace Ant.Navigation
                     Gizmos.DrawCube(
                         cell.WorldPosition,
                         Vector3.one * grid.CellSize * 0.9f);
-
-                    Gizmos.color = Color.black;
-
-                    Gizmos.DrawWireCube(
-                        cell.WorldPosition,
-                        Vector3.one * grid.CellSize);
                 }
             }
+#endif
         }
     }
 

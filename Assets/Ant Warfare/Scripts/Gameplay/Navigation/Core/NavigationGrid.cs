@@ -8,15 +8,18 @@ namespace Ant.Navigation
         public int Width;
         public int Height;
 
+        public Vector2 Origin;
+
         public float CellSize;
 
         private NavigationCell[,] cells;
 
-        public NavigationGrid(int width, int height, float cellSize)
+        public NavigationGrid(int width, int height, float cellSize, Vector2 origin)
         {
             Width = width;
             Height = height;
             CellSize = cellSize;
+            Origin = origin;
 
             cells = new NavigationCell[width, height];
 
@@ -37,8 +40,8 @@ namespace Ant.Navigation
 
         public Vector2Int WorldToCell(Vector2 worldPos)
         {
-            int x = Mathf.FloorToInt(worldPos.x / CellSize);
-            int y = Mathf.FloorToInt(worldPos.y / CellSize);
+            int x = Mathf.FloorToInt((worldPos.x - Origin.x) / CellSize);
+            int y = Mathf.FloorToInt((worldPos.y - Origin.y) / CellSize);
 
             return new Vector2Int(x, y);
         }
@@ -46,8 +49,8 @@ namespace Ant.Navigation
         public Vector2 CellToWorld(Vector2Int cell)
         {
             return new Vector2(
-                (cell.x + 0.5f) * CellSize,
-                (cell.y + 0.5f) * CellSize);
+                Origin.x + (cell.x + 0.5f) * CellSize,
+                Origin.y + (cell.y + 0.5f) * CellSize);
         }
 
         public bool InBounds(Vector2Int coord)
