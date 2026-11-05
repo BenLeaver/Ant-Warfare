@@ -102,6 +102,6 @@ public class AntContext
     /// <returns></returns>
     public Vector3 GetValidPointWithinRange(Vector3 origin, float minRange, float maxRange)
     {
-        return World.GetReachableNavMeshPoint(origin, minRange, maxRange);
+        return World.GetReachableGridPoint(origin, minRange, maxRange);
     }
 }

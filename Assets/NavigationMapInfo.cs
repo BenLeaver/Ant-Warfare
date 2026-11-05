@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
 public class NavigationMapInfo : MonoBehaviour
 {
@@ -7,4 +8,6 @@ public class NavigationMapInfo : MonoBehaviour
 
     public float cellSize = 1f;
     public Vector2 origin;
+
+    public Tilemap[] walkableTilemaps;
 }

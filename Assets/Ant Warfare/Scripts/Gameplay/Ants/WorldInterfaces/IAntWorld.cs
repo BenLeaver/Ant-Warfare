@@ -29,8 +29,12 @@ public interface IAntWorld
     void StopMovement();
     bool HasReached(Vector3 target, float threshold);
     bool HasActivePath();
-    Vector3 GetReachableNavMeshPoint(Vector3 origin, float minRange, float maxRange,
-    int attempts = 50, float snapDistance = 2f);
+    Vector3 GetReachableGridPoint(
+        Vector3 origin, 
+        float minRange, 
+        float maxRange,
+        int attempts = 20);
+
     Vector3 FindClosestReachablePoint(Vector3 target);
 
     // Perception

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 using Ant.AI;
+using Ant.Navigation;
 
 /// <summary>
 /// Implementation of IAntWorld for singleplayer, acting as a bridge between the world and the 
@@ -50,6 +51,14 @@ public class SingleplayerAntWorld : MonoBehaviour, IAntWorld
 
     public Vector3 Position => myInfo.transform.position;
     public Vector3 MouthPosition => mouth.position;
+
+    // Navigation
+    private List<Vector2> currentPath;
+    private int currentWaypointIndex;
+    public List<Vector2> CurrentPath => currentPath;
+    public int CurrentWaypointIndex => currentWaypointIndex;
+
+    [SerializeField] private float waypointReachDistance = 0.5f;
 
     private bool isDying = false;
 
@@ -133,6 +142,8 @@ public class SingleplayerAntWorld : MonoBehaviour, IAntWorld
         CheckUpgradesOnUpdate();
         stateManager.Tick(Time.deltaTime);
 
+        UpdatePathMovement();
+
         // Keep carried food attached to mouth
         if (foodCarried != null)
         {
@@ -169,121 +180,198 @@ public class SingleplayerAntWorld : MonoBehaviour, IAntWorld
             rotationSpeed * Time.deltaTime);
     }
 
+    // New Movement
+    private void UpdatePathMovement()
+    {
+        if (currentPath == null)
+            return;
+
+        if (currentWaypointIndex >= currentPath.Count)
+            return;
+
+        Vector2 waypoint = currentPath[currentWaypointIndex];
+        Vector2 currentPos = transform.position;
+        Vector2 direction = (waypoint - currentPos);
+
+        float distance = direction.magnitude;
+        if (distance <= waypointReachDistance)
+        {
+            currentWaypointIndex++;
+
+            if (currentWaypointIndex >= currentPath.Count)
+            {
+                anim.SetBool("isWalking", false);
+                return;
+            }
+
+            waypoint = currentPath[currentWaypointIndex];
+
+            direction = waypoint - (Vector2)transform.position;
+        }
+
+        direction.Normalize();
+
+        SetRotation(direction);
+
+        transform.position += (Vector3)(direction * agent.speed * Time.deltaTime);
+    }
+
+
     public void SetDestination(Vector3 target)
     {
-        if (!agent.enabled) return;
-
+        //if (!agent.enabled) return;
         anim.SetBool("isWalking", true);
-        agent.isStopped = false;
-        agent.SetDestination(target);
+
+        currentPath = NavigationManager.Instance.RequestPath(transform.position, target);
+        currentWaypointIndex = 0;
+
+        //agent.isStopped = false;
+        //agent.SetDestination(target);
     }
 
     public void StopMovement()
     {
-        if (!agent.enabled) return;
+        //if (!agent.enabled) return;
 
         anim.SetBool("isWalking", false);
-        agent.isStopped = true;
-        agent.ResetPath();
+
+        currentPath = null;
+        currentWaypointIndex = 0;
+        //agent.isStopped = true;
+        //agent.ResetPath();
     }
 
     public bool HasReached(Vector3 target, float threshold)
     {
-        if (!agent.enabled) return true;
+        //if (!agent.enabled) return true;
 
-        if (agent.pathPending) return false;
+        //if (agent.pathPending) return false;
 
-        return agent.remainingDistance <= threshold;
+        //return agent.remainingDistance <= threshold;
+        return Vector3.Distance(transform.position, target) <= threshold;
     }
 
     public bool HasActivePath()
     {
-        return (agent.hasPath || agent.pathPending);
+        return currentPath != null && currentWaypointIndex < currentPath.Count;
     }
 
-    public Vector3 GetReachableNavMeshPoint(Vector3 origin, float minRange, float maxRange,
-    int attempts = 50, float snapDistance = 2f)
+    public Vector3 GetReachableGridPoint(
+        Vector3 origin,
+        float minRange,
+        float maxRange,
+        int attempts = 30)
     {
-        if (!agent.isOnNavMesh)
+        NavigationGrid grid = NavigationManager.Instance.OverworldGrid;
+
+        if (grid == null)
         {
-            Debug.LogWarning("Ant is not on NavMesh");
+            Debug.LogWarning("Navigation grid is null");
             return myInfo.transform.position;
         }
 
-        // Ensure the origin is on the navmesh.
-        if (!NavMesh.SamplePosition(origin, out NavMeshHit originHit, Mathf.Infinity, agent.areaMask))
+        // Ensure origin is inside a walkable cell.
+        Vector2Int originCell =
+            grid.WorldToCell(origin);
+
+        NavigationCell startCell =
+            grid.GetCell(originCell);
+
+        if (startCell == null || !startCell.Walkable)
         {
-            origin = agent.transform.position;
-        }
-        else
-        {
-            origin = originHit.position;
+            origin = myInfo.transform.position;
         }
 
-        for (int i=0; i<attempts; i++)
+        for (int i = 0; i < attempts; i++)
         {
             Vector2 dir2D = Random.insideUnitCircle.normalized;
+
             float t = Random.value;
             float dist = Mathf.Lerp(minRange, maxRange, t * t);
 
-            Vector3 candidate = origin + new Vector3(dir2D.x, dir2D.y, 0f) * dist;
+            Vector3 candidate =
+                origin +
+                new Vector3(dir2D.x, dir2D.y, 0f) * dist;
 
-            if (!NavMesh.SamplePosition(candidate, out NavMeshHit hit, snapDistance, agent.areaMask)) continue;
+            Vector2Int candidateCell =
+                grid.WorldToCell(candidate);
 
-            Vector3 flattened = new Vector3(hit.position.x, hit.position.y, 0f);
+            NavigationCell cell =
+                grid.GetCell(candidateCell);
 
-            if (HasValidPath(flattened))
-                return flattened;
+            if (cell == null)
+                continue;
+
+            if (!cell.Walkable)
+                continue;
+
+            return cell.WorldPosition;
         }
-        Debug.LogWarning($"No valid navmesh point found for origin {origin}, maxRange {maxRange}");
+
+        Debug.LogWarning(
+            $"No valid grid point found for origin {origin}, maxRange {maxRange}");
+
         return myInfo.transform.position;
     }
 
-    private bool HasValidPath(Vector3 target)
-    {
-        NavMeshPath _path = new NavMeshPath();
-        NavMesh.CalculatePath(agent.transform.position, target, NavMesh.AllAreas, _path);
-        return _path.status == NavMeshPathStatus.PathComplete;
-    }
-
     /// <summary>
-    /// Finds the closest reachable point on the current navmesh to the target.
+    /// Finds the closest reachable point in the navigation grid to the target.
+    /// If the target itself is reachable, returns it.
+    /// Otherwise samples outward in rings until a reachable point is found.
     /// </summary>
     public Vector3 FindClosestReachablePoint(Vector3 target)
     {
-        NavMeshHit hit;
+        NavigationGrid grid =
+            NavigationManager.Instance.OverworldGrid;
 
-        // Snap target to navmesh
-        if (!NavMesh.SamplePosition(target, out hit, 5f, NavMesh.AllAreas))
-            return agent.transform.position; // fallback to current position
+        if (grid == null)
+            return transform.position;
 
-        // Check if reachable
-        NavMeshPath path = new NavMeshPath();
-        NavMesh.CalculatePath(agent.transform.position, hit.position, NavMesh.AllAreas, path);
+        // Check target itself first.
+        Vector2Int targetCell =
+            grid.WorldToCell(target);
 
-        if (path.status == NavMeshPathStatus.PathComplete)
-            return hit.position;
+        NavigationCell cell =
+            grid.GetCell(targetCell);
 
-        // Not reachable -> find closest reachable point
-        // Try sampling points around the target
+        if (cell != null &&
+            cell.Walkable)
+        {
+            return cell.WorldPosition;
+        }
+
+        // Search outward in rings.
         for (float r = 2f; r <= 20f; r += 2f)
         {
             for (int i = 0; i < 12; i++)
             {
-                float angle = i * 30f;
-                Vector3 offset = new Vector3(Mathf.Cos(angle), Mathf.Sin(angle), 0f) * r;
-                Vector3 candidate = target + offset;
+                float angle = i * 30f * Mathf.Deg2Rad;
 
-                if (NavMesh.SamplePosition(candidate, out hit, 1f, NavMesh.AllAreas))
-                {
-                    NavMesh.CalculatePath(agent.transform.position, hit.position, NavMesh.AllAreas, path);
-                    if (path.status == NavMeshPathStatus.PathComplete)
-                        return hit.position;
-                }
+                Vector3 candidate =
+                    target +
+                    new Vector3(
+                        Mathf.Cos(angle),
+                        Mathf.Sin(angle),
+                        0f) * r;
+
+                Vector2Int candidateCell =
+                    grid.WorldToCell(candidate);
+
+                NavigationCell candidateNavCell =
+                    grid.GetCell(candidateCell);
+
+                if (candidateNavCell == null)
+                    continue;
+
+                if (!candidateNavCell.Walkable)
+                    continue;
+
+                return candidateNavCell.WorldPosition;
             }
         }
 
-        return agent.transform.position;
+        // Fallback to current position.
+        return transform.position;
     }
 
     public GameObject FindFriendlyQueen()

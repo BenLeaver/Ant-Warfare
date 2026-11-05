@@ -86705,6 +86705,12 @@ MonoBehaviour:
   height: 200
   cellSize: 1
   origin: {x: -100, y: -100}
+  walkableTilemaps:
+  - {fileID: 768488306}
+  - {fileID: 269888751}
+  - {fileID: 1384116337}
+  - {fileID: 356457403}
+  - {fileID: 707731778}
 --- !u!1 &1527767756
 GameObject:
   m_ObjectHideFlags: 0

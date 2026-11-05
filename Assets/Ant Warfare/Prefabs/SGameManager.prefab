@@ -112,6 +112,7 @@ MonoBehaviour:
   width: 100
   height: 100
   cellSize: 1
+  walkableTilemaps: []
   obstacleMask:
     serializedVersion: 2
     m_Bits: 1024

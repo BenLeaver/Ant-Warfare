@@ -14,6 +14,7 @@ using Ant.AI;
 public class AntEnemyIRState : BaseAntState
 {
     private float enemyUpdateTimer = 0f;
+    private Vector3 lastPathTarget;
 
     public AntEnemyIRState(AntStateManager manager, AntContext context, AntStateType stateType)
     : base(manager, context, stateType)
@@ -28,7 +29,16 @@ public class AntEnemyIRState : BaseAntState
         enemyUpdateTimer = 0f;
 
         context.CurrentEnemyTarget = context.World.FindClosestEnemy();
-        context.World.SetDestination(context.CurrentEnemyTarget.transform.position);
+
+        if (context.CurrentEnemyTarget == null)
+        {
+            manager.PopInterrupt();
+            return;
+        }
+
+        context.LocalTarget = context.CurrentEnemyTarget.transform.position;
+        context.World.SetDestination(context.LocalTarget);
+        lastPathTarget = context.LocalTarget;
     }
 
     public override void UpdateState(float deltaTime)
@@ -42,9 +52,13 @@ public class AntEnemyIRState : BaseAntState
         if (enemyUpdateTimer > 0.5f || context.CurrentEnemyTarget == null || context.CurrentEnemyTarget.go == null)
         {
             enemyUpdateTimer = 0f;
-            if (!UpdateEnemyTarget()) return;   
+            if (!UpdateEnemyTarget()) return;
+
+            context.LocalTarget = context.CurrentEnemyTarget.transform.position;
+            context.World.SetDestination(context.LocalTarget);
+            lastPathTarget = context.LocalTarget;
         }
-        
+
         context.LocalTarget = context.CurrentEnemyTarget.transform.position;
         float enemyDist = Vector3.Distance(context.World.MouthPosition, context.LocalTarget);
         if (enemyDist > context.SightRange)
@@ -59,12 +73,22 @@ public class AntEnemyIRState : BaseAntState
         if (enemyDist > context.AttackRange)
         {
             // Enemy is outside of attack range -> move towards enemy.
-            context.World.SetDestination(context.LocalTarget);
+            
+            // Recalculate only when enemy has moved far enough
+            if (Vector3.Distance(context.LocalTarget, lastPathTarget) > 0.5f)
+            {
+                context.World.SetDestination(context.LocalTarget);
+                lastPathTarget = context.LocalTarget;
+            }
         }
         else
         {
             // Enemy is within attack range -> attack enemy and stand still.
-            context.World.StopMovement();
+            if (context.World.HasActivePath())
+            {
+                context.World.StopMovement();
+            }
+            
             if (context.AttackTimer > context.AttackDelay)
             {
                 context.AttackTimer = 0f;

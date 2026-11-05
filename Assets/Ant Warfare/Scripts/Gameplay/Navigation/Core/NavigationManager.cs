@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using Ant.Navigation.Pathfinding;
+using UnityEngine.Tilemaps;
 
 namespace Ant.Navigation
 {
@@ -12,6 +13,9 @@ namespace Ant.Navigation
         public int width = 1000;
         public int height = 1000;
         public float cellSize = 1f;
+
+        [SerializeField]
+        private Tilemap[] walkableTilemaps;
 
         [Header("Obstacle Detection")]
         public LayerMask obstacleMask;
@@ -46,6 +50,8 @@ namespace Ant.Navigation
                 mapInfo.cellSize,
                 mapInfo.origin);
 
+            walkableTilemaps = mapInfo.walkableTilemaps;
+
             Debug.Log("Baking navigation grid...");
 
             for (int x = 0; x < mapInfo.width; x++)
@@ -57,6 +63,21 @@ namespace Ant.Navigation
                     Vector2 worldPos =
                         OverworldGrid.CellToWorld(cellCoord);
 
+                    bool hasGround = false;
+
+                    foreach (Tilemap tilemap in walkableTilemaps)
+                    {
+                        if (tilemap == null) continue;
+
+                        Vector3Int tilePos = tilemap.WorldToCell(worldPos);
+
+                        if (tilemap.HasTile(tilePos))
+                        {
+                            hasGround = true;
+                            break;
+                        }
+                    }
+
                     bool blocked =
                         Physics2D.OverlapBox(
                             worldPos,
@@ -64,9 +85,12 @@ namespace Ant.Navigation
                             0f,
                             obstacleMask);
 
+                    bool walkable =
+                        hasGround && !blocked;
+
                     OverworldGrid.SetWalkable(
                         cellCoord,
-                        !blocked);
+                        walkable);
                 }
             }
 

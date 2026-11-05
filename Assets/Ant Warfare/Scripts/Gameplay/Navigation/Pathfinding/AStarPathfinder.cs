@@ -47,6 +47,12 @@ namespace Ant.Navigation.Pathfinding
                 {
                     if (!neighbourCell.Walkable) continue;
 
+                    if (!CanMoveToNeighbour(
+                        grid,
+                        current.Cell,
+                        neighbourCell))
+                        continue;
+
                     if (closedSet.Contains(neighbourCell.Cell)) continue;
 
                     float tentativeGCost = current.GCost + Vector2.Distance(current.Cell.WorldPosition, neighbourCell.WorldPosition);
@@ -120,6 +126,40 @@ namespace Ant.Navigation.Pathfinding
             path.Reverse();
 
             return path;
+        }
+
+        private bool CanMoveToNeighbour(
+            NavigationGrid grid,
+            NavigationCell current,
+            NavigationCell neighbour)
+        {
+            Vector2Int delta = neighbour.Cell - current.Cell;
+
+            // Horizontal/vertical movement is always allowed.
+            if (Mathf.Abs(delta.x) + Mathf.Abs(delta.y) == 1)
+                return true;
+
+            // Diagonal movement.
+            if (Mathf.Abs(delta.x) == 1 &&
+                Mathf.Abs(delta.y) == 1)
+            {
+                NavigationCell sideA =
+                    grid.GetCell(
+                        current.Cell + new Vector2Int(delta.x, 0));
+
+                NavigationCell sideB =
+                    grid.GetCell(
+                        current.Cell + new Vector2Int(0, delta.y));
+
+                // Cannot squeeze through corners.
+                if (sideA == null || !sideA.Walkable)
+                    return false;
+
+                if (sideB == null || !sideB.Walkable)
+                    return false;
+            }
+
+            return true;
         }
     }
 }
