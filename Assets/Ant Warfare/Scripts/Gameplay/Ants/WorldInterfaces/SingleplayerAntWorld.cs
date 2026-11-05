@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.AI;
 using Ant.AI;
 using Ant.Navigation;
 
@@ -13,15 +12,12 @@ using Ant.Navigation;
 /// 
 /// Each worker/soldier ant owns an instance of this class.
 /// </summary>
-[RequireComponent(typeof(NavMeshAgent))]
 public class SingleplayerAntWorld : MonoBehaviour, IAntWorld
 {
     [SerializeField] private AntStateManager stateManager;
     [SerializeField] private AntContext context;
 
     private UnitInfo myInfo;
-
-    private NavMeshAgent agent;
     private Animator anim;
     public SHealth healthScript;
     public Transform mouth;
@@ -53,6 +49,10 @@ public class SingleplayerAntWorld : MonoBehaviour, IAntWorld
     public Vector3 MouthPosition => mouth.position;
 
     // Navigation
+    [Header("Movement")]
+    [SerializeField] private float moveSpeed = 3.5f;
+    public float MoveSpeed => moveSpeed;
+
     private List<Vector2> currentPath;
     private int currentWaypointIndex;
     public List<Vector2> CurrentPath => currentPath;
@@ -71,10 +71,6 @@ public class SingleplayerAntWorld : MonoBehaviour, IAntWorld
 
     void Awake()
     {
-        agent = GetComponent<UnityEngine.AI.NavMeshAgent>();
-        agent.updateRotation = false;
-        agent.updateUpAxis = false;
-
         healthScript = GetComponent<SHealth>();
         anim = GetComponent<Animator>();
     }
@@ -213,41 +209,28 @@ public class SingleplayerAntWorld : MonoBehaviour, IAntWorld
 
         SetRotation(direction);
 
-        transform.position += (Vector3)(direction * agent.speed * Time.deltaTime);
+        transform.position += (Vector3)(direction * moveSpeed * Time.deltaTime);
     }
 
 
     public void SetDestination(Vector3 target)
     {
-        //if (!agent.enabled) return;
         anim.SetBool("isWalking", true);
 
         currentPath = NavigationManager.Instance.RequestPath(transform.position, target);
         currentWaypointIndex = 0;
-
-        //agent.isStopped = false;
-        //agent.SetDestination(target);
     }
 
     public void StopMovement()
     {
-        //if (!agent.enabled) return;
-
         anim.SetBool("isWalking", false);
 
         currentPath = null;
         currentWaypointIndex = 0;
-        //agent.isStopped = true;
-        //agent.ResetPath();
     }
 
     public bool HasReached(Vector3 target, float threshold)
     {
-        //if (!agent.enabled) return true;
-
-        //if (agent.pathPending) return false;
-
-        //return agent.remainingDistance <= threshold;
         return Vector3.Distance(transform.position, target) <= threshold;
     }
 
@@ -681,7 +664,7 @@ public class SingleplayerAntWorld : MonoBehaviour, IAntWorld
 
     public void UpgradeSpeed(float mult)
     {
-        agent.speed *= mult;
+        moveSpeed *= mult;
     }
 
     public void UpgradeFoodMult(float mult)

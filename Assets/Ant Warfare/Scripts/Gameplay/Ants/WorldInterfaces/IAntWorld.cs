@@ -37,6 +37,8 @@ public interface IAntWorld
 
     Vector3 FindClosestReachablePoint(Vector3 target);
 
+    float MoveSpeed { get; }
+
     // Perception
     Vector3 Position { get; }
     Vector3 MouthPosition { get; }
