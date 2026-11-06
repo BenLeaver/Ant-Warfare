@@ -209,7 +209,16 @@ public class SingleplayerAntWorld : MonoBehaviour, IAntWorld
 
         SetRotation(direction);
 
-        transform.position += (Vector3)(direction * moveSpeed * Time.deltaTime);
+        float moveDistance = moveSpeed * Time.deltaTime;
+
+        if (moveDistance >= distance)
+        {
+            transform.position = waypoint;
+        }
+        else
+        {
+            transform.position += (Vector3)(direction * moveDistance);
+        }
     }
 
 
