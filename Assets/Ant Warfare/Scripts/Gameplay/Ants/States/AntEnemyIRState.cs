@@ -68,13 +68,13 @@ public class AntEnemyIRState : BaseAntState
             return;
         }
 
-        context.FaceLocalTarget();
-
         if (enemyDist > context.AttackRange)
         {
             // Enemy is outside of attack range -> move towards enemy.
             
             // Recalculate only when enemy has moved far enough
+
+            // TODO: Update more regularly when you get closer to the enemy - could use normalised direction difference
             if (Vector3.Distance(context.LocalTarget, lastPathTarget) > 0.5f)
             {
                 context.World.SetDestination(context.LocalTarget);
@@ -84,10 +84,14 @@ public class AntEnemyIRState : BaseAntState
         else
         {
             // Enemy is within attack range -> attack enemy and stand still.
+
             if (context.World.HasActivePath())
             {
                 context.World.StopMovement();
             }
+
+            // Rotate to face enemy. Since ant is standing still now, this is not done by movement system.
+            context.FaceLocalTarget();
             
             if (context.AttackTimer > context.AttackDelay)
             {
