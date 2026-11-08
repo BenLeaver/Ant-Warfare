@@ -139,6 +139,17 @@ public class SingleplayerAntWorld : MonoBehaviour, IAntWorld
     // Update is called once per frame
     void Update()
     {
+        if (problematic)
+        {
+            if (currentPath == null)
+                Debug.Log("Current path is null");
+
+            Debug.Log($"Path Length: {currentPath.Count}");
+            Debug.Log($"Current Waypoint Index: {CurrentWaypointIndex}");
+            
+        }
+            
+
         CheckUpgradesOnUpdate();
         stateManager.Tick(Time.deltaTime);
 
@@ -210,11 +221,12 @@ public class SingleplayerAntWorld : MonoBehaviour, IAntWorld
             waypoint = currentPath[currentWaypointIndex];
 
             direction = waypoint - (Vector2)transform.position;
+            distance = direction.magnitude;
 
             if (problematic)
                 Debug.Log($"Reached Waypoint. New waypoint:{waypoint}, New direction: {direction}, Transform.position: {(Vector2)transform.position}");
         }
-
+        
         direction.Normalize();
 
         SetRotation(direction);

@@ -103,10 +103,16 @@ namespace Ant.Navigation
 
             if (path == null)
             {
+                Debug.LogWarning($"NavigationManager returning null path for start:{start}, end:{end}");
                 return null;
             }
-                
-            return SmoothPath(path);
+            
+            var smoothedPath = SmoothPath(path);
+            if (smoothedPath == null)
+            {
+                Debug.LogWarning($"NavigationManager returning null path after smoothing for start:{start}, end:{end}");
+            }
+            return smoothedPath;
         }
 
         private List<Vector2> SmoothPath(List<Vector2> path)
