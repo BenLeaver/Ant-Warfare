@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Ant.AI;
 
@@ -46,8 +44,6 @@ public class AntConfusedState : BaseAntState
             manager.DecideNextState();
             return;
         }
-
-        context.FaceLocalTarget();
 
         // Just double check that the agent is still moving towards the destination.
         // If it was disrupted somehow, and the path is lost, sets destination again.
