@@ -196,7 +196,6 @@ public class SingleplayerAntWorld : MonoBehaviour, IAntWorld
     {
         if (currentPath == null)
         {
-            Debug.Log($"currentPath is null for {transform.position}");
             return;
         }
 
@@ -284,7 +283,7 @@ public class SingleplayerAntWorld : MonoBehaviour, IAntWorld
         Vector3 origin,
         float minRange,
         float maxRange,
-        int attempts = 30)
+        int attempts = 20)
     {
         NavigationGrid grid = NavigationManager.Instance.OverworldGrid;
 
