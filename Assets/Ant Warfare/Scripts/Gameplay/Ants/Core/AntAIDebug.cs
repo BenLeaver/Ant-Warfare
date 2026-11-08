@@ -43,6 +43,9 @@ public class AntAIDebug : MonoBehaviour
         if (Application.isPlaying && world != null)
         {
             var currentPath = world.CurrentPath;
+               
+            // Should not try and display path if it doesn't exist.
+            if (currentPath == null) return;
 
             if (currentPath != null && currentPath.Count > 0)
             {

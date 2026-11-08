@@ -195,7 +195,10 @@ public class SingleplayerAntWorld : MonoBehaviour, IAntWorld
     private void UpdatePathMovement()
     {
         if (currentPath == null)
+        {
+            Debug.Log($"currentPath is null for {transform.position}");
             return;
+        }
 
         if (currentWaypointIndex >= currentPath.Count)
             return;
@@ -234,8 +237,6 @@ public class SingleplayerAntWorld : MonoBehaviour, IAntWorld
         float moveDistance = moveSpeed * Time.deltaTime;
 
         //transform.position += (Vector3)(direction * moveDistance);
-
-        distance = direction.magnitude;
         if (moveDistance >= distance)
         {
             transform.position = waypoint;
