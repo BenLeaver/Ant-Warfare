@@ -10,8 +10,8 @@ namespace Ant.Navigation.Pathfinding
             Vector2Int startCoord = grid.WorldToCell(startPos);
             Vector2Int endCoord = grid.WorldToCell(endPos);
 
-            NavigationCell startCell = grid.GetCell(startCoord);
-            NavigationCell endCell = grid.GetCell(endCoord);
+            NavigationCell startCell = FindNearestWalkableCell(grid, startCoord);
+            NavigationCell endCell = FindNearestWalkableCell(grid, endCoord);
 
             if (startCell == null || endCell == null)
                 return null;
@@ -160,6 +160,41 @@ namespace Ant.Navigation.Pathfinding
             }
 
             return true;
+        }
+
+        private NavigationCell FindNearestWalkableCell(
+            NavigationGrid grid,
+            Vector2Int centre)
+        {
+            NavigationCell centreCell = grid.GetCell(centre);
+
+            if (centreCell != null && centreCell.Walkable)
+            {
+                return centreCell;
+            }
+
+            for (int radius = 1; radius <= 5; radius++)
+            {
+                for (int dx = -radius; dx <= radius; dx++)
+                {
+                    for (int dy = -radius; dy <= radius; dy++)
+                    {
+                        Vector2Int coord =
+                            centre + new Vector2Int(dx, dy);
+
+                        NavigationCell cell =
+                            grid.GetCell(coord);
+
+                        if (cell != null &&
+                            cell.Walkable)
+                        {
+                            return cell;
+                        }
+                    }
+                }
+            }
+
+            return null;
         }
     }
 }
