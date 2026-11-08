@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using UnityEngine;
 using Ant.AI;
 
@@ -48,18 +47,14 @@ public class AntFollowPathState : BaseAntState
 
         if (Vector3.Distance(context.World.Position, context.LocalTarget) <= 2f)
         {
-            //Debug.Log($"FollowPath Local target reached");
             manager.DecideNextState();
             return;
         }
-
-        context.FaceLocalTarget();
 
         // Just double check that the agent is still moving towards the destination.
         // If it was disrupted somehow, and the path is lost, sets destination again.
         if (!context.World.HasActivePath())
         {
-            Debug.Log("Resetting destination in FollowPath update state.");
             context.World.SetDestination(context.LocalTarget);
         }
     }
