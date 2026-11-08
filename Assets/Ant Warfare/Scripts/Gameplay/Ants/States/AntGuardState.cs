@@ -54,8 +54,6 @@ public class AntGuardState : BaseAntState
                 context.World.SetDestination(context.LocalTarget);
             }
 
-            context.FaceLocalTarget();
-
             if (Vector3.Distance(context.World.Position, context.LocalTarget) <= 2f)
             {
                 manager.DecideNextState();

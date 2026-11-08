@@ -29,7 +29,6 @@ public class AntSearchState : BaseAntState
         currentDuration = 0f;
         IRCheckTimer = 0f;
 
-
         if (!isResuming)
         {
             GameObject q = context.World.FindFriendlyQueen();
@@ -52,7 +51,6 @@ public class AntSearchState : BaseAntState
             }
 
             context.UltimateTarget = context.LocalTarget;
-            context.FaceLocalTarget();
 
             float targetDist = Vector3.Distance(context.LocalTarget, context.World.Position);
 
@@ -61,7 +59,6 @@ public class AntSearchState : BaseAntState
                 // If the target is far away place a pheromone so that other ants follow.
                 context.World.PlacePheromone(PheromoneSubtype.SearchPath);
             }
-            
         }
 
         context.World.SetDestination(context.LocalTarget);
@@ -80,8 +77,6 @@ public class AntSearchState : BaseAntState
             return;
         }
 
-        context.FaceLocalTarget();
-
         // Just double check that the agent is still moving towards the destination.
         // If it was disrupted somehow, and the path is lost, sets destination again.
         if (!context.World.HasActivePath())
@@ -92,7 +87,6 @@ public class AntSearchState : BaseAntState
 
     public bool CheckInterrupts()
     {
-
         // Only check interrupts about every 0.5 seconds.
         if (IRCheckTimer < 0.5f) return false;
 
