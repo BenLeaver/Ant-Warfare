@@ -14,7 +14,9 @@ using Ant.AI;
 public class AntEnemyIRState : BaseAntState
 {
     private float enemyUpdateTimer = 0f;
+    private float pathUpdateTimer = 0f;
     private Vector3 lastPathTarget;
+    private Vector3 lastPathDirection;
 
     public AntEnemyIRState(AntStateManager manager, AntContext context, AntStateType stateType)
     : base(manager, context, stateType)
@@ -27,6 +29,7 @@ public class AntEnemyIRState : BaseAntState
         maxDuration = 30f;
         currentDuration = 0f;
         enemyUpdateTimer = 0f;
+        pathUpdateTimer = 0f;
 
         context.CurrentEnemyTarget = context.World.FindClosestEnemy();
 
@@ -39,28 +42,27 @@ public class AntEnemyIRState : BaseAntState
         context.LocalTarget = context.CurrentEnemyTarget.transform.position;
         context.World.SetDestination(context.LocalTarget);
         lastPathTarget = context.LocalTarget;
+        lastPathDirection = (context.LocalTarget - context.World.Position).normalized;
     }
 
     public override void UpdateState(float deltaTime)
     {
         base.UpdateState(deltaTime);
         enemyUpdateTimer += deltaTime;
+        pathUpdateTimer += deltaTime;
 
-        // Update the enemy target about two times a second - or sooner if the previous target no longer exists.
+        // Update the enemy target about once a second - or sooner if the previous target no longer exists.
         // When an enemy is killed the gameobject is marked as null
         // But the cached enemy UnitInfo in this script is not necessarily marked as null
-        if (enemyUpdateTimer > 0.5f || context.CurrentEnemyTarget == null || context.CurrentEnemyTarget.go == null)
+        if (enemyUpdateTimer > 1f || context.CurrentEnemyTarget == null || context.CurrentEnemyTarget.go == null)
         {
             enemyUpdateTimer = 0f;
             if (!UpdateEnemyTarget()) return;
-
-            context.LocalTarget = context.CurrentEnemyTarget.transform.position;
-            context.World.SetDestination(context.LocalTarget);
-            lastPathTarget = context.LocalTarget;
         }
 
-        context.LocalTarget = context.CurrentEnemyTarget.transform.position;
-        float enemyDist = Vector3.Distance(context.World.MouthPosition, context.LocalTarget);
+        Vector3 enemyPosition = context.CurrentEnemyTarget.transform.position;
+
+        float enemyDist = Vector3.Distance(context.World.MouthPosition, enemyPosition);
         if (enemyDist > context.SightRange)
         {
             // Enemy is outside of sight range -> stop interrupt.
@@ -71,14 +73,17 @@ public class AntEnemyIRState : BaseAntState
         if (enemyDist > context.AttackRange)
         {
             // Enemy is outside of attack range -> move towards enemy.
-            
-            // Recalculate only when enemy has moved far enough
-
-            // TODO: Update more regularly when you get closer to the enemy - could use normalised direction difference
-            if (Vector3.Distance(context.LocalTarget, lastPathTarget) > 0.5f)
+            if (pathUpdateTimer >= 0.25f)
             {
-                context.World.SetDestination(context.LocalTarget);
-                lastPathTarget = context.LocalTarget;
+                pathUpdateTimer = 0f;
+                // Recalculate only when enemy has moved far enough
+                if (ShouldRepath(enemyDist, enemyPosition))
+                {
+                    context.LocalTarget = enemyPosition;
+                    context.World.SetDestination(enemyPosition);
+                    lastPathTarget = enemyPosition;
+                    lastPathDirection = (enemyPosition - context.World.Position).normalized;
+                }
             }
         }
         else
@@ -91,7 +96,7 @@ public class AntEnemyIRState : BaseAntState
             }
 
             // Rotate to face enemy. Since ant is standing still now, this is not done by movement system.
-            context.FaceLocalTarget();
+            context.FacePoint(enemyPosition);
             
             if (context.AttackTimer > context.AttackDelay)
             {
@@ -111,5 +116,21 @@ public class AntEnemyIRState : BaseAntState
             return false;
         }
         return true;
+    }
+
+    private bool ShouldRepath(float enemyDist, Vector3 enemyPos)
+    {
+        float moveThreshold = Mathf.Lerp(0.2f, 2.0f, Mathf.Clamp01(enemyDist / 10f));
+
+        bool movedEnough = Vector3.Distance(
+            enemyPos,
+            lastPathTarget)
+            > moveThreshold;
+
+        Vector3 currentDirection = (enemyPos - context.World.Position).normalized;
+        float angleChange = Vector3.Angle(lastPathDirection, currentDirection);
+        bool angleChanged = angleChange > 15f;
+
+        return movedEnough || angleChanged;
     }
 }

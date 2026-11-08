@@ -71,7 +71,7 @@ public class AntSearchState : BaseAntState
         IRCheckTimer += deltaTime;
         if (CheckInterrupts()) return;
 
-        if (Vector3.Distance(context.World.Position, context.LocalTarget) <= 2f)
+        if (Vector3.Distance(context.World.Position, context.LocalTarget) <= 1f)
         {
             manager.DecideNextState();
             return;

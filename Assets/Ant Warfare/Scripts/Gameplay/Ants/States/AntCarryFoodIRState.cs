@@ -66,13 +66,13 @@ public class AntCarryFoodIRState : BaseAntState
         else
         {
             // Attempt to set destination to location 10-25 units away, that is closer to the queen.
-            // Try 5 times, and take the one that gets you the closest.
+            // Try 8 times, and take the one that gets you the closest.
             // If no destination closer than the current position was found, just set the destination to the queen position (with some random variation).
             context.UltimateTarget = queenPos;
 
             Vector3 bestPos = context.World.Position;
             float bestDist = queenDist;
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < 8; i++)
             {
                 Vector3 candidate = context.GetValidPointWithinRange(context.World.Position, 10f, 25f);
                 float dist = Vector3.Distance(queenPos, candidate);
@@ -108,7 +108,7 @@ public class AntCarryFoodIRState : BaseAntState
         }
 
         currentDuration += deltaTime;
-        if (currentDuration >= maxDuration || Vector3.Distance(context.World.Position, context.LocalTarget) <= 2f)
+        if (currentDuration >= maxDuration || Vector3.Distance(context.World.Position, context.LocalTarget) <= 1f)
         {
             // Self-loop -> Enter this state again.
             manager.ChangeState(manager.carryFoodIRState);
