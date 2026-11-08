@@ -69,6 +69,10 @@ public class SingleplayerAntWorld : MonoBehaviour, IAntWorld
     private float lastHealTime;
 
 
+    // Temp: For testing
+    public bool problematic = false;
+    public bool Problematic => problematic;
+
     void Awake()
     {
         healthScript = GetComponent<SHealth>();
@@ -188,10 +192,13 @@ public class SingleplayerAntWorld : MonoBehaviour, IAntWorld
         Vector2 waypoint = currentPath[currentWaypointIndex];
         Vector2 currentPos = transform.position;
         Vector2 direction = (waypoint - currentPos);
+        if (problematic)
+            Debug.Log($"Initial. Waypoint:{waypoint}, current:{currentPos}, direction:{direction}");
 
         float distance = direction.magnitude;
         if (distance <= waypointReachDistance)
         {
+            
             currentWaypointIndex++;
 
             if (currentWaypointIndex >= currentPath.Count)
@@ -203,6 +210,9 @@ public class SingleplayerAntWorld : MonoBehaviour, IAntWorld
             waypoint = currentPath[currentWaypointIndex];
 
             direction = waypoint - (Vector2)transform.position;
+
+            if (problematic)
+                Debug.Log($"Reached Waypoint. New waypoint:{waypoint}, New direction: {direction}, Transform.position: {(Vector2)transform.position}");
         }
 
         direction.Normalize();
@@ -211,9 +221,18 @@ public class SingleplayerAntWorld : MonoBehaviour, IAntWorld
 
         float moveDistance = moveSpeed * Time.deltaTime;
 
+        //transform.position += (Vector3)(direction * moveDistance);
+
+        distance = direction.magnitude;
         if (moveDistance >= distance)
         {
             transform.position = waypoint;
+            if (problematic)
+            {
+                Debug.Log($"{moveDistance} >= {distance}");
+                Debug.Log(waypoint);
+                Debug.Log(currentPos);
+            }
         }
         else
         {

@@ -15,6 +15,7 @@ using Ant.AI;
 /// </summary>
 public interface IAntWorld
 {
+    bool Problematic { get;  }
     AntType Type { get; }
     float DeltaTime { get; }
 

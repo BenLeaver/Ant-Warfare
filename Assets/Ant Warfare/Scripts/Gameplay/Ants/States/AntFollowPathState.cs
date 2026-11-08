@@ -31,10 +31,11 @@ public class AntFollowPathState : BaseAntState
 
         if (!isResuming)
         {
+            //Debug.Log($"Entering FollowPath state for the first time and moving towards: {context.LocalTarget}");
             context.UltimateTarget = target; 
             context.LocalTarget = context.GetValidPointWithinRange(target, 0f, 7.5f);
         }
-
+        
         context.World.SetDestination(context.LocalTarget);
     }
 
@@ -47,6 +48,7 @@ public class AntFollowPathState : BaseAntState
 
         if (Vector3.Distance(context.World.Position, context.LocalTarget) <= 2f)
         {
+            //Debug.Log($"FollowPath Local target reached");
             manager.DecideNextState();
             return;
         }
@@ -57,6 +59,7 @@ public class AntFollowPathState : BaseAntState
         // If it was disrupted somehow, and the path is lost, sets destination again.
         if (!context.World.HasActivePath())
         {
+            Debug.Log("Resetting destination in FollowPath update state.");
             context.World.SetDestination(context.LocalTarget);
         }
     }

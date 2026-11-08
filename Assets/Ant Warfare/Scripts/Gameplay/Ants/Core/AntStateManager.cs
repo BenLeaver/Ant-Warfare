@@ -43,7 +43,7 @@ public class AntStateManager
     // Anti-infinite-loop guard
     private int lastStateChangeFrame = -1;
     private int stateChangesThisFrame = 0;
-    private const int MaxStateChangesPerFrame = 5;
+    private const int MaxStateChangesPerFrame = 3;
 
     public AntStateManager(AntContext context)
     {
@@ -81,6 +81,12 @@ public class AntStateManager
     /// </summary>
     public void ChangeState(BaseAntState newState, Vector3 target = default, int subtype = 0)
     {
+        if (context.World.Problematic)
+        {
+            Debug.Log($"{Time.frameCount} {CurrentStateType} -> {newState.StateType}");
+        }
+        
+
         // Infinite loop guard
         if (Time.frameCount == lastStateChangeFrame)
         {

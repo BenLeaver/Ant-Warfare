@@ -101,8 +101,11 @@ namespace Ant.Navigation
         {
             List<Vector2> path = pathfinder.FindPath(OverworldGrid, start, end);
 
-            if (path == null) return null;
-
+            if (path == null)
+            {
+                return null;
+            }
+                
             return SmoothPath(path);
         }
 
