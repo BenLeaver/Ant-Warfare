@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using UnityEngine;
 using Ant.AI;
 
@@ -25,7 +24,7 @@ public class AntFoodIRState : BaseAntState
     public override void EnterState(Vector3 target = default, int subtype = 0, bool isResuming = false)
     {
         base.EnterState(target, subtype, isResuming);
-        maxDuration = 30f;
+        maxDuration = 10f;
         currentDuration = 0f;
         foodUpdateTimer = 0f;
         IRCheckTimer = 0f;
@@ -46,7 +45,6 @@ public class AntFoodIRState : BaseAntState
         IRCheckTimer += deltaTime;
         if (CheckInterrupts()) return;
 
-
         foodUpdateTimer += deltaTime;
 
         GameObject food = context.CurrentFoodTarget;
@@ -57,8 +55,8 @@ public class AntFoodIRState : BaseAntState
             if (!UpdateFoodTarget()) return;
             context.LocalTarget = context.CurrentFoodTarget.transform.position;
             context.World.SetDestination(context.LocalTarget);
+            food = context.CurrentFoodTarget;
         }
-
 
         float foodDist = Vector3.Distance(context.World.MouthPosition, food.transform.position);
         if (foodDist > context.SightRange)
@@ -67,8 +65,6 @@ public class AntFoodIRState : BaseAntState
             manager.PopInterrupt();
             return;
         }
-
-        context.FaceLocalTarget();
 
         if (foodDist <= context.PickupRange)
         {

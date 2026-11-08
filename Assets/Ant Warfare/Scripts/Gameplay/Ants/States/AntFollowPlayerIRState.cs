@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using UnityEngine;
 using Ant.AI;
 
@@ -52,8 +51,6 @@ public class AntFollowPlayerIRState : BaseAntState
         updateTargetTimer += deltaTime;
         if (CheckInterrupts()) return;
 
-        context.FaceLocalTarget();
-
         if (updateTargetTimer >= 1f)
         {
             updateTargetTimer = 0f;
@@ -99,7 +96,7 @@ public class AntFollowPlayerIRState : BaseAntState
         if (closest == null) return false;
 
         float dist = Vector3.Distance(closest.transform.position, context.World.Position);
-        if (dist < context.SightRange / 2)
+        if (dist < context.SightRange / 4)
         {
             // Enemy in sight - interrupt.
             manager.PushInterrupt(manager.enemyIRState);
@@ -115,7 +112,7 @@ public class AntFollowPlayerIRState : BaseAntState
         if (closest == null) return false;
 
         float dist = Vector3.Distance(closest.transform.position, context.World.Position);
-        if (dist < context.SightRange / 2)
+        if (dist < context.SightRange / 4)
         {
             // Food in sight - interrupt.
             manager.PushInterrupt(manager.foodIRState);
