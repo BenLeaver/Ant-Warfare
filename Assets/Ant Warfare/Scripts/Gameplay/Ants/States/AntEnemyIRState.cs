@@ -31,11 +31,13 @@ public class AntEnemyIRState : BaseAntState
         enemyUpdateTimer = 0f;
         pathUpdateTimer = 0f;
 
+        context.DisableAutoRotation();
         context.CurrentEnemyTarget = context.World.FindClosestEnemy();
 
         if (context.CurrentEnemyTarget == null)
         {
             manager.PopInterrupt();
+            context.EnableAutoRotation();
             return;
         }
 
@@ -57,7 +59,11 @@ public class AntEnemyIRState : BaseAntState
         if (enemyUpdateTimer > 1f || context.CurrentEnemyTarget == null || context.CurrentEnemyTarget.go == null)
         {
             enemyUpdateTimer = 0f;
-            if (!UpdateEnemyTarget()) return;
+            if (!UpdateEnemyTarget())
+            {
+                context.EnableAutoRotation();
+                return;
+            }
         }
 
         Vector3 enemyPosition = context.CurrentEnemyTarget.transform.position;
@@ -67,6 +73,7 @@ public class AntEnemyIRState : BaseAntState
         {
             // Enemy is outside of sight range -> stop interrupt.
             manager.PopInterrupt();
+            context.EnableAutoRotation();
             return;
         }
 
@@ -94,9 +101,6 @@ public class AntEnemyIRState : BaseAntState
             {
                 context.World.StopMovement();
             }
-
-            // Rotate to face enemy. Since ant is standing still now, this is not done by movement system.
-            context.FacePoint(enemyPosition);
             
             if (context.AttackTimer > context.AttackDelay)
             {
@@ -104,6 +108,8 @@ public class AntEnemyIRState : BaseAntState
                 context.AttackEnemy();
             }
         }
+
+        context.FacePoint(enemyPosition);
     }
 
     private bool UpdateEnemyTarget()

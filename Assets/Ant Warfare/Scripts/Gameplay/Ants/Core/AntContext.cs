@@ -104,4 +104,16 @@ public class AntContext
     {
         return World.GetReachableGridPoint(origin, minRange, maxRange);
     }
+
+    public void DisableAutoRotation()
+    {
+        World.AutoRotate = false;
+    }
+
+    public void EnableAutoRotation()
+    {
+        World.AutoRotate = true;
+    }
+
+
 }

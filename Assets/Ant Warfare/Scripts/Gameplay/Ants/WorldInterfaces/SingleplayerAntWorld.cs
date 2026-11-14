@@ -58,6 +58,12 @@ public class SingleplayerAntWorld : MonoBehaviour, IAntWorld
     public List<Vector2> CurrentPath => currentPath;
     public int CurrentWaypointIndex => currentWaypointIndex;
 
+    private bool autoRotate = true;
+    public bool AutoRotate {
+        get => autoRotate;
+        set => autoRotate = value;
+    }
+
     [SerializeField] private float waypointReachDistance = 0.5f;
 
     private bool isDying = false;
@@ -231,7 +237,11 @@ public class SingleplayerAntWorld : MonoBehaviour, IAntWorld
         
         direction.Normalize();
 
-        SetRotation(direction);
+        if (autoRotate)
+        {
+            // Autorotate to where the ant is moving towards.
+            SetRotation(direction);
+        }
 
         float moveDistance = moveSpeed * Time.deltaTime;
 

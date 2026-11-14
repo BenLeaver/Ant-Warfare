@@ -39,6 +39,7 @@ public interface IAntWorld
     Vector3 FindClosestReachablePoint(Vector3 target);
 
     float MoveSpeed { get; }
+    bool AutoRotate { get; set; }
 
     // Perception
     Vector3 Position { get; }
