@@ -64,6 +64,10 @@ public class SingleplayerAntWorld : MonoBehaviour, IAntWorld
         set => autoRotate = value;
     }
 
+    [Header("Separation")]
+    [SerializeField] private float separationRadius = 2.0f;
+    [SerializeField] private float separationWeight = 3.0f;
+
     [SerializeField] private float waypointReachDistance = 0.5f;
 
     private bool isDying = false;
@@ -197,7 +201,41 @@ public class SingleplayerAntWorld : MonoBehaviour, IAntWorld
             rotationSpeed * Time.deltaTime);
     }
 
-    // New Movement
+    private Vector2 CalculateSeparationForce()
+    {
+        Vector2 force = Vector2.zero;
+
+        List<UnitInfo> nearbyUnits = UnitManager.Instance.GetNearbyUnits(transform.position);
+
+        foreach (UnitInfo unit in nearbyUnits)
+        {
+            if (unit == myInfo)
+                continue;
+
+            if (unit.team != myInfo.team)
+                continue;
+
+            Vector2 offset =
+                (Vector2)transform.position -
+                (Vector2)unit.transform.position;
+
+            float distance = offset.magnitude;
+
+            if (distance < 0.001f)
+                continue;
+
+            if (distance > separationRadius)
+                continue;
+
+            float strength = (separationRadius - distance) / separationRadius;
+
+            force +=
+                offset.normalized * strength;
+        }
+
+        return force;
+    }
+
     private void UpdatePathMovement()
     {
         if (currentPath == null)
@@ -237,10 +275,22 @@ public class SingleplayerAntWorld : MonoBehaviour, IAntWorld
         
         direction.Normalize();
 
+        Vector2 separation = CalculateSeparationForce() * separationWeight;
+        Vector2 finalDirection = direction + separation;
+
+        if (finalDirection.sqrMagnitude > 0.0001f)
+        {
+            finalDirection.Normalize();
+        }
+        else
+        {
+            finalDirection = direction;
+        }
+
         if (autoRotate)
         {
             // Autorotate to where the ant is moving towards.
-            SetRotation(direction);
+            SetRotation(finalDirection);
         }
 
         float moveDistance = moveSpeed * Time.deltaTime;
@@ -258,7 +308,7 @@ public class SingleplayerAntWorld : MonoBehaviour, IAntWorld
         }
         else
         {
-            transform.position += (Vector3)(direction * moveDistance);
+            transform.position += (Vector3)(finalDirection * moveDistance);
         }
     }
 
