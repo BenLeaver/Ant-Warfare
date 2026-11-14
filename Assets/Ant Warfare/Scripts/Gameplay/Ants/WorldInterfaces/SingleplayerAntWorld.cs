@@ -65,8 +65,15 @@ public class SingleplayerAntWorld : MonoBehaviour, IAntWorld
     }
 
     [Header("Separation")]
-    [SerializeField] private float separationRadius = 2.0f;
-    [SerializeField] private float separationWeight = 3.0f;
+    [SerializeField] private float separationRadius = 3.0f;
+    [SerializeField] private float separationWeight = 1.0f;
+
+    private struct SeparationData
+    {
+        public Vector2 force;
+        public int nearbyFriendlies;
+    }
+
 
     [SerializeField] private float waypointReachDistance = 0.5f;
 
@@ -201,6 +208,45 @@ public class SingleplayerAntWorld : MonoBehaviour, IAntWorld
             rotationSpeed * Time.deltaTime);
     }
 
+    private SeparationData CalculateSeparation()
+    {
+        SeparationData result = new SeparationData();
+
+        List<UnitInfo> nearbyUnits = UnitManager.Instance.GetNearbyUnits(transform.position);
+
+        foreach (UnitInfo unit in nearbyUnits)
+        {
+            if (unit == myInfo)
+                continue;
+
+            if (unit.team != myInfo.team)
+                continue;
+
+            Vector2 offset =
+                (Vector2)transform.position -
+                (Vector2)unit.transform.position;
+
+            float distance = offset.magnitude;
+
+            if (distance < 0.001f)
+                continue;
+
+            if (distance > separationRadius)
+                continue;
+
+            result.nearbyFriendlies++;
+
+            float t = (separationRadius - distance) / separationRadius;
+
+            // Cubic falloff - weak until ants are very close
+            float strength = t;
+
+            result.force += offset.normalized * strength;
+        }
+
+        return result;
+    }
+
     private Vector2 CalculateSeparationForce()
     {
         Vector2 force = Vector2.zero;
@@ -227,13 +273,35 @@ public class SingleplayerAntWorld : MonoBehaviour, IAntWorld
             if (distance > separationRadius)
                 continue;
 
-            float strength = (separationRadius - distance) / separationRadius;
+            float t = (separationRadius - distance) / separationRadius;
+
+            // Cubic falloff - weak until ants are very close
+            float strength = t * t * t;
 
             force +=
                 offset.normalized * strength;
         }
 
         return force;
+    }
+
+    private bool IsSpaceOccupied(
+        Vector2 position, 
+        float radius)
+    {
+        var nearbyUnits = UnitManager.Instance.GetNearbyUnits(position);
+
+        foreach (var unit in nearbyUnits)
+        {
+            if (unit == myInfo)
+                continue;
+
+            float dist = Vector2.Distance(position, unit.transform.position);
+
+            if (dist < radius) return true;
+        }
+
+        return false;
     }
 
     private void UpdatePathMovement()
@@ -275,7 +343,9 @@ public class SingleplayerAntWorld : MonoBehaviour, IAntWorld
         
         direction.Normalize();
 
-        Vector2 separation = CalculateSeparationForce() * separationWeight;
+        var separationData = CalculateSeparation();
+
+        Vector2 separation = separationData.force * separationWeight;
         Vector2 finalDirection = direction + separation;
 
         if (finalDirection.sqrMagnitude > 0.0001f)
@@ -292,8 +362,24 @@ public class SingleplayerAntWorld : MonoBehaviour, IAntWorld
             // Autorotate to where the ant is moving towards.
             SetRotation(finalDirection);
         }
+        
+        // Congestion slowdown
+        float congestionMultiplier = 1f;
+        
+        if (separationData.nearbyFriendlies > 2)
+        {
+            congestionMultiplier = 0.75f;
+        }
+        if (separationData.nearbyFriendlies > 4)
+        {
+            congestionMultiplier = 0.5f;
+        }
+        if (separationData.nearbyFriendlies > 7)
+        {
+            congestionMultiplier = 0.25f;
+        }
 
-        float moveDistance = moveSpeed * Time.deltaTime;
+        float moveDistance = moveSpeed * congestionMultiplier * Time.deltaTime;
 
         //transform.position += (Vector3)(direction * moveDistance);
         if (moveDistance >= distance)
