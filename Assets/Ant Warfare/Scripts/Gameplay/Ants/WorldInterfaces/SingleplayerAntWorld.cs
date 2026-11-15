@@ -66,7 +66,7 @@ public class SingleplayerAntWorld : MonoBehaviour, IAntWorld
 
     [Header("Separation")]
     [SerializeField] private float separationRadius = 3.0f;
-    [SerializeField] private float separationWeight = 1.0f;
+    [SerializeField] private float separationWeight = 0.4f;
 
     private struct SeparationData
     {
@@ -238,7 +238,6 @@ public class SingleplayerAntWorld : MonoBehaviour, IAntWorld
 
             float t = (separationRadius - distance) / separationRadius;
 
-            // Cubic falloff - weak until ants are very close
             float strength = t;
 
             result.force += offset.normalized * strength;
@@ -247,48 +246,13 @@ public class SingleplayerAntWorld : MonoBehaviour, IAntWorld
         return result;
     }
 
-    private Vector2 CalculateSeparationForce()
-    {
-        Vector2 force = Vector2.zero;
-
-        List<UnitInfo> nearbyUnits = UnitManager.Instance.GetNearbyUnits(transform.position);
-
-        foreach (UnitInfo unit in nearbyUnits)
-        {
-            if (unit == myInfo)
-                continue;
-
-            if (unit.team != myInfo.team)
-                continue;
-
-            Vector2 offset =
-                (Vector2)transform.position -
-                (Vector2)unit.transform.position;
-
-            float distance = offset.magnitude;
-
-            if (distance < 0.001f)
-                continue;
-
-            if (distance > separationRadius)
-                continue;
-
-            float t = (separationRadius - distance) / separationRadius;
-
-            // Cubic falloff - weak until ants are very close
-            float strength = t * t * t;
-
-            force +=
-                offset.normalized * strength;
-        }
-
-        return force;
-    }
-
-    private bool IsSpaceOccupied(
+    private bool IsPositionOccupied(
         Vector2 position, 
         float radius)
     {
+
+        // Can I safely move this frame?
+        // TODO: Use more efficient check
         var nearbyUnits = UnitManager.Instance.GetNearbyUnits(position);
 
         foreach (var unit in nearbyUnits)
@@ -357,12 +321,6 @@ public class SingleplayerAntWorld : MonoBehaviour, IAntWorld
             finalDirection = direction;
         }
 
-        if (autoRotate)
-        {
-            // Autorotate to where the ant is moving towards.
-            SetRotation(finalDirection);
-        }
-        
         // Congestion slowdown
         float congestionMultiplier = 1f;
         
@@ -370,17 +328,40 @@ public class SingleplayerAntWorld : MonoBehaviour, IAntWorld
         {
             congestionMultiplier = 0.75f;
         }
-        if (separationData.nearbyFriendlies > 4)
+        if (separationData.nearbyFriendlies > 3)
         {
             congestionMultiplier = 0.5f;
         }
-        if (separationData.nearbyFriendlies > 7)
+        if (separationData.nearbyFriendlies > 4)
         {
             congestionMultiplier = 0.25f;
+        }
+        if (separationData.nearbyFriendlies > 5)
+        {
+            congestionMultiplier = 0.1f;
         }
 
         float moveDistance = moveSpeed * congestionMultiplier * Time.deltaTime;
 
+        Vector2 desiredPosition = currentPos + finalDirection * moveDistance;
+        bool occupied = IsPositionOccupied(desiredPosition, 0.3f);
+
+        if (occupied && separationData.nearbyFriendlies > 4)
+        {
+            Debug.Log("Extremely crowded");
+            // If it is extremely crowded (e.g. chokepoints) hard stop.
+            moveDistance = 0f;
+        }
+        else if (occupied)
+        {
+            moveDistance *= 0.25f;
+        }
+
+        if (autoRotate)
+        {
+            // Autorotate to where the ant is moving towards.
+            SetRotation(finalDirection);
+        }
         //transform.position += (Vector3)(direction * moveDistance);
         if (moveDistance >= distance)
         {
