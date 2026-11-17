@@ -65,8 +65,8 @@ public class SingleplayerAntWorld : MonoBehaviour, IAntWorld
     }
 
     [Header("Separation")]
-    [SerializeField] private float separationRadius = 3.0f;
-    [SerializeField] private float separationWeight = 0.4f;
+    [SerializeField] private float separationRadius = 4.0f;
+    [SerializeField] private float separationWeight = 0.5f;
 
     private struct SeparationData
     {
@@ -208,7 +208,7 @@ public class SingleplayerAntWorld : MonoBehaviour, IAntWorld
             rotationSpeed * Time.deltaTime);
     }
 
-    private SeparationData CalculateSeparation()
+    private SeparationData CalculateSeparation(Vector2 moveDirection)
     {
         SeparationData result = new SeparationData();
 
@@ -240,7 +240,34 @@ public class SingleplayerAntWorld : MonoBehaviour, IAntWorld
 
             float strength = t;
 
-            result.force += offset.normalized * strength;
+            // Higher influence for ants in front
+            Vector2 toOther = ((Vector2)unit.transform.position - (Vector2)transform.position).normalized;
+
+            float ahead = Vector2.Dot(moveDirection, toOther);
+
+            float directionalWeight;
+            if (ahead > 0.5f)
+            {
+                // Mostly in front
+                directionalWeight = 2f;
+            }
+            else if (ahead > 0f)
+            {
+                // Slightly in front
+                directionalWeight = 1.5f;
+            }
+            else if (ahead > -0.5f)
+            {
+                // To the side
+                directionalWeight = 1f;
+            }
+            else
+            {
+                // Mostly behind
+                directionalWeight = 0.25f;
+            }
+
+            result.force += offset.normalized * strength * directionalWeight;
         }
 
         return result;
@@ -307,14 +334,37 @@ public class SingleplayerAntWorld : MonoBehaviour, IAntWorld
         
         direction.Normalize();
 
-        var separationData = CalculateSeparation();
+        var separationData = CalculateSeparation(direction);
 
-        Vector2 separation = separationData.force * separationWeight;
+        // Reduce separation forces when crowded
+        float crowdReduction = 1f;
+        if (separationData.nearbyFriendlies > 3)
+        {
+            crowdReduction = 0.75f;
+        }
+        else if (separationData.nearbyFriendlies > 5)
+        {
+            crowdReduction = 0.5f;
+        }
+        else if (separationData.nearbyFriendlies > 8)
+        {
+            crowdReduction = 0.25f;
+        }
+        Vector2 separation = separationData.force * separationWeight * crowdReduction;
+
         Vector2 finalDirection = direction + separation;
 
         if (finalDirection.sqrMagnitude > 0.0001f)
         {
             finalDirection.Normalize();
+
+            float forwardDot = Vector2.Dot(finalDirection, direction);
+
+            // Never let separation cause backwards movement.
+            if (forwardDot < 0f)
+            {
+                finalDirection = direction;
+            }
         }
         else
         {
@@ -324,37 +374,35 @@ public class SingleplayerAntWorld : MonoBehaviour, IAntWorld
         // Congestion slowdown
         float congestionMultiplier = 1f;
         
-        if (separationData.nearbyFriendlies > 2)
-        {
-            congestionMultiplier = 0.75f;
-        }
         if (separationData.nearbyFriendlies > 3)
         {
-            congestionMultiplier = 0.5f;
+            congestionMultiplier = 0.9f;
         }
         if (separationData.nearbyFriendlies > 4)
         {
-            congestionMultiplier = 0.25f;
+            congestionMultiplier = 0.8f;
         }
         if (separationData.nearbyFriendlies > 5)
         {
-            congestionMultiplier = 0.1f;
+            congestionMultiplier = 0.7f;
+        }
+        if (separationData.nearbyFriendlies > 6)
+        {
+            congestionMultiplier = 0.6f;
+        }
+        if (separationData.nearbyFriendlies > 8)
+        {
+            congestionMultiplier = 0.5f;
         }
 
         float moveDistance = moveSpeed * congestionMultiplier * Time.deltaTime;
 
         Vector2 desiredPosition = currentPos + finalDirection * moveDistance;
-        bool occupied = IsPositionOccupied(desiredPosition, 0.3f);
+        bool occupied = IsPositionOccupied(desiredPosition, 0.2f);
 
-        if (occupied && separationData.nearbyFriendlies > 4)
+        if (occupied)
         {
-            Debug.Log("Extremely crowded");
-            // If it is extremely crowded (e.g. chokepoints) hard stop.
-            moveDistance = 0f;
-        }
-        else if (occupied)
-        {
-            moveDistance *= 0.25f;
+            moveDistance *= 0.75f;
         }
 
         if (autoRotate)
