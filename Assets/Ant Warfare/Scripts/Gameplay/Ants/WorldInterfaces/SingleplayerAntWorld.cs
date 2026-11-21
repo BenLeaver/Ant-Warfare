@@ -65,8 +65,8 @@ public class SingleplayerAntWorld : MonoBehaviour, IAntWorld
     }
 
     [Header("Separation")]
-    [SerializeField] private float separationRadius = 2.0f;
-    [SerializeField] private float separationWeight = 3.0f;
+    private float separationRadius = 5.0f;
+    private float separationWeight = 0.5f;
 
     [SerializeField] private float waypointReachDistance = 0.5f;
 
@@ -227,7 +227,8 @@ public class SingleplayerAntWorld : MonoBehaviour, IAntWorld
             if (distance > separationRadius)
                 continue;
 
-            float strength = (separationRadius - distance) / separationRadius;
+            //float strength = (separationRadius - distance) / separationRadius;
+            float strength = 0.1f;
 
             force +=
                 offset.normalized * strength;
