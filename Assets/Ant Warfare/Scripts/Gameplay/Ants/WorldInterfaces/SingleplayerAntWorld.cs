@@ -66,7 +66,7 @@ public class SingleplayerAntWorld : MonoBehaviour, IAntWorld
 
     [Header("Separation")]
     private float separationRadius = 5.0f;
-    private float separationWeight = 0.5f;
+    private float separationWeight = 0.3f;
 
     [Header("Collision Separation")]
     [SerializeField] private float collisionRadius = 0.4f;
@@ -150,7 +150,6 @@ public class SingleplayerAntWorld : MonoBehaviour, IAntWorld
         stateManager.StopPlayerIR();
     }
 
-    // Update is called once per frame
     void Update()
     {
         if (problematic)
@@ -283,24 +282,55 @@ public class SingleplayerAntWorld : MonoBehaviour, IAntWorld
         direction.Normalize();
 
         Vector2 separation = CalculateSeparationForce() * separationWeight;
-        Vector2 finalDirection = direction + separation;
 
-        if (finalDirection.sqrMagnitude > 0.0001f)
+        // Preferred movement direction including separation.
+        Vector2 separatedDirection = direction + separation;
+        if (separatedDirection.sqrMagnitude > 0.0001f)
         {
-            finalDirection.Normalize();
+            separatedDirection.Normalize();
         }
         else
         {
-            finalDirection = direction;
+            separatedDirection = direction;
         }
+
+        float moveDistance = moveSpeed * Time.deltaTime;
+
+        // Check whether separation would push onto non-walkable terrain.
+        NavigationGrid grid =
+            NavigationManager.Instance.OverworldGrid;
+
+        Vector2 separatedCandidatePos =
+            currentPos +
+            separatedDirection * moveDistance;
+
+        bool canUseSeparation = false;
+
+        if (grid != null)
+        {
+            Vector2Int candidateCell =
+                grid.WorldToCell(separatedCandidatePos);
+
+            NavigationCell navCell =
+                grid.GetCell(candidateCell);
+
+            canUseSeparation =
+                navCell != null &&
+                navCell.Walkable;
+        }
+
+        // If separation would move us into a wall,
+        // fall back to pure path following.
+        Vector2 finalDirection =
+            canUseSeparation
+                ? separatedDirection
+                : direction;
 
         if (autoRotate)
         {
             // Autorotate to where the ant is moving towards.
             SetRotation(finalDirection);
         }
-
-        float moveDistance = moveSpeed * Time.deltaTime;
 
         //transform.position += (Vector3)(direction * moveDistance);
         if (moveDistance >= distance)
@@ -376,8 +406,25 @@ public class SingleplayerAntWorld : MonoBehaviour, IAntWorld
 
         if (push.sqrMagnitude > 0.0001f)
         {
-            transform.position +=
-                (Vector3)(push * collisionPushStrength);
+            Vector2 pushOffset = push * collisionPushStrength;
+            Vector2 candidatePos = (Vector2)transform.position + pushOffset;
+
+            NavigationGrid grid =
+                NavigationManager.Instance.OverworldGrid;
+
+            Vector2Int cell =
+                grid.WorldToCell(candidatePos);
+
+            NavigationCell navCell =
+                grid.GetCell(cell);
+
+            if (navCell != null &&
+                navCell.Walkable)
+            {
+                transform.position = candidatePos;
+            }
+
+            // TODO: Slide along valid axes
         }
     }
 
