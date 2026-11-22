@@ -68,6 +68,10 @@ public class SingleplayerAntWorld : MonoBehaviour, IAntWorld
     private float separationRadius = 5.0f;
     private float separationWeight = 0.5f;
 
+    [Header("Collision Separation")]
+    [SerializeField] private float collisionRadius = 0.4f;
+    [SerializeField] private float collisionPushStrength = 0.5f;
+
     [SerializeField] private float waypointReachDistance = 0.5f;
 
     private bool isDying = false;
@@ -164,6 +168,8 @@ public class SingleplayerAntWorld : MonoBehaviour, IAntWorld
         stateManager.Tick(Time.deltaTime);
 
         UpdatePathMovement();
+
+        ResolveOverlaps();
 
         // Keep carried food attached to mouth
         if (foodCarried != null)
@@ -328,6 +334,51 @@ public class SingleplayerAntWorld : MonoBehaviour, IAntWorld
 
         currentPath = null;
         currentWaypointIndex = 0;
+    }
+
+    private void ResolveOverlaps()
+    {
+        List<UnitInfo> nearbyUnits =
+            UnitManager.Instance.GetNearbyUnits(transform.position);
+
+        Vector2 push = Vector2.zero;
+
+        foreach (UnitInfo unit in nearbyUnits)
+        {
+            if (unit == myInfo)
+                continue;
+
+            Vector2 offset =
+                (Vector2)transform.position -
+                (Vector2)unit.transform.position;
+
+            float distance = offset.magnitude;
+
+            float minDistance =
+                collisionRadius * 2f;
+
+            if (distance < 0.001f)
+            {
+                offset = Random.insideUnitCircle.normalized;
+                distance = 0.001f;
+            }
+
+            if (distance >= minDistance)
+                continue;
+
+            float overlap =
+                minDistance - distance;
+
+            push +=
+                offset.normalized *
+                overlap;
+        }
+
+        if (push.sqrMagnitude > 0.0001f)
+        {
+            transform.position +=
+                (Vector3)(push * collisionPushStrength);
+        }
     }
 
     public bool HasReached(Vector3 target, float threshold)
