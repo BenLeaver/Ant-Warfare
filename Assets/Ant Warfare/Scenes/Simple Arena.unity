@@ -86664,7 +86664,7 @@ MonoBehaviour:
     m_ColorSpace: -1
     m_NumColorKeys: 8
     m_NumAlphaKeys: 2
-  cycleDuration: 120
+  cycleDuration: 240
   bugPrefabs:
   - {fileID: 4408639761703185043, guid: dcca6365c4a5a3547b09caafba6db883, type: 3}
   - {fileID: 4408639761703185043, guid: 8245ef98774af964684d4945d1d2497f, type: 3}
